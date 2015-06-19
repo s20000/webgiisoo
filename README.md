@@ -1,3 +1,3 @@
 # webgiisoo
-java web framework, a runntime module management
+java web framework, and a system of module/plugin management
 
