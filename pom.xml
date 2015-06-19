@@ -307,7 +307,7 @@
 						<goals>
 							<goal>jar</goal>
 						</goals>
-						<phase>package, install</phase>
+						<phase>prepare-package</phase>
 						<configuration>
 							<classifier>framework-${project.version}</classifier>
 							<includes>
@@ -384,7 +384,6 @@
 					</execution>
 				</executions>
 			</plugin>
-
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
