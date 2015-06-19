@@ -1,0 +1,30 @@
+#parse('user/head.html')
+
+<div id="content">
+	<div class='center'>
+		<div class='outter'>
+			<div class='inner'>
+				<form method="post" class="forget">
+				#if($message)<div class='message'>$message</div>#end
+					<div class="title">
+						<span class="lock"></span>$lang.get('user.forget')!
+					</div>
+					<div class="left">
+						<div><label>$lang.get('label.input_email'):</label><input type="text" name="email" value=""></div>
+						<div class="terms">
+						</div>
+						<div class="btn">
+							<button type="submit">$lang.get('btn.sendemail')</button>
+						</div>
+					</div>
+					<div class="right">
+						<a href="/user/login">$lang.get('a.i_have_account')</a>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+#parse('user/foot.html')
+	

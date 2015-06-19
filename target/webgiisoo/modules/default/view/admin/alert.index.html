@@ -1,0 +1,37 @@
+<div class='head'>$lang.get('alert.index.title')</div>
+
+#parse('/widget/widget.message.html')
+
+<div class='tabs'>
+	<a href='/admin/alert/index' class='selected' >$lang.get('a.alert')</a>
+</div>
+
+<table id='user-table' class='tablesorter nospace' border="0" cellpadding="0" cellspacing="1">
+	<thead>
+		<tr>
+			<th>$lang.get('head.to')</th>
+			<th>$lang.get('head.tag')</th>
+			<th>$lang.get('head.content')</th>
+			<th>$lang.get('head.state')</th>
+			<th>$lang.get('head.sent')</th>
+		</tr>
+	</thead>
+	<tbody>
+#foreach($f in $list)
+	<tr>
+		<td>$f.number</td>
+		<td>#if($f.tag)$lang.get("alert.tag_$f.tag")#end</td>
+		<td>#if($f.content)$f.content#end</td>
+		<td>$lang.get("alert.state_$f.state")</td>
+		<td>$lang.format($f.sent, 'yyyy-MM-dd hh:mm:ss')</td>
+	</tr>
+#end
+	</tbody>
+</table>
+
+ #parse('/widget/goto.page.html')
+
+<script>
+$('#user-table').tablesorter();
+
+</script>

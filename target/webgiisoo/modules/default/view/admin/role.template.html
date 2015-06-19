@@ -1,0 +1,28 @@
+<script>
+	var template = {};
+	template.admin = ['access.dict.admin', 'access.efile.admin'];
+	template.roleadmin = ['access.config.query', 'access.dict.export'];
+	template.user = ['access.dict.query'];
+
+	$(function(){
+		$('select[name=template]').change(function(e){
+			var v = $(this).val();
+			console.log(this);
+			
+			//clean all
+			$('#access-table td input[type=checkbox]').each(function(i, e){
+				e.checked = false;
+			});
+			
+			if(v !== '') {
+				$(template[v]).each(function(i, s){
+					$('#access-table td input[type=checkbox][name=access]').each(function(i, e){
+						if(e.value == s) {
+							e.checked = true;
+						}
+					});
+				});
+			}
+		});
+	})
+</script>

@@ -1,0 +1,12 @@
+<div class='head'>$lang.get('myspace.add.title')</div>
+
+#parse('/widget/widget.message.html')
+
+#parse('/widget/file.uploader.html')
+
+<script>
+$('#fileupload').on('fileuploaddone', function (e, data) {
+	load('/admin/myspace');
+});
+</script>
+

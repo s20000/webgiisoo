@@ -1,0 +1,35 @@
+<div class='head'>$lang.get('title.import.upgrade')</div>
+
+<div class='btns'>
+	<a href='/admin/importupgrade/add'>$lang.get('a.module.add')</a>
+</div>
+
+#parse('/widget/widget.message.html')
+
+<table id='user-table' class='tablesorter' border="0" cellpadding="0" cellspacing="1">
+	<thead>
+		<tr>
+			<th>$lang.get('head.name')</th>
+			<th>$lang.get('head.created')</th>
+			<th>$lang.get('head.size')</th>
+			<th></th>
+		</tr>
+	</thead>
+	<tbody>
+#foreach($f in $list)
+	<tr>
+		<td>$f.name</td>
+		<td>$lang.format($f.lastModified())</td>
+		<td>$lang.size($f.length())</td>
+		<td>
+			<a href='/admin/importupgrade/apply?name=$f.name'>$lang.get('a.apply')</a>
+			<a class='delete' href='/admin/importupgrade/delete?name=$f.name'>$lang.get('a.delete')</a>
+		</td>
+	</tr>
+#end
+	</tbody>
+</table>
+
+<script>
+	$('#user-table').tablesorter();
+</script>

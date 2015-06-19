@@ -1,0 +1,30 @@
+<div class='head'>$lang.get('export.upgrade.index.title')</div>
+
+<script type="text/javascript" src="/js/jquery.filedownload.js"></script>
+
+#parse('/widget/widget.message.html')
+
+<table id='user-table' class='tablesorter' border="0" cellpadding="0" cellspacing="1">
+	<thead>
+		<tr>
+			<th>$lang.get('head.name')</th>
+			<th>$lang.get('head.created')</th>
+			<th>$lang.get('head.size')</th>
+			<th></th>
+		</tr>
+	</thead>
+	<tbody>
+#foreach($f in $list)
+	<tr>
+		<td><a href='javascript:;' onclick='$.download("/tmp/export/$f.name")'>$f.name</a></td>
+		<td>$lang.format($f.lastModified())</td>
+		<td>$lang.size($f.length())</td>
+		<td><a href='/admin/exportupgrade/delete?name=$f.name'>$lang.get('a.delete')</a></td>
+	</tr>
+#end
+	</tbody>
+</table>
+
+<script>
+	$('#user-table').tablesorter();
+</script>

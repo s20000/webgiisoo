@@ -1,0 +1,17 @@
+<div class='head'>$lang.get('title.import.upgrade')</div>
+
+#parse('/widget/widget.message.html')
+
+#parse('/widget/file.uploader.html')
+
+<div class='notes'>
+	$lang.get('notes.upload.module')
+</div>
+
+<script>
+$('#fileupload').on('fileuploaddone', function (e, data) {
+	$.post('/admin/importupgrade/add', {url: data.result.url}, function(d){
+		$('#error').text(d.message);
+	});
+});
+</script>

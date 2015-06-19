@@ -1,0 +1,17 @@
+<div class='head'>$lang.get('title.add.module')</div>
+
+#parse('/widget/widget.message.html')
+
+#parse('/widget/file.uploader.html')
+
+<div class='notes'>
+	$lang.get('notes.upload.module')
+</div>
+
+<script>
+function uploaddone(url){
+	$.post('/admin/module/add', {url: url}, function(d){
+		$('#error').text(d.message);
+	});
+}
+</script>

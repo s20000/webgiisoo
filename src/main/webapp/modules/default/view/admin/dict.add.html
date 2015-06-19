@@ -1,0 +1,32 @@
+<div class='head'>$lang.get('dict.add.title')</div>
+
+#parse('/widget/widget.message.html') #parse('/admin/dict.tabs.html')
+
+<form action='/admin/dict/add' method='post' class='form'
+	enctype="multipart/form-data">
+	<input type='hidden' name='parent' value='$parent' />
+	<div>
+		<label><h3>
+				$lang.get('dict.name')(
+				<r>*</r>
+				)
+			</h3>:<input type='text' bad="1" onblur="verify(this, '/admin/dict/verify')" name='name'
+			value=#if($name) '$name' #else '' #end /></label>
+			<div class='note'></div>
+	</div>
+	<div>
+		<label><h3>
+				$lang.get('dict.display')(
+				<r>*</r>
+				)
+			</h3>:<input type='text' bad="1" onblur="verify(this, '/admin/dict/verify')" name='display'
+			value=#if($display) '$display' #else '' #end /></label>
+			<div class='note'></div>
+	</div>
+	<div>
+		<label><h3>$lang.get('label.seq')</h3>:<input type='text'
+			name='seq' value=#if($seq) '$seq' #else '' #end /></label>
+	</div>
+
+	<button type='submit'>$lang.get('btn.add')</button>
+</form>

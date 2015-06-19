@@ -1,0 +1,7 @@
+<div class='tabs'>
+	<a href='/admin/dict/root' #if($path == 'root') class='selected' #end>$lang.get('a.dict.root')</a>
+	<a href='/admin/dict/history'  #if($path == 'history') class='selected' #end >$lang.get('a.dict.history')</a>
+#if($path != 'root' && $d)
+	<a href='/admin/dict/$d.id' class='selected' >$d.name</a>
+#end
+</div>

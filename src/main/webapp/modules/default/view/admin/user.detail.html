@@ -1,0 +1,36 @@
+<div class='head'>$lang.get('user.detail.title')</div>
+
+#parse('/widget/widget.message.html')
+
+<div class='tabs'>
+	<a href='/admin/user'>$lang.get('a.user')</a>
+	<a href='/admin/user/history' >$lang.get('a.history')</a>
+	<a href='/admin/user/detail?id=$u.id' class='selected'>$lang.get('a.detail')</a>
+</div>
+
+<div class='form'>
+	<div><label><h3>$lang.get('user.name')</h3>:<i>$u.name</i></label></div>
+	<div><label><h3>$lang.get('user.nickname')</h3>:<i>#if($u.nickname) $u.nickname #end</i></label></div>
+	<div><label><h3>$lang.get('user.company')</h3>:<i>$!u.company</i></label></div>
+	<div><label><h3>$lang.get('user.department')</h3>:<i>$!u.department</i></label></div>
+	<div><label><h3>$lang.get('user.title')</h3>:<i>#if($u.title) $u.title #end </i></label></div>
+	<div><label><h3>$lang.get('user.phone')</h3>:<i>$!u.phone</i></label></div>
+	#parse('/admin/user.detail.external.html')
+	
+	<div><label><h3>$lang.get('user.roles')</h3>:[
+			#foreach($r in $u.role.list) 
+				<span class='role'>$r.name</span>
+			#end
+		]</label></div>
+	<div><label><h3>$lang.get('user.lastlogintime')</h3>:<i>$lang.format($!u.lastlogintime, 'yy-MM-dd hh:mm:ss')</i></label></div>
+	<div><label><h3>$lang.get('user.lastloginip')</h3>:<i>$!u.ip</i></label></div>
+	<div><label><h3>$lang.get('user.lastfailtime')</h3>:<i>#if($u.lastfailtime > 0)$lang.format($!u.lastfailtime, 'yy-MM-dd hh:mm:ss')($lang.past($u.lastfailtime))#end</i></label></div>
+	<div><label><h3>$lang.get('user.lastfailip')</h3>:<i>$!u.lastfailip</i></label></div>
+	<div><label><h3>$lang.get('user.failtimes')</h3>:<i>$!u.failtimes</i></label></div>
+	#parse('')
+
+	<div class='btns'>
+		<a href='javascript:;' onclick='back()'>$lang.get('a.back')</a>
+	</div>
+
+</div>

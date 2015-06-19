@@ -1,0 +1,243 @@
+<project name="demo" default="patch" basedir=".">
+
+	<property name="dist" value="/opt/d/joe/www" />
+
+	<property file="src/main/webapp/modules/default/module.ini" />
+
+	<tstamp>
+		<format property="TODAY" pattern="yyMMdd" locale="zh,CN" />
+		<format property="BUILDNO" pattern="yyMMddhhmm" locale="zh,CN" />
+	</tstamp>
+
+	<target name="patch" description="build sever all">
+		<delete file="target/webgiisoo_*.zip" />
+
+		<replaceregexp byline="true">
+			<fileset file="target/webgiisoo/modules/default/view/release.txt" />
+			<regexp pattern="^build=\d+" />
+			<substitution expression="build=${BUILDNO}" />
+		</replaceregexp>
+
+		<replaceregexp byline="true">
+			<fileset file="target/webgiisoo/modules/default/module.ini" />
+			<regexp pattern="^build=\d+" />
+			<substitution expression="build=${BUILDNO}" />
+		</replaceregexp>
+
+		<copy todir="target/webgiisoo/modules/default/WEB-INF/lib">
+			<fileset dir="lib" />
+		</copy>
+
+		<copy todir="target/webgiisoo/modules/default/WEB-INF">
+			<fileset dir="target/webgiisoo/WEB-INF" />
+		</copy>
+
+		<zip destfile="target/webgiisoo_${version}_${BUILDNO}.zip">
+			<fileset dir="target/webgiisoo/modules/default">
+				<exclude name="**/classes/**" />
+				<exclude name="**/com/**" />
+			</fileset>
+		</zip>
+		
+		<copy todir="../archieves">
+			<fileset file="target/webgiisoo_${version}_${BUILDNO}.zip" />
+		</copy>
+				
+	</target>
+
+	<target name="deploy"
+		depends="deploy-s1,deploy-s11, deploy-j1, deploy-s2, deploy-a1, deploy-e1, deploy-e11, deploy-t1, deploy-doctor, deploy-smgw, deploy-desk">
+	</target>
+
+	<target name="deploy-webgiisoo" description="copy all to /opt/d/joe/www"
+		depends="">
+		<delete dir="${dist}/webgiisoo/WEB-INF/lib/" />
+		<delete dir="${dist}/webgiisoo/modules/default/" />
+
+		<copy todir="${dist}/webgiisoo/WEB-INF/lib/">
+			<fileset dir="target/webgiisoo/WEB-INF/lib/" />
+		</copy>
+
+		<copy todir="${dist}/webgiisoo/modules/default/">
+			<fileset dir="target/webgiisoo/modules/default/" excludes="**/com/**/*.class" />
+		</copy>
+
+	</target>
+
+	<target name="deploy-j1" description="copy all to /opt/d/joe/www"
+		depends="">
+		<delete dir="${dist}/webj1/modules/default/" />
+		<delete dir="${dist}/webj1/WEB-INF/lib/" />
+
+		<copy todir="${dist}/webj1/WEB-INF/lib/">
+			<fileset dir="target/webgiisoo/WEB-INF/lib/" />
+		</copy>
+
+		<copy todir="${dist}/webj1/modules/default/">
+			<fileset dir="target/webgiisoo/modules/default/" excludes="**/com/**/*.class" />
+		</copy>
+
+	</target>
+
+	<target name="deploy-desk" description="copy all to /opt/d/joe/www"
+		depends="">
+		<delete dir="${dist}/webdesk/modules/default/" />
+		<delete dir="${dist}/webdesk/WEB-INF/lib/" />
+
+		<copy todir="${dist}/webdesk/WEB-INF/lib/">
+			<fileset dir="target/webgiisoo/WEB-INF/lib/" />
+		</copy>
+
+		<copy todir="${dist}/webdesk/modules/default/">
+			<fileset dir="target/webgiisoo/modules/default/" excludes="**/com/**" />
+		</copy>
+
+	</target>
+
+	<target name="deploy-e1" description="copy all to /opt/d/joe/www"
+		depends="">
+		<delete dir="${dist}/webe1/modules/default/" />
+		<delete dir="${dist}/webe1/WEB-INF/lib/" />
+
+		<copy todir="${dist}/webe1/WEB-INF/lib/">
+			<fileset dir="target/webgiisoo/WEB-INF/lib/" />
+		</copy>
+
+		<copy todir="${dist}/webe1/modules/default/">
+			<fileset dir="target/webgiisoo/modules/default/" excludes="**/com/**" />
+		</copy>
+
+	</target>
+
+	<target name="deploy-e11" description="copy all to /opt/d/joe/www"
+		depends="">
+		<delete dir="${dist}/webe11/modules/default/" />
+		<delete dir="${dist}/webe11/WEB-INF/lib/" />
+
+		<copy todir="${dist}/webe11/WEB-INF/lib/">
+			<fileset dir="target/webgiisoo/WEB-INF/lib/" />
+		</copy>
+
+		<copy todir="${dist}/webe11/modules/default/">
+			<fileset dir="target/webgiisoo/modules/default/" excludes="**/com/**" />
+		</copy>
+
+	</target>
+
+	<target name="deploy-a1" description="copy all to /opt/d/joe/www"
+		depends="">
+		<delete dir="${dist}/weba1/WEB-INF/lib/" />
+		<delete dir="${dist}/weba1/modules/default/" />
+
+		<copy todir="${dist}/weba1/WEB-INF/lib/">
+			<fileset dir="target/webgiisoo/WEB-INF/lib/" />
+		</copy>
+
+		<copy todir="${dist}/weba1/modules/default/">
+			<fileset dir="target/webgiisoo/modules/default/" excludes="**/com/**" />
+		</copy>
+
+	</target>
+
+	<target name="deploy-t1" description="copy all to /opt/d/joe/www"
+		depends="">
+		<delete dir="${dist}/webt1/WEB-INF/lib/" />
+		<delete dir="${dist}/webt1/modules/default/" />
+
+		<copy todir="${dist}/webt1/WEB-INF/lib/">
+			<fileset dir="target/webgiisoo/WEB-INF/lib/" />
+		</copy>
+
+		<copy todir="${dist}/webt1/modules/default/">
+			<fileset dir="target/webgiisoo/modules/default/" excludes="**/com/**" />
+		</copy>
+
+	</target>
+
+	<target name="deploy-s1" description="copy all to /opt/d/joe/www"
+		depends="">
+		<delete dir="${dist}/webs1/WEB-INF/lib/" />
+		<delete dir="${dist}/webs1/modules/default/" />
+
+		<copy todir="${dist}/webs1/WEB-INF/lib/">
+			<fileset dir="target/webgiisoo/WEB-INF/lib/" />
+		</copy>
+
+		<copy todir="${dist}/webs1/modules/default/">
+			<fileset dir="target/webgiisoo/modules/default/" excludes="**/com/**/*.class" />
+		</copy>
+
+	</target>
+
+	<target name="deploy-s11" description="copy all to /opt/d/joe/www"
+		depends="">
+		<delete dir="${dist}/webs11/WEB-INF/lib/" />
+		<delete dir="${dist}/webs11/modules/default/" />
+
+		<copy todir="${dist}/webs11/WEB-INF/lib/">
+			<fileset dir="target/webgiisoo/WEB-INF/lib/" />
+		</copy>
+
+		<copy todir="${dist}/webs11/modules/default/">
+			<fileset dir="target/webgiisoo/modules/default/" excludes="**/com/**/*.class" />
+		</copy>
+
+	</target>
+
+	<target name="deploy-s2" description="copy all to /opt/d/joe/www"
+		depends="">
+		<delete dir="${dist}/webs2/WEB-INF/lib/" />
+		<delete dir="${dist}/webs2/modules/default/" />
+
+		<copy todir="${dist}/webs2/WEB-INF/lib/">
+			<fileset dir="target/webgiisoo/WEB-INF/lib/" />
+		</copy>
+
+		<copy todir="${dist}/webs2/modules/default/">
+			<fileset dir="target/webgiisoo/modules/default/" excludes="**/com/**" />
+		</copy>
+
+	</target>
+	<target name="deploy-doctor" description="copy all to /opt/d/joe/www"
+		depends="">
+		<delete dir="${dist}/webdoctor/WEB-INF/lib/" />
+		<delete dir="${dist}/webdoctor/modules/default/" />
+
+		<copy todir="${dist}/webdoctor/WEB-INF/lib/">
+			<fileset dir="target/webgiisoo/WEB-INF/lib/" />
+		</copy>
+
+		<copy todir="${dist}/webdoctor/modules/default/">
+			<fileset dir="target/webgiisoo/modules/default/" excludes="**/com/**" />
+		</copy>
+
+	</target>
+
+
+	<target name="deploy-smgw" description="copy all to /opt/d/joe/www"
+		depends="">
+		<delete dir="${dist}/websmgw/modules/default/" />
+
+		<copy todir="${dist}/websmgw/WEB-INF/lib/">
+			<fileset dir="target/webgiisoo/WEB-INF/lib/" />
+		</copy>
+
+		<copy todir="${dist}/websmgw/modules/default/">
+			<fileset dir="target/webgiisoo/modules/default/" excludes="**/com/**" />
+		</copy>
+
+	</target>
+
+	<target name="help" description="display the Help message">
+		<echo message="Quick Start web application" />
+		<echo message="===========================" />
+		<echo />
+		<echo message="Main targets:" />
+		<echo />
+		<echo message="deploy                 copy all to /opt/d/joe/www" />
+		<echo message="help                  display the Help message" />
+		<echo />
+		<echo />
+	</target>
+
+</project>

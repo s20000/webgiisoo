@@ -1,0 +1,34 @@
+<div class='head'>$lang.get('url.index.title')</div>
+
+<div class='btns'>
+	<a href='/admin/url/add'>$lang.get('a.url.add')</a>
+</div>
+
+#parse('/widget/widget.message.html')
+
+<table id='user-table' class='tablesorter' border="0" cellpadding="0" cellspacing="1">
+	<thead>
+		<tr>
+			<th>$lang.get('head.seq')</th>
+			<th>$lang.get('head.url')</th>
+			<th>$lang.get('head.dest')</th>
+			<th></th>
+		</tr>
+	</thead>
+	<tbody>
+#foreach($f in $list)
+	<tr>
+		<td>$f.seq</td>
+		<td><a href='/admin/url/edit?url=$f.url'>$f.url</a></td>
+		<td>$f.dest</td>
+		<td><a class='delete' href='/admin/url/delete?url=$f.url'>$lang.get('a.delete')</a></td>
+	</tr>
+#end
+	</tbody>
+</table>
+
+ #parse('/widget/goto.page.html')
+
+<script>
+	$('#user-table').tablesorter();
+</script>

@@ -1,0 +1,27 @@
+<div class='head'>$lang.get('doc.add.title')</div>
+
+<script type="text/javascript" src="/js/folderpicker.js"></script>
+
+#parse('/widget/widget.message.html')
+
+<div class='tabs'>
+	<a href='/admin/folder'>$lang.get('a.folder')</a>
+	<a href='/admin/doc/add?fid=$folder.id' class='selected'>$lang.get('a.add'):$folder.name</a>
+</div>
+
+#parse('/widget/file.uploader.html')
+
+<form action='/admin/doc/add'  method='post' class='form' enctype="multipart/form-data">
+	<input type='hidden' name='repo' value=''/>
+	<div><label>$lang.get('label.folder'):<input type='text' folder-picker="true" name='folder' value=#if($folder) '$folder.name' #else '' #end/></label></div>
+	<div><label><h3>$lang.get('label.tag')</h3>:<input type='text' name='tag' value=#if($tag) '$tag' #else '' #end/></label></div>
+	<div><label><h3>$lang.get('label.ver')</h3>:<input type='text' name='ver' value=#if($ver)'$ver' #else '' #end /></label></div>
+	<div><button type='submit'>$lang.get('btn.add')</button></div>
+</form>
+
+<script>
+$('#fileupload').on('fileuploaddone', function (e, data) {
+	$('input[name=repo]').attr('value', data.result.url);
+});
+</script>
+

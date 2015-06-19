@@ -1,0 +1,23 @@
+<div class='head'>$lang.get('folder.add.title')</div>
+
+#parse('/widget/widget.message.html')
+
+<div class='tabs'>
+	<a href='/admin/folder'>$lang.get('a.folder')</a>
+	<a href='/admin/folder/add' class='selected'>$lang.get('a.add')</a>
+</div>
+
+<form action='/admin/folder/add'  method='post' class='form' enctype="multipart/form-data">
+	<input type='hidden' name='parent' value='$parent'/> 
+	
+	<div><label><h3>$lang.get('label.name')</h3>:<input type='text' name='name' value=''/></label></div>
+	<div><label><h3>$lang.get('label.title')</h3>:<input type='text' name='title' value=''/></label></div>
+##	<div><label><h3>$lang.get('label.hot')</h3>:<input type='text' name='hot' value=''/></label></div>
+##	<div><label><h3>$lang.get('label.recommend')</h3>:<input type='text' name='recommend' value=''/></label></div>
+	<div><label><h3>$lang.get('label.seq')</h3>:<input type='text' name='seq' value='999'/></label></div>
+	<div><label><h3>$lang.get('label.access')</h3>:<input type='text' name='access' value=''/></label></div>
+##	<div><label><h3>$lang.get('label.content')</h3>:<textarea name='content'></textarea></label></div>
+	
+	<button type='submit'>$lang.get('btn.add')</button>
+</form>	
+

@@ -1,0 +1,15 @@
+net/sf/json/util/WebHijackPreventionStrategy$1.class
+net/sf/json/util/JavaIdentifierTransformer$1.class
+com/giisoo/core/bean/Bean$1.class
+com/giisoo/core/rpc/StubCodecFactory$1.class
+net/sf/json/util/PropertySetStrategy$1.class
+net/sf/json/processors/JsonValueProcessorMatcher$1.class
+net/sf/json/processors/PropertyNameProcessorMatcher$1.class
+net/sf/json/util/NewBeanInstanceStrategy$1.class
+com/giisoo/app/web/DefaultListener$1.class
+net/sf/json/util/PropertyExclusionClassMatcher$1.class
+net/sf/json/util/CycleDetectionStrategy$1.class
+net/sf/json/processors/DefaultValueProcessorMatcher$1.class
+net/sf/json/processors/JsonBeanProcessorMatcher$1.class
+com/giisoo/framework/mdc/TConnCenter$1.class
+net/sf/json/AbstractJSON$1.class

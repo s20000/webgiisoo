@@ -1,0 +1,23 @@
+<div class='head'>$lang.get('app.add.title')</div>
+
+#parse('/widget/widget.message.html')
+
+<div class='tabs'>
+	<a href='/admin/app' >$lang.get('a.app')</a>
+	<a href='/admin/app/add' class='selected'>$lang.get('a.add')</a>
+</div>
+
+<form action='/admin/app/add'  method='post' class='form' enctype="multipart/form-data">
+	<div><label><h3>$lang.get('label.appid')(<r>*</r>)</h3>:<input type='text' bad="1" onblur="verify(this, '/admin/app/verify')" name='appid' value=#if($appid) '$appid' #else '' #end/></label></div>
+	<div><label><h3>$lang.get('label.logout')</h3>:<input type='text' name='logout' value= #if($logout)'$logout' #else '' #end /></label></div>
+	<div><label><h3>$lang.get('label.company')</h3>:<input type='text' name='company' value= #if($company)'$company' #else '' #end /></label></div>
+	<div><label><h3>$lang.get('label.contact')</h3>:<input type='text' name='contact' value= #if($contact)'$contact' #else '' #end /></label></div>
+	<div><label><h3>$lang.get('label.phone')</h3>:<input type='text' name='phone' value= #if($phone)'$phone' #else '' #end /></label></div>
+	<div><label><h3>$lang.get('label.email')</h3>:<input type='text' name='email' value= #if($email)'$email' #else '' #end /></label></div>
+	<div><label><h3>$lang.get('label.memo')</h3>:<input type='text' name='memo' value= #if($memo)'$memo' #else '' #end /></label></div>
+
+	<button type='submit'>$lang.get('btn.add')</button>
+</form>
+
+<script>
+</script>
