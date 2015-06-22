@@ -369,23 +369,6 @@
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>2.10.1</version>
-				<configuration>
-					<show>public</show>
-					<destDir>${project.build.directory}/webgiisoo/modules/default/view/docs/apidocs
-					</destDir>
-				</configuration>
-				<executions>
-					<execution>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
 				<version>2.4</version>
 				<configuration>
