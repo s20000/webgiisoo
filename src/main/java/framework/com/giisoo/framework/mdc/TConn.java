@@ -20,6 +20,7 @@ import com.giisoo.framework.common.User;
 import com.giisoo.framework.mdc.command.*;
 import com.giisoo.framework.web.Language;
 import com.giisoo.utils.base.*;
+import com.giisoo.utils.base.Base64;
 
 /**
  * MDC device which interact with mdc client in server side
