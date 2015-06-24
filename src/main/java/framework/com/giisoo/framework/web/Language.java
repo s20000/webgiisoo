@@ -10,6 +10,7 @@ import java.util.*;
 
 import org.apache.commons.logging.*;
 
+import com.giisoo.core.bean.Bean;
 import com.giisoo.core.bean.X;
 import com.giisoo.framework.common.Dict;
 import com.giisoo.utils.base.Html;
@@ -265,7 +266,73 @@ public class Language {
 	 * @return the string
 	 */
 	public String format(String t, String format) {
+		try {
+			SimpleDateFormat sdf = formats.get(format);
+			if (sdf == null) {
+				sdf = new SimpleDateFormat(format);
+
+				// if (data.containsKey("date.timezone")) {
+				// sdf.setTimeZone(TimeZone.getTimeZone(get("date.timezone")));
+				// }
+
+				formats.put(format, sdf);
+			}
+
+			// parse t to datetime, assume the datetime is
+			// "YYYY ? MM ? dd hh:mm:ss"
+
+			return sdf.format(new Date(_parseDatetime(t)));
+		} catch (Exception e) {
+			log.error(t, e);
+		}
 		return t;
+	}
+
+	private long _parseDatetime(String sdate) {
+		String[] ss = sdate.split("[-/_:H ]");
+
+		if (ss.length < 3) {
+			return 0;
+		}
+		Calendar c = Calendar.getInstance();
+		c.setTimeInMillis(0);
+		int[] d = new int[ss.length];
+		for (int i = 0; i < d.length; i++) {
+			d[i] = Bean.toInt(ss[i]);
+		}
+
+		if (d[0] > 100) {
+			c.set(Calendar.YEAR, d[0]);
+			if (d[1] > 12) {
+				c.set(Calendar.MONTH, d[2] - 1);
+				c.set(Calendar.DATE, d[1]);
+			} else {
+				c.set(Calendar.MONTH, d[1] - 1);
+				c.set(Calendar.DATE, d[2]);
+			}
+		} else if (d[2] > 100) {
+			c.set(Calendar.YEAR, d[2]);
+
+			if (d[0] > 12) {
+				c.set(Calendar.MONTH, d[1] - 1);
+				c.set(Calendar.DATE, d[0]);
+			} else {
+				c.set(Calendar.MONTH, d[0] - 1);
+				c.set(Calendar.DATE, d[1]);
+			}
+		}
+
+		if (d.length > 3) {
+			c.set(Calendar.HOUR, d[3]);
+		}
+		if (d.length > 4) {
+			c.set(Calendar.MINUTE, d[4]);
+		}
+		if (d.length > 5) {
+			c.set(Calendar.SECOND, d[5]);
+		}
+
+		return c.getTimeInMillis();
 	}
 
 	/**
