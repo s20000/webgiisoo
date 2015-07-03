@@ -2450,7 +2450,7 @@ public final class JSONObject extends AbstractJSON implements JSON, Map,
 	 *             if the key is not found.
 	 */
 	public String getString(String key) {
-		verifyIsNull();
+		// verifyIsNull();
 		Object o = get(key);
 		if (o != null) {
 			return o.toString();
@@ -2466,7 +2466,7 @@ public final class JSONObject extends AbstractJSON implements JSON, Map,
 	 * @return true if the key exists in the JSONObject.
 	 */
 	public boolean has(String key) {
-		verifyIsNull();
+		// verifyIsNull();
 		return this.properties.containsKey(key);
 	}
 
