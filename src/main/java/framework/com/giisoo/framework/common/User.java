@@ -25,7 +25,7 @@ import com.giisoo.framework.web.Module;
  * 
  */
 @DBMapping(table = "tbluser")
-public class User extends Bean implements Exportable {
+public final class User extends Bean implements Exportable {
 
 	/**
    * 
@@ -946,40 +946,6 @@ public class User extends Bean implements Exportable {
 	public static List<String> listCompany() {
 		return Bean.loadList("tbluser", "distinct company", "id>0", null,
 				String.class, null);
-	}
-
-	public static class DummyUser extends User {
-		Set<String> access = new HashSet<String>();
-
-		/**
-		 * Instantiates a new dummy user.
-		 * 
-		 * @param access
-		 *            the access
-		 */
-		public DummyUser(String... access) {
-			set("id", Integer.MIN_VALUE);
-			for (String s : access) {
-				this.access.add(s);
-			}
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see com.giisoo.framework.common.User#hasAccess(java.lang.String[])
-		 */
-		@Override
-		public boolean hasAccess(String... name) {
-			for (String s : name) {
-				if (access.contains(s)) {
-					return true;
-				}
-			}
-
-			return false;
-		}
-
 	}
 
 	/**
