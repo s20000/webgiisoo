@@ -89,7 +89,7 @@ public class setting extends Model {
 
 	}
 
-	public static class base extends setting {
+	public static class system extends setting {
 
 		@Override
 		public void set() {
@@ -112,30 +112,6 @@ public class setting extends Model {
 					lang.get("save.success") + ", "
 							+ lang.get("restart.required"));
 
-			get();
-		}
-
-		@Override
-		public void get() {
-			this.set("deploycode", SystemConfig.s("deploy.code", null));
-			this.set("systemcode", SystemConfig.s("system.code", null));
-			this.set("nodename", SystemConfig.s("node.name", null));
-
-			this.set("oplog_max", SystemConfig.i("oplog.max", 50000));
-			this.set("oplog_min", SystemConfig.i("oplog.min", 20000));
-
-			// this.set("prikey", SystemConfig.s("pri_key", null));
-			this.set("pubkey", SystemConfig.s("pub_key", null));
-
-			this.set("page", "/admin/setting.base.html");
-		}
-
-	}
-
-	public static class system extends setting {
-
-		@Override
-		public void set() {
 			SystemConfig.setConfig("ntp.server", this.getString("ntp"));
 
 			if (!X.isEmpty(this.getString("ntp"))) {
@@ -155,6 +131,17 @@ public class setting extends Model {
 
 		@Override
 		public void get() {
+
+			this.set("deploycode", SystemConfig.s("deploy.code", null));
+			this.set("systemcode", SystemConfig.s("system.code", null));
+			this.set("nodename", SystemConfig.s("node.name", null));
+
+			this.set("oplog_max", SystemConfig.i("oplog.max", 50000));
+			this.set("oplog_min", SystemConfig.i("oplog.min", 20000));
+
+			// this.set("prikey", SystemConfig.s("pri_key", null));
+			this.set("pubkey", SystemConfig.s("pub_key", null));
+
 			this.set("ntp", SystemConfig.s("ntp.server", null));
 
 			this.set("time", lang.format(System.currentTimeMillis(),

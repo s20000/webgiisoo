@@ -547,3 +547,5 @@ label.mdc.tcp.port=监听端口
 label.mdc.tcp.domain=域
 label.mdc.repo.url=文件仓库
 user.name.format.error=用户名格式错误
+a.setting.system=系统设置
+a.setting.base=基本设置

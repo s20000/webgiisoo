@@ -102,7 +102,6 @@ public class DefaultListener implements LifeListener {
 		new NtpTask().schedule(X.AMINUTE);
 
 		setting.register("system", new setting.system());
-		setting.register("base", new setting.base());
 
 	}
 

@@ -141,7 +141,7 @@ public class Http {
 		DefaultHttpClient client = getClient(url);
 
 		if (client != null) {
-			HttpPost post = new HttpPost();
+			HttpPost post = new HttpPost(url);
 			try {
 
 				if (headers != null && headers.length > 0) {

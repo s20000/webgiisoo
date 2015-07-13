@@ -1,6 +1,14 @@
 	<div><label><h3>$lang.get('system.time')</h3>:<input type='text' name='time' value='$time' readonly=readonly/><a href='#leanmodal' rel='leanModal'>设置</a></label></div>
 	<div><label><h3>$lang.get('label.ntp')</h3>:<input type='text' name='ntp' value=#if($ntp)'$ntp' #else '' #end/></label></div>
 
+	<div><label><h3>$lang.get('label.deploycode')(<r>*</r>)</h3>:<input type='text' name='deploycode' value=#if($deploycode)'$deploycode' #else '' #end/></label></div>
+	<div><label><h3>$lang.get('label.systemcode')</h3>:<i>$lang.get("node.type_$module.node_type")</i></label></div>
+	<div><label><h3>$lang.get('label.nodename')</h3>:<input type='text' name='nodename' value=#if($nodename)'$nodename' #else '' #end/></label></div>
+	<div><label><h3>$lang.get('label.oplog_max')</h3>:<input type='text' name='oplog_max' value=#if($oplog_max)'$oplog_max' #else '' #end/></label></div>
+	<div><label><h3>$lang.get('label.oplog_min')</h3>:<input type='text' name='oplog_min' value=#if($oplog_min)'$oplog_min' #else '' #end/></label></div>
+
+	<div><label class='full'><h3>$lang.get('label.pubkey')</h3>:<textarea name='pubkey'>#if($pubkey)$pubkey#end</textarea></label></div>
+
 <div id='leanmodal' class='settime'>
 	<div class='leanmodal_header'><label><h3>$lang.get('system.settime')</h3>:<i></i></label></div>
 	<div><label><h3>$lang.get('system.time')</h3>:<input type='text' name='time' value='$time'/></label></div>
