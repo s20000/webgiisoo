@@ -22,7 +22,7 @@ public class role extends Model {
 	/**
 	 * Adds the.
 	 */
-	@Path(path = "add", login = true, access = "access.admin")
+	@Path(path = "add", login = true, access = "access.user.admin")
 	public void add() {
 		if (method.isPost()) {
 
@@ -54,7 +54,7 @@ public class role extends Model {
 	/**
 	 * Verify.
 	 */
-	@Path(path = "verify", login = true, access = "access.admin")
+	@Path(path = "verify", login = true, access = "access.user.admin")
 	public void verify() {
 		String name = this.getString("name");
 		String value = this.getString("value");
@@ -78,7 +78,7 @@ public class role extends Model {
 	/**
 	 * Edits the.
 	 */
-	@Path(path = "edit", login = true, access = "access.admin")
+	@Path(path = "edit", login = true, access = "access.user.admin")
 	public void edit() {
 		if (method.isPost()) {
 
@@ -139,7 +139,7 @@ public class role extends Model {
 	/**
 	 * Delete.
 	 */
-	@Path(path = "delete", login = true, access = "access.admin")
+	@Path(path = "delete", login = true, access = "access.user.admin")
 	public void delete() {
 		String ids = this.getString("id");
 		int updated = 0;
@@ -170,7 +170,7 @@ public class role extends Model {
 	/* (non-Javadoc)
 	 * @see com.giisoo.framework.web.Model#onGet()
 	 */
-	@Path(login = true, access = "access.admin")
+	@Path(login = true, access = "access.user.admin")
 	public void onGet() {
 
 		int s = this.getInt("s");
