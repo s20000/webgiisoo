@@ -14,6 +14,7 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import com.giisoo.core.bean.*;
+import com.giisoo.core.cache.Cache;
 import com.giisoo.core.conf.SystemConfig;
 import com.giisoo.framework.common.Company.Department;
 import com.giisoo.framework.web.Module;
@@ -212,6 +213,11 @@ public final class User extends Bean implements Exportable {
 	 * @return the user
 	 */
 	public static User load(String name) {
+		String uid = "user://name/" + name;
+		User u1 = (User) Cache.get(uid);
+		if (u1 != null) {
+			return u1;
+		}
 
 		List<User> list = Bean.load("tbluser", null, "name=?",
 				new String[] { name }, User.class);
@@ -238,6 +244,8 @@ public final class User extends Bean implements Exportable {
 					}
 				}
 
+				u.setExpired(60);
+				Cache.set(uid, u);
 				return u;
 			}
 		}
@@ -253,7 +261,19 @@ public final class User extends Bean implements Exportable {
 	 * @return the user
 	 */
 	public static User loadById(int id) {
-		return Bean.load("tbluser", "id=?", new Object[] { id }, User.class);
+		String uid = "user://id/" + id;
+		User u = (User) Cache.get(uid);
+		if (u != null) {
+			return u;
+		}
+
+		u = Bean.load("tbluser", "id=?", new Object[] { id }, User.class);
+		if (u != null) {
+			u.setExpired(60);
+		}
+		Cache.set(uid, u);
+
+		return u;
 	}
 
 	/**
@@ -768,6 +788,9 @@ public final class User extends Bean implements Exportable {
 	 */
 	public int failed(String ip) {
 		set("failtimes", getInt("failtimes") + 1);
+
+		Cache.remove("user://name/" + this.getString("name"));
+		Cache.remove("user://id/" + this.getId());
 
 		return Bean
 				.update("id=?",

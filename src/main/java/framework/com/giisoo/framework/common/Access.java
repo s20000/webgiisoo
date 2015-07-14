@@ -7,8 +7,10 @@ package com.giisoo.framework.common;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
@@ -57,7 +59,8 @@ public class Access extends Bean implements Exportable {
 	}
 
 	/**
-	 * Add a access name, the access name MUST fit with "access.[group].[name]" .
+	 * Add a access name, the access name MUST fit with "access.[group].[name]"
+	 * .
 	 * 
 	 * @param name
 	 *            the name
@@ -66,17 +69,33 @@ public class Access extends Bean implements Exportable {
 		if (X.isEmpty(name) || !name.startsWith("access.")) {
 			log.error("error access.name: " + name, new Exception(
 					"error access name:" + name));
-		} else if (!Bean.exists("name=?", new Object[] { name }, Access.class)) {
+		} else if (!exists(name)) {
+
 			if (Bean.insert(V.create("name", name).set("id", name),
 					Access.class) > 0) {
 				Bean.onChanged("tblaccess", IData.OP_CREATE, "name=?",
 						new Object[] { name });
 			}
+
 		}
 	}
 
+	static private Set<String> cache = new HashSet<String>();
+
+	public static boolean exists(String name) {
+		if (cache.contains(name)) {
+			return true;
+		}
+
+		if (Bean.exists("name=?", new Object[] { name }, Access.class)) {
+			cache.add(name);
+			return true;
+		}
+		return false;
+	}
+
 	/**
-	 * Load all access and group by [group] name.
+	 * Load all access and group by [group] name
 	 * 
 	 * @return the map
 	 */
@@ -101,7 +120,9 @@ public class Access extends Bean implements Exportable {
 		return r;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.giisoo.bean.Bean#load(java.sql.ResultSet)
 	 */
 	@Override
@@ -110,8 +131,11 @@ public class Access extends Bean implements Exportable {
 		id = r.getString("id");
 	}
 
-	/* (non-Javadoc)
-	 * @see com.giisoo.bean.Exportable#output(java.lang.String, java.lang.Object[], java.util.zip.ZipOutputStream)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.giisoo.bean.Exportable#output(java.lang.String,
+	 * java.lang.Object[], java.util.zip.ZipOutputStream)
 	 */
 	public JSONObject output(String where, Object[] args, ZipOutputStream out) {
 		List<Access> list = Bean.load((String[]) null, where, args,
@@ -138,8 +162,11 @@ public class Access extends Bean implements Exportable {
 		return jo;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.giisoo.bean.Exportable#input(net.sf.json.JSONArray, java.util.zip.ZipFile)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.giisoo.bean.Exportable#input(net.sf.json.JSONArray,
+	 * java.util.zip.ZipFile)
 	 */
 	public int input(JSONArray list, ZipFile in) {
 		int count = 0;
@@ -147,17 +174,21 @@ public class Access extends Bean implements Exportable {
 		for (int i = 0; i < len; i++) {
 			JSONObject name = list.getJSONObject(i);
 
-			if (!Bean.exists("name=?", new Object[] { name }, Access.class)) {
-				count += Bean.insert(V.create("name", name).set("id", name),
-						Access.class);
+			if (!exists(name.getString("name"))) {
+				count += Bean.insert(
+						V.create("name", name.get("name")).set("id",
+								name.get("name")), Access.class);
 			}
 		}
 
 		return count;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.giisoo.bean.Exportable#load(java.lang.String, java.lang.Object[], int, int)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.giisoo.bean.Exportable#load(java.lang.String,
+	 * java.lang.Object[], int, int)
 	 */
 	public Beans<Access> load(String where, Object[] args, int s, int n) {
 		return Bean.load(where, args, "order by name", s, n, Access.class);
