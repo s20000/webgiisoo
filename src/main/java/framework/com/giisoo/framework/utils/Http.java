@@ -139,6 +139,7 @@ public class Http {
 		Response r = new Response();
 
 		DefaultHttpClient client = getClient(url);
+		log.debug("url=" + url);
 
 		if (client != null) {
 			HttpPost post = new HttpPost(url);
@@ -148,6 +149,7 @@ public class Http {
 					for (String[] s : headers) {
 						if (s != null && s.length > 1) {
 							post.addHeader(s[0], s[1]);
+							log.debug("header: " + s[0] + "=" + s[1]);
 						}
 					}
 				}
@@ -160,6 +162,7 @@ public class Http {
 								BasicNameValuePair param = new BasicNameValuePair(
 										s[0], s[1]);
 								paramList.add(param);
+								log.debug("body: " + s[0] + "=" + s[1]);
 							}
 						}
 						post.setEntity(new UrlEncodedFormEntity(paramList,
@@ -171,6 +174,8 @@ public class Http {
 						if (f != null && f.length > 1 && f[1] instanceof File) {
 							FileBody fileBody = new FileBody((File) f[1]);
 							entity.addPart((String) f[0], fileBody);
+
+							log.debug("file: " + f[0]);
 						}
 					}
 
@@ -188,6 +193,8 @@ public class Http {
 				HttpResponse resp = client.execute(post);
 				r.status = resp.getStatusLine().getStatusCode();
 				r.body = getContext(resp);
+
+				log.debug("got: status=" + r.status + ", body=" + r.body);
 
 			} catch (Exception e) {
 				log.error(url, e);
