@@ -660,6 +660,7 @@ public class Module {
 				Module m = modules.get(0);
 				String name = m.lifelistener;
 				if (name != null) {
+					
 					Class<?> c = Class.forName(name, true, classLoader);
 					Object o = c.newInstance();
 
@@ -679,6 +680,7 @@ public class Module {
 			if (lifelistener != null) {
 				String name = lifelistener;
 				if (name != null) {
+					
 					Class<?> c = Class.forName(name, true, classLoader);
 					Object o = c.newInstance();
 
