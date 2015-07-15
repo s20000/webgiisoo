@@ -63,14 +63,14 @@ public class Cache {
 	public static Cachable get(String id) {
 		try {
 
-			/**
-			 * must using my class loader, otherwise
-			 */
-			Thread thread = Thread.currentThread();
-			if (Module.classLoader != null
-					&& thread.getContextClassLoader() != Module.classLoader) {
-				thread.setContextClassLoader(Module.classLoader);
-			}
+			// /**
+			// * must using my class loader, otherwise
+			// */
+			// Thread thread = Thread.currentThread();
+			// if (Module.classLoader != null
+			// && thread.getContextClassLoader() != Module.classLoader) {
+			// thread.setContextClassLoader(Module.classLoader);
+			// }
 
 			// log.debug("contextclassloader.cache="
 			// + Thread.currentThread().getContextClassLoader());

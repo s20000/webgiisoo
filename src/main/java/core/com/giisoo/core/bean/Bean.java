@@ -2571,6 +2571,31 @@ public abstract class Bean extends DefaultCachable implements
 			return this;
 		}
 
+		/**
+		 * copy the checkbox value in V, "on"="on", otherwise="off"
+		 * 
+		 * @param jo
+		 * @param names
+		 * @return V
+		 */
+		public V copyCheckbox(JSONObject jo, String... names) {
+			if (jo == null || names == null || names.length == 0)
+				return this;
+
+			for (String s : names) {
+				if (jo.containsKey(s)) {
+					Object o = jo.get(s);
+					if (X.isEmpty(o)) {
+						set(s, "off");
+					} else if ("on".equals(o)) {
+						set(s, "on");
+					}
+				}
+			}
+
+			return this;
+		}
+
 		public String name(int i) {
 			return list.get(i).name;
 		}
