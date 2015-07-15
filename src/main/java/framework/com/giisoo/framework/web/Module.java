@@ -496,7 +496,8 @@ public class Module {
 			_conf = conf;
 			classLoader = new GClassLoader(Module.class.getClassLoader());
 
-			Thread.currentThread().setContextClassLoader(classLoader);
+			Thread thread = Thread.currentThread();
+			thread.setContextClassLoader(classLoader);
 
 			// String t = SystemConfig.s("home.module", "default");
 			File f = new File(_conf.getString("home") + "/modules/");

@@ -4,6 +4,7 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.logging.*;
 
 import com.danga.MemCached.*;
+import com.giisoo.framework.web.Module;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -61,6 +62,19 @@ public class Cache {
 	 */
 	public static Cachable get(String id) {
 		try {
+
+			/**
+			 * must using my class loader, otherwise
+			 */
+			Thread thread = Thread.currentThread();
+			if (Module.classLoader != null
+					&& thread.getContextClassLoader() != Module.classLoader) {
+				thread.setContextClassLoader(Module.classLoader);
+			}
+
+			// log.debug("contextclassloader.cache="
+			// + Thread.currentThread().getContextClassLoader());
+
 			Cachable r = null;
 			if (memCachedClient != null) {
 				r = (Cachable) memCachedClient.get(id);
