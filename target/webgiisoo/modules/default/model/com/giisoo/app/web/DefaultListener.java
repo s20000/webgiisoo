@@ -102,7 +102,6 @@ public class DefaultListener implements LifeListener {
 		new NtpTask().schedule(X.AMINUTE);
 
 		setting.register("system", new setting.system());
-		setting.register("base", new setting.base());
 
 	}
 
@@ -335,13 +334,12 @@ public class DefaultListener implements LifeListener {
 							 */
 							OpLog.warn("upgrade", X.EMPTY,
 									"delete duplicated jar file, but low version:"
-											+ ((File) pp[1]).getName()
-											+ ", keep: " + f.getName());
+											+ ((File) pp[1]).getAbsolutePath()
+											+ ", keep: " + f.getAbsolutePath());
 
 							log.warn("delete duplicated jar file, but low version:"
-									+ ((File) pp[1]).getName()
-									+ ", keep: "
-									+ f.getName());
+									+ ((File) pp[1]).getAbsolutePath()
+									+ ", keep: " + f.getAbsolutePath());
 							((File) pp[1]).delete();
 							changed = true;
 							map.put(name, new Object[] { ver, f });
@@ -353,14 +351,14 @@ public class DefaultListener implements LifeListener {
 							 */
 							OpLog.warn("upgrade", X.EMPTY,
 									"delete duplicated jar file, but low version:"
-											+ f.getName() + ", keep: "
-											+ ((File) pp[1]).getName());
+											+ f.getAbsolutePath() + ", keep: "
+											+ ((File) pp[1]).getAbsolutePath());
 
 							log.warn("delete duplicated jar file, but low version:"
-									+ f.getName()
+									+ f.getAbsolutePath()
 									+ ", keep: "
-									+ ((File) pp[1]).getName());
-							
+									+ ((File) pp[1]).getAbsolutePath());
+
 							f.delete();
 							changed = true;
 							// map.put(name, new Object[] { ver, f });

@@ -328,7 +328,7 @@
 							<includes>
 								<include>**/com/giisoo/app/web/**</include>
 							</includes>
-							<outputDirectory>${project.build.directory}/webgiisoo/modules/default/model
+							<outputDirectory>${project.build.directory}/webgiisoo/WEB-INF/lib
 							</outputDirectory>
 						</configuration>
 					</execution>
