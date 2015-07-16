@@ -99,7 +99,8 @@ public class Config {
 		FileReloader reloader = new FileReloader();
 
 		PropertiesConfiguration c1 = null;
-		String file = home + "/conf/" + confName + ".properties";
+		String file = home + File.pathSeparator + "conf" + File.pathSeparator
+				+ confName + ".properties";
 		if (new File(file).exists()) {
 			c1 = new PropertiesConfiguration(file);
 			c1.setEncoding("utf-8");
@@ -166,7 +167,7 @@ public class Config {
 		if (!conf.containsKey("site.name")) {
 			conf.setProperty("site.name", "default");
 		}
-		
+
 	}
 
 	/**
