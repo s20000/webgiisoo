@@ -99,7 +99,7 @@ public class Config {
 		FileReloader reloader = new FileReloader();
 
 		PropertiesConfiguration c1 = null;
-		String file = home + File.pathSeparator + "conf" + File.pathSeparator
+		String file = home + File.separator + "conf" + File.separator
 				+ confName + ".properties";
 		if (new File(file).exists()) {
 			c1 = new PropertiesConfiguration(file);
