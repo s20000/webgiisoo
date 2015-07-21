@@ -660,7 +660,7 @@ public class Module {
 				Module m = modules.get(0);
 				String name = m.lifelistener;
 				if (name != null) {
-					
+
 					Class<?> c = Class.forName(name, true, classLoader);
 					Object o = c.newInstance();
 
@@ -680,7 +680,7 @@ public class Module {
 			if (lifelistener != null) {
 				String name = lifelistener;
 				if (name != null) {
-					
+
 					Class<?> c = Class.forName(name, true, classLoader);
 					Object o = c.newInstance();
 
@@ -935,10 +935,14 @@ public class Module {
 	 */
 	public Template getTemplate(String viewname, boolean allowEmpty) {
 		try {
-			File f = new File(path + "/view/" + viewname);
+			viewname = viewname.replaceAll("/", File.separator);
+			File f = new File(path + File.separator + "view" + File.separator
+					+ viewname);
 			// System.out.println(f.getAbsolutePath());
 
-			if (f.exists() && f.getCanonicalPath().startsWith(path + "/view")) {
+			if (f.exists()
+					&& f.getCanonicalPath().startsWith(
+							path + File.separator + "view")) {
 				return Velocity.getTemplate(viewname, "UTF-8");
 			}
 
