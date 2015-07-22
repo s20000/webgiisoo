@@ -2219,6 +2219,22 @@ public abstract class Bean extends DefaultCachable implements
 	}
 
 	/**
+	 * update the collection by query
+	 * 
+	 * @param query
+	 * @param v
+	 * @param t
+	 * @return int of updated
+	 */
+	final protected static int updateCollection(DBObject query, V v, Class<?> t) {
+		String collection = getCollection(t);
+		if (collection != null && !"none".equals(collection)) {
+			return updateCollection(collection, query, v);
+		}
+		return -1;
+	}
+
+	/**
 	 * insert into the collection
 	 * 
 	 * @param collection
@@ -2248,7 +2264,21 @@ public abstract class Bean extends DefaultCachable implements
 	 */
 	final protected static int updateCollection(String collection, Object id,
 			V v) {
+
 		BasicDBObject q = new BasicDBObject().append(X._ID, id);
+		return updateCollection(collection, q, v);
+	}
+
+	/**
+	 * update the data by query
+	 * 
+	 * @param collection
+	 * @param q
+	 * @param v
+	 * @return int of updated
+	 */
+	final protected static int updateCollection(String collection, DBObject q,
+			V v) {
 		BasicDBObject d = new BasicDBObject();
 
 		int len = v.size();
@@ -2405,7 +2435,7 @@ public abstract class Bean extends DefaultCachable implements
 	}
 
 	/**
-	 * The Class V.
+	 * The Class V. of value
 	 */
 	public static final class V {
 
