@@ -88,7 +88,7 @@ public class App extends Command {
 						if (r.has(X.STATE)) {
 							r1.put(X.STATE, r.get(X.STATE));
 						} else {
-							r1.put(X.STATE, X.OK);
+							r1.put(X.STATE, X.OK_200);
 						}
 
 						out.writeString(r1.toString());

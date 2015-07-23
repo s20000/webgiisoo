@@ -125,7 +125,7 @@ public class Activate extends Command {
 					 */
 					d.create(clientid, key, uid);
 
-					jo.put(X.STATE, X.OK);
+					jo.put(X.STATE, X.OK_200);
 
 					if (d.isSupportEncode()) {
 						/**

@@ -66,7 +66,7 @@ public class Hello extends Command {
 
 					log.debug("[" + uid + "] say hello, obj:" + d);
 
-					r.put(X.STATE, X.OK);
+					r.put(X.STATE, X.OK_200);
 
 					String code = UID.random(24);
 					log.info("uid:" + uid + ", code:" + code + ", pubkey:"

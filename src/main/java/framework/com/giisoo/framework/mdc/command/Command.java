@@ -195,7 +195,7 @@ public abstract class Command implements Serializable {
 	 */
 	public static void load(String packname) {
 
-		// log.debug("loading command from: " + packname);
+		log.debug("loading command from: " + packname);
 
 		/**
 		 * get all the class in the package
@@ -220,12 +220,12 @@ public abstract class Command implements Serializable {
 							byte cmd = f.getByte(c1);
 							processor.put(cmd, c1);
 
-							// log.info("found command [" + c.getName() + "]");
+							log.info("found command [" + c.getName() + "]");
 						} else {
-							// log.debug("[" + c + "] has not 'COMMAND' field");
+							log.debug("[" + c + "] has not 'COMMAND' field");
 						}
 					} else {
-						// log.debug("[" + c + "] is not extend from Command");
+						log.debug("[" + c + "] is not extend from Command");
 					}
 				} catch (Exception e) {
 					// e.printStackTrace();

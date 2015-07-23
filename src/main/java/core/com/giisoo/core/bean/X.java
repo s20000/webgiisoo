@@ -96,7 +96,7 @@ public class X {
 	public static final String STATUS = "status";
 
 	/** The Constant OK. */
-	public static final String OK = "ok";
+	public static final int OK = 200;
 
 	/** The Constant UTF8. */
 	public static final String UTF8 = "UTF-8";
