@@ -26,7 +26,7 @@ import com.giisoo.framework.web.Module;
  * 
  */
 @DBMapping(table = "tbluser")
-public final class User extends Bean implements Exportable {
+public class User extends Bean implements Exportable {
 
 	/**
    * 
