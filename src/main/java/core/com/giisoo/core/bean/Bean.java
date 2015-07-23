@@ -3336,6 +3336,9 @@ public abstract class Bean extends DefaultCachable implements
 		return false;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	@Override
 	public String getDisplay() {
 		/**
@@ -3457,7 +3460,14 @@ public abstract class Bean extends DefaultCachable implements
 	 * @return String
 	 */
 	public String getString(String name) {
-		return (String) get(name);
+		Object o = get(name);
+		if (o == null) {
+			return null;
+		} else if (o instanceof String) {
+			return (String) o;
+		} else {
+			return o.toString();
+		}
 	}
 
 	/**

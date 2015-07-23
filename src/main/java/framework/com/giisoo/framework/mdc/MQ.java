@@ -197,6 +197,8 @@ public final class MQ {
 							+ ", message=" + message);
 				}
 			}
+		} else {
+			log.warn("no connection for uid= " + uid + ", message=" + message);
 		}
 		return count;
 	}
