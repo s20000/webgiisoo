@@ -71,7 +71,9 @@ public class TConnCenter implements ICallback {
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.giisoo.framework.mdc.ICallback#run(int, java.lang.Object[])
 	 */
 	public void run(int command, Object... o) {
@@ -199,6 +201,9 @@ public class TConnCenter implements ICallback {
 			 */
 			if (conns.size() > 0) {
 				TConn[] cc = conns.values().toArray(new TConn[conns.size()]);
+
+				log.info("nop.size=" + conns.size() + ", conns.key="
+						+ conns.keySet() + ", connection.size=" + cc.length);
 				for (TConn c : cc) {
 					if (System.currentTimeMillis() - c.lastio > X.AMINUTE * 3) {
 						c.send(Command.NOP, null, null, false);
