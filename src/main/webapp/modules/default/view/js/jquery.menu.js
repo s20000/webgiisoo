@@ -29,8 +29,11 @@
 					});
 
 					function tohtml(e) {
-						var s = '<div class="item">';
-
+						var s = '<div class="item" ';
+						if(e.style) {
+							s += ' style="' + e.style + '" ';
+						}
+						s += '>';
 						s += '<div class="title ';
 						if (e.hasChildren) {
 							s += ' haschild ';

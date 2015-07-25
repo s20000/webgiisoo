@@ -73,6 +73,8 @@ public class Menu extends Bean {
 
 	String tip;
 
+	String style;
+
 	/**
 	 * Insert or update.
 	 * 
@@ -149,7 +151,7 @@ public class Menu extends Bean {
 				 * create menu if not exists
 				 */
 				V v = V.create().copy(jo, "url", "click", "classes", "content",
-						"tag", "access", "seq", "tip");
+						"tag", "access", "seq", "tip", "style");
 
 				/**
 				 * create the access if not exists
@@ -274,6 +276,7 @@ public class Menu extends Bean {
 		access = r.getString("access");
 		seq = r.getInt("seq");
 		tip = r.getString("tip");
+		style = r.getString("style");
 	}
 
 	public String getTip() {
@@ -440,5 +443,9 @@ public class Menu extends Bean {
 	 */
 	public static void cleanup() {
 		Bean.delete("seq<0", null, Menu.class);
+	}
+
+	public String getStyle() {
+		return style;
 	}
 }

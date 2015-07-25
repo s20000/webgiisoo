@@ -12,6 +12,7 @@ import java.util.List;
 import net.sf.json.*;
 
 import com.giisoo.core.bean.Beans;
+import com.giisoo.core.bean.X;
 import com.giisoo.framework.common.*;
 import com.giisoo.framework.web.*;
 
@@ -23,7 +24,9 @@ import com.giisoo.framework.web.*;
  */
 public class menu extends Model {
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.giisoo.framework.web.Model#onGet()
 	 */
 	@Override
@@ -32,7 +35,9 @@ public class menu extends Model {
 		onPost();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.giisoo.framework.web.Model#onPost()
 	 */
 	@Require(login = false)
@@ -92,14 +97,18 @@ public class menu extends Model {
 				 */
 				jo.put("text", lang.get(m.getName()));
 				jo.put("id", m.getId());
-				if (m.getClasses() != null) {
+				if (!X.isEmpty(m.getClasses())) {
 					jo.put("classes", m.getClasses());
+				}
+
+				if (!X.isEmpty(m.getStyle())) {
+					jo.put("style", m.getStyle());
 				}
 
 				/**
 				 * set the url
 				 */
-				if (m.getUrl() != null && m.getUrl().length() > 0) {
+				if (!X.isEmpty(m.getUrl())) {
 					jo.put("url", m.getUrl());
 				}
 
@@ -110,11 +119,11 @@ public class menu extends Model {
 					jo.put("hasChildren", true);
 				}
 
-				if (m.getClick() != null && m.getClick().length() > 0) {
+				if (!X.isEmpty(m.getClick())) {
 					jo.put("click", m.getClick());
 				}
 
-				if (m.getContent() != null && m.getContent().length() > 0) {
+				if (!X.isEmpty(m.getContent())) {
 					jo.put("content", m.getContent());
 				}
 
@@ -124,5 +133,4 @@ public class menu extends Model {
 
 		this.response(arr);
 	}
-
 }
