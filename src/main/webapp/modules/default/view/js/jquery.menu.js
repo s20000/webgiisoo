@@ -29,7 +29,11 @@
 					});
 
 					function tohtml(e) {
-						var s = '<div class="item" ';
+						var s = '<div ';
+						if(e.hasChildren || e.click || e.url) {
+							//this is menu item
+							s += ' class="item" ';
+						}
 						if(e.style) {
 							s += ' style="' + e.style + '" ';
 						}
