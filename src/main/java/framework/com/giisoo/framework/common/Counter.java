@@ -8,9 +8,33 @@ package com.giisoo.framework.common;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.management.MBeanAttributeInfo;
+import javax.management.MBeanConstructorInfo;
+import javax.management.MBeanInfo;
+import javax.management.MBeanNotificationInfo;
+import javax.management.MBeanOperationInfo;
+
 import com.giisoo.core.bean.Bean;
 
-public class Counter {
+public class Counter extends MBeanInfo {
+
+	public Counter(String className, String description,
+			MBeanAttributeInfo[] attributes,
+			MBeanConstructorInfo[] constructors,
+			MBeanOperationInfo[] operations,
+			MBeanNotificationInfo[] notifications)
+			throws IllegalArgumentException {
+		
+		super(className, description, attributes, constructors, operations,
+				notifications);
+		// TODO Auto-generated constructor stub
+
+	}
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	private static Map<String, Integer> counters = new HashMap<String, Integer>();
 	private static Map<String, Object[]> maxs = new HashMap<String, Object[]>();

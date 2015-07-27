@@ -17,7 +17,7 @@ import org.apache.log4j.PropertyConfigurator;
 /**
  * The Class Config.
  */
-public class Config {
+public class Config{
 
 	/** The conf. */
 	private static PropertiesConfiguration conf;
