@@ -14,6 +14,7 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import com.giisoo.core.bean.*;
+import com.giisoo.core.cache.Cache;
 import com.giisoo.framework.web.Module;
 
 /**
@@ -35,8 +36,6 @@ public class Role extends Bean implements Exportable {
 	String memo;
 	long updated;
 
-	transient List<String> accesses;
-
 	/**
 	 * Checks for.
 	 * 
@@ -45,20 +44,13 @@ public class Role extends Bean implements Exportable {
 	 * @return true, if successful
 	 */
 	public boolean has(Access a) {
-		getAccesses();
+		List<String> list = getAccesses();
 
-		return accesses.contains(a.name);
+		return list == null ? false : list.contains(a.name);
 	}
 
 	public String getMemo() {
 		return memo;
-	}
-
-	public List<String> getAccesses() {
-		if (accesses == null) {
-			accesses = getAccess(id);
-		}
-		return accesses;
 	}
 
 	private static int nextId() {
@@ -105,9 +97,22 @@ public class Role extends Bean implements Exportable {
 	 *            the rid
 	 * @return the access
 	 */
-	public static List<String> getAccess(int rid) {
-		return Bean.loadList("tblroleaccess", "name", "rid=?",
-				new Object[] { rid }, String.class, null);
+	public List<String> getAccesses() {
+
+		if (!this.containsKey("accesses")) {
+			List<String> list = Bean.loadList("tblroleaccess", "name", "rid=?",
+					new Object[] { id }, String.class, null);
+
+			this.set("accesses", list);
+
+			recache();
+		}
+
+		return (List<String>) this.get("accesses");
+	}
+
+	private void recache() {
+		Cache.set("role://" + id, this);
 	}
 
 	/**
@@ -165,10 +170,23 @@ public class Role extends Bean implements Exportable {
 	}
 
 	private static Role load(int rid) {
-		return Bean.load("tblrole", "id=?", new Object[] { rid }, Role.class);
+		Role r = (Role) Cache.get("role://" + rid);
+
+		if (r == null) {
+			r = Bean.load("tblrole", "id=?", new Object[] { rid }, Role.class);
+		}
+
+		if (r != null) {
+			r.setExpired(60);
+			Cache.set("role://" + rid, r);
+		}
+
+		return r;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.giisoo.bean.Bean#load(java.sql.ResultSet)
 	 */
 	@Override
@@ -179,7 +197,9 @@ public class Role extends Bean implements Exportable {
 		updated = r.getLong("updated");
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.giisoo.bean.Bean#toJSON(net.sf.json.JSONObject)
 	 */
 	@Override
@@ -261,8 +281,11 @@ public class Role extends Bean implements Exportable {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see com.giisoo.bean.Exportable#output(java.lang.String, java.lang.Object[], java.util.zip.ZipOutputStream)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.giisoo.bean.Exportable#output(java.lang.String,
+	 * java.lang.Object[], java.util.zip.ZipOutputStream)
 	 */
 	public JSONObject output(String where, Object[] args, ZipOutputStream out) {
 		int s = 0;
@@ -300,8 +323,11 @@ public class Role extends Bean implements Exportable {
 		return jo;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.giisoo.bean.Exportable#input(net.sf.json.JSONArray, java.util.zip.ZipFile)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.giisoo.bean.Exportable#input(net.sf.json.JSONArray,
+	 * java.util.zip.ZipFile)
 	 */
 	public int input(JSONArray list, ZipFile in) {
 		int count = 0;
@@ -347,8 +373,11 @@ public class Role extends Bean implements Exportable {
 		return Bean.delete("id=?", new Object[] { id }, Role.class);
 	}
 
-	/* (non-Javadoc)
-	 * @see com.giisoo.bean.Exportable#load(java.lang.String, java.lang.Object[], int, int)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.giisoo.bean.Exportable#load(java.lang.String,
+	 * java.lang.Object[], int, int)
 	 */
 	public Beans<Role> load(String where, Object[] args, int s, int n) {
 		return Bean.load(null, null, "order by id", s, n, Role.class);

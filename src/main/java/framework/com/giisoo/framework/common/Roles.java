@@ -46,7 +46,7 @@ public class Roles extends Bean {
 			list = Role.loadAll(roles);
 
 			for (Role r : list) {
-				List<String> names = Role.getAccess(r.id);
+				List<String> names = r.getAccesses();
 				access.addAll(names);
 			}
 		}
