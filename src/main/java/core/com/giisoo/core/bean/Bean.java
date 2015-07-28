@@ -841,6 +841,7 @@ public abstract class Bean extends DefaultCachable implements
 					cs = outdoor.keySet().toArray(
 							new Connection[outdoor.size()]);
 				}
+				
 				for (Connection c : cs) {
 					Long[] dd = outdoor.get(c);
 					if (dd != null && dd[0] == tid) {
