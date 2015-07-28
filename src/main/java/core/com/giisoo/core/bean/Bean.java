@@ -31,6 +31,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.giisoo.core.cache.DefaultCachable;
+import com.giisoo.framework.common.OpLog;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
@@ -841,7 +842,7 @@ public abstract class Bean extends DefaultCachable implements
 					cs = outdoor.keySet().toArray(
 							new Connection[outdoor.size()]);
 				}
-				
+
 				for (Connection c : cs) {
 					Long[] dd = outdoor.get(c);
 					if (dd != null && dd[0] == tid) {
@@ -1687,6 +1688,7 @@ public abstract class Bean extends DefaultCachable implements
 	protected static <T extends Bean> Beans<T> load(String collection,
 			DBObject query, DBObject orderBy, int offset, int limit,
 			Class<T> clazz) {
+		TimeStamp t = TimeStamp.create();
 		DBCollection db = Bean.getCollection(collection);
 		DBCursor cur = db.find(query);
 		try {
@@ -1707,6 +1709,16 @@ public abstract class Bean extends DefaultCachable implements
 				limit--;
 			}
 
+			log.debug("load - cost=" + t.past() + "ms, collection="
+					+ collection + ", query=" + query + ", order=" + orderBy
+					+ ", result=" + bs);
+
+			if (t.past() > 10000) {
+				OpLog.warn("bean", "load", "cost=" + t.past() + "ms",
+						"load - cost=" + t.past() + "ms, collection="
+								+ collection + ", query=" + query + ", order="
+								+ orderBy + ", result=" + bs);
+			}
 			return bs;
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
