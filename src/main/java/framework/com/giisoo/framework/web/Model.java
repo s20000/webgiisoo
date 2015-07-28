@@ -112,7 +112,18 @@ public class Model {
 
 	protected User login = null;
 
+	protected long created = System.currentTimeMillis();
+
 	private static final ThreadLocal<Module> _currentmodule = new ThreadLocal<Module>();
+
+	protected boolean expired() {
+		int expired = Module.home.getInt("request.expired");
+		if (expired > 0) {
+			return System.currentTimeMillis() - created > expired * 1000;
+		}
+
+		return false;
+	}
 
 	/**
 	 * Clean.
@@ -1773,6 +1784,11 @@ public class Model {
 	 *            the allow override
 	 */
 	final protected boolean show(String viewname, boolean allowOverride) {
+		if (expired()) {
+			log.warn("the request was expired");
+			return false;
+		}
+
 		Writer writer = null;
 		try {
 
