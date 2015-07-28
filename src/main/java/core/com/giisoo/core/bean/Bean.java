@@ -2097,6 +2097,16 @@ public abstract class Bean extends DefaultCachable implements
 					rs.list.add(b);
 				}
 			}
+
+			log.debug("load - cost=" + t.past() + "ms, collection=" + table
+					+ ", sql=" + sql + ", result=" + rs);
+
+			if (t.past() > 10000) {
+				OpLog.warn("bean", "load", "cost=" + t.past() + "ms",
+						"load - cost=" + t.past() + "ms, collection=" + table
+								+ ", sql=" + sql + ", result=" + rs);
+			}
+
 			return rs;
 		} catch (Exception e) {
 
