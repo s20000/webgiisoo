@@ -67,8 +67,10 @@ public class Access extends Bean implements Exportable {
 	 */
 	public static void set(String name) {
 		if (X.isEmpty(name) || !name.startsWith("access.")) {
+			
 			log.error("error access.name: " + name, new Exception(
 					"error access name:" + name));
+			
 		} else if (!exists(name)) {
 
 			if (Bean.insert(V.create("name", name).set("id", name),

@@ -33,7 +33,6 @@ import com.giisoo.core.bean.X;
 import com.giisoo.core.conf.SystemConfig;
 import com.giisoo.core.index.SearchResults;
 import com.giisoo.core.index.Searchable;
-import com.giisoo.framework.mdc.*;
 import com.giisoo.framework.mdc.command.*;
 import com.giisoo.utils.base.Html;
 
@@ -318,7 +317,8 @@ public class Model {
 												this.deny();
 											}
 
-											OpLog.warn("deny", uri, null,
+											OpLog.warn("deny", uri, "requred: "
+													+ lang.get(pp.access()),
 													login.getId(),
 													this.getRemoteHost());
 											return;
@@ -522,6 +522,11 @@ public class Model {
 					/**
 					 * the user logined, but no access, show deny
 					 */
+					OpLog.warn("deny", uri,
+							"requred: " + lang.get(require.access()),
+							login == null ? -1 : login.getId(),
+							this.getRemoteHost());
+
 					deny();
 				}
 				break;

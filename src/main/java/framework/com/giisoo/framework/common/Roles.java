@@ -72,7 +72,7 @@ public class Roles extends Bean {
 			/**
 			 * test the name exists in while access? if not then add it in DB
 			 */
-			if (s != null && !"".equals(s)) {
+			if (!X.isEmpty(s)) {
 				Access.set(s);
 			}
 

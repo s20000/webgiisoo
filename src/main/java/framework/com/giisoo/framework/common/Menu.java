@@ -145,8 +145,8 @@ public class Menu extends Bean {
 		try {
 			// log.info(jo);
 
-			String name = jo.containsKey("name") ? jo.getString("name") : null;
-			if (name != null) {
+			String name = jo.getString("name");
+			if (!X.isEmpty(name)) {
 				/**
 				 * create menu if not exists
 				 */
@@ -184,7 +184,34 @@ public class Menu extends Bean {
 						insertOrUpdate(j, m.getId());
 					}
 				}
+			} else {
+				// is role ?
+				String role = jo.getString("role");
+				String access = jo.getString("access");
+				if (!X.isEmpty(role) && !X.isEmpty(access)) {
+					String memo = jo.getString("memo");
+					int rid = Role.create(role, memo);
+					if (rid <= 0) {
+						Role r = Role.loadByName(role);
+						if (r != null) {
+							rid = r.getId();
+						}
+					}
+					if (rid > 0) {
+						String[] ss = access.split("[|&]");
+						for (String s : ss) {
+							Access.set(s);
+							
+							Role.setAccess(rid, s);
+						}
+					} else {
+						log.error("can not create or load the role: " + role);
+						OpLog.warn("initial",
+								"can not create or load the role:" + role, null);
+					}
+				}
 			}
+
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
