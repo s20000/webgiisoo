@@ -20,6 +20,7 @@ table.tablesorter thead tr .header {
 	background-repeat: no-repeat;
 	background-position: center right;
 	cursor: pointer;
+	width: initial;
 }
 
 table.tablesorter tbody td {
