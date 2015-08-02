@@ -5,6 +5,8 @@
  */
 package com.giisoo.app.web.admin;
 
+import java.util.regex.Pattern;
+
 import net.sf.json.JSONObject;
 
 import com.giisoo.core.bean.Bean;
@@ -14,6 +16,7 @@ import com.giisoo.core.bean.Bean.W;
 import com.giisoo.core.bean.X;
 import com.giisoo.framework.common.*;
 import com.giisoo.framework.web.*;
+import com.mongodb.BasicDBObject;
 
 public class user extends Model {
 
@@ -114,22 +117,60 @@ public class user extends Model {
 		int n = this.getInt("n", 10, "default.list.number");
 
 		JSONObject jo = this.getJSON();
-		W w = W.create().copy(jo, W.OP_EQ, "op")
-				.copyInt(jo, W.OP_EQ, "uid", "type").copy(jo, W.OP_LIKE, "ip");
-		if (jo.has("starttime")) {
-			long s1 = lang.parse(jo.getString("starttime"), "yyyy-MM-dd");
-			if (s1 > 0) {
-				w.and("created", s1, W.OP_GT_EQ);
-			}
+		// W w = W.create().copy(jo, W.OP_EQ, "op")
+		// .copyInt(jo, W.OP_EQ, "uid", "type").copy(jo, W.OP_LIKE, "ip");
+		// if (jo.has("starttime")) {
+		// long s1 = lang.parse(jo.getString("starttime"), "yyyy-MM-dd");
+		// if (s1 > 0) {
+		// w.and("created", s1, W.OP_GT_EQ);
+		// }
+		// }
+		// if (jo.has("endtime")) {
+		// long s1 = lang.parse(jo.getString("endtime"), "yyyy-MM-dd");
+		// if (s1 > 0) {
+		// w.and("created", s1, W.OP_LT_EQ);
+		// }
+		// }
+		//
+		// w.and("module", User.class.getName());
+
+		BasicDBObject q = new BasicDBObject().append("module",
+				User.class.getName());
+		if (!X.isEmpty(jo.get("op"))) {
+			q.append("op", jo.get("op"));
 		}
-		if (jo.has("endtime")) {
-			long s1 = lang.parse(jo.getString("endtime"), "yyyy-MM-dd");
-			if (s1 > 0) {
-				w.and("created", s1, W.OP_LT_EQ);
-			}
+		if (!X.isEmpty(jo.get("uid"))) {
+			q.append("uid", Bean.toInt(jo.get("uid")));
+		}
+		if (!X.isEmpty(jo.get("type"))) {
+			q.append("type", Bean.toInt(jo.get("type")));
+		}
+		if (!X.isEmpty(jo.get("ip"))) {
+			q.append("ip", Pattern.compile(jo.getString("ip"),
+					Pattern.CASE_INSENSITIVE));
+		}
+		if (!X.isEmpty(jo.getString("starttime"))) {
+			q.append("created",
+					new BasicDBObject().append("$gte",
+							Bean.toInt(lang.format(lang.parse(
+									jo.getString("starttime"), "yyyy-MM-dd"),
+									"yyyyMMdd"))));
+
+		} else {
+			long today_2 = System.currentTimeMillis() - X.ADAY * 2;
+			jo.put("starttime", lang.format(today_2, "yyyy-MM-dd"));
+			q.append(
+					"created",
+					new BasicDBObject().append("$gte",
+							Bean.toInt(lang.format(today_2, "yyyyMMdd"))));
 		}
 
-		w.and("module", User.class.getName());
+		if (!X.isEmpty(jo.getString("endtime"))) {
+			q.append("created", new BasicDBObject().append("$lte", Bean
+					.toInt(lang.format(
+							lang.parse(jo.getString("endtime"), "yyyy-MM-dd"),
+							"yyyyMMdd"))));
+		}
 
 		this.set("cate", User.class.getName());
 
@@ -137,7 +178,7 @@ public class user extends Model {
 
 		this.set("currentpage", s);
 
-		Beans<OpLog> bs = OpLog.load(w, s, n);
+		Beans<OpLog> bs = OpLog.load(q, s, n);
 		this.set(bs, s, n);
 
 		this.show("/admin/user.history.html");

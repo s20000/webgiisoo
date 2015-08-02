@@ -17,6 +17,7 @@ import com.giisoo.core.bean.*;
 import com.giisoo.core.conf.SystemConfig;
 import com.giisoo.framework.utils.Shell;
 import com.giisoo.framework.web.Language;
+import com.mongodb.BasicDBObject;
 
 /**
  * Operation Log
@@ -24,7 +25,7 @@ import com.giisoo.framework.web.Language;
  * @author yjiang
  * 
  */
-@DBMapping(table = "tbloplog")
+@DBMapping(collection = "oplog")
 public class OpLog extends Bean implements Exportable {
 
 	private static final long serialVersionUID = 1L;
@@ -32,17 +33,6 @@ public class OpLog extends Bean implements Exportable {
 	public static final int TYPE_INFO = 0;
 	public static final int TYPE_WARN = 1;
 	public static final int TYPE_ERROR = 2;
-
-	String id;
-	long created;
-	String system;
-	String module;
-	int uid;
-	String ip;
-	int type;
-	String op;
-	String brief;
-	String message;
 
 	/**
 	 * Removes the.
@@ -94,11 +84,14 @@ public class OpLog extends Bean implements Exportable {
 	 *            the limit
 	 * @return the beans
 	 */
-	public static Beans<OpLog> load(W w, int offset, int limit) {
-		return Bean.load(w == null ? null : w.where(),
-				w == null ? null : w.args(),
-				w == null || X.isEmpty(w.orderby()) ? "order by created desc"
-						: w.orderby(), offset, limit, OpLog.class);
+	public static Beans<OpLog> load(BasicDBObject query, BasicDBObject order,
+			int offset, int limit) {
+		return Bean.load(query, order, offset, limit, OpLog.class);
+	}
+
+	public static Beans<OpLog> load(BasicDBObject query, int offset, int limit) {
+		return load(query, new BasicDBObject().append("created", -1), offset,
+				limit);
 	}
 
 	/**
@@ -272,80 +265,8 @@ public class OpLog extends Bean implements Exportable {
 		return info(system, module, op, brief, message, uid, ip);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.giisoo.bean.Bean#load(java.sql.ResultSet)
-	 */
-	@Override
-	protected void load(ResultSet r) throws SQLException {
-		id = r.getString("id");
-		created = r.getLong("created");
-		system = r.getString("system");
-		module = r.getString("module");
-		uid = r.getInt("uid");
-		type = r.getInt("type");
-		op = r.getString("op");
-		message = r.getString("message");
-		ip = r.getString("ip");
-		brief = r.getString("brief");
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.giisoo.bean.Bean#toJSON(net.sf.json.JSONObject)
-	 */
-	@Override
-	public boolean toJSON(JSONObject jo) {
-		jo.put("id", id);
-		jo.put("created", created);
-		jo.put("system", system);
-		jo.put("module", module);
-		jo.put("uid", uid);
-		jo.put("type", type);
-		jo.put("op", op);
-		jo.put("message", message);
-		jo.put("ip", ip);
-		jo.put("brief", brief);
-
-		return true;
-	}
-
-	public String getIp() {
-		return ip;
-	}
-
-	public long getCreated() {
-		return created;
-	}
-
-	public String getSystem() {
-		return system;
-	}
-
-	public String getModule() {
-		return module;
-	}
-
-	public int getUid() {
-		return uid;
-	}
-
-	public int getType() {
-		return type;
-	}
-
-	public String getOp() {
-		return op;
-	}
-
-	public String getMessage() {
-		return message;
-	}
-
 	public String getId() {
-		return id;
+		return this.getString(X._ID);
 	}
 
 	/*
@@ -414,17 +335,11 @@ public class OpLog extends Bean implements Exportable {
 		return count;
 	}
 
-	public String getBrief() {
-		return brief;
-	}
-
-	transient User user;
-
 	public User getUser() {
-		if (user == null && uid >= 0) {
-			user = User.loadById(uid);
+		if (!this.containsKey("user_obj")) {
+			this.set("user_obj", User.loadById(this.getInt("uid")));
 		}
-		return user;
+		return (User) this.get("user_obj");
 	}
 
 	/*
@@ -438,15 +353,15 @@ public class OpLog extends Bean implements Exportable {
 	}
 
 	public String getExportableId() {
-		return id;
+		return getId();
 	}
 
 	public String getExportableName() {
-		return message;
+		return this.getString("message");
 	}
 
 	public long getExportableUpdated() {
-		return created;
+		return this.getLong("created");
 	}
 
 	/**
@@ -764,14 +679,24 @@ public class OpLog extends Bean implements Exportable {
 	 */
 	public static int info(String system, String module, String op,
 			String brief, String message, int uid, String ip) {
+		return _log(OpLog.TYPE_INFO, system, module, op, brief, message, uid,
+				ip);
+	}
+
+	private static int _log(int type, String system, String module, String op,
+			String brief, String message, int uid, String ip) {
+
+		// brief = Language.getLanguage().truncate(brief, 1024);
+		// message = Language.getLanguage().truncate(message, 8192);
+
 		long t = System.currentTimeMillis();
 		String id = UID.id(t, op, message);
-		int i = Bean.insert(
+		int i = Bean.insertCollection(
 				V.create("id", id).set("created", t).set("system", system)
 						.set("module", module).set("op", op)
 						.set("brief", brief).set("message", message)
-						.set("uid", uid).set("ip", ip)
-						.set("type", OpLog.TYPE_INFO), OpLog.class);
+						.set("uid", uid).set("ip", ip).set("type", type),
+				OpLog.class);
 
 		if (i > 0) {
 			Category.update(system, module, op);
@@ -782,10 +707,22 @@ public class OpLog extends Bean implements Exportable {
 			if (SystemConfig.i("logger.rsyslog", 0) == 1) {
 				Language lang = Language.getLanguage();
 				// 192.168.1.1#系统名称#2014-10-31#ERROR#日志消息#程序名称
-				Shell.log(ip, Shell.Logger.info,
-						lang.get("log.module_" + module),
-						lang.get("log.opt_" + op) + "//" + brief + ", uid="
-								+ uid);
+				if (type == OpLog.TYPE_INFO) {
+					Shell.log(ip, Shell.Logger.info,
+							lang.get("log.module_" + module),
+							lang.get("log.opt_" + op) + "//" + brief + ", uid="
+									+ uid);
+				} else if (type == OpLog.TYPE_ERROR) {
+					Shell.log(ip, Shell.Logger.error,
+							lang.get("log.module_" + module),
+							lang.get("log.opt_" + op) + "//" + brief + ", uid="
+									+ uid);
+				} else {
+					Shell.log(ip, Shell.Logger.warn,
+							lang.get("log.module_" + module),
+							lang.get("log.opt_" + op) + "//" + brief + ", uid="
+									+ uid);
+				}
 			}
 
 			onChanged("tbloplog", IData.OP_CREATE, "created=? and id=?",
@@ -962,37 +899,8 @@ public class OpLog extends Bean implements Exportable {
 	 */
 	public static int warn(String system, String module, String op,
 			String brief, String message, int uid, String ip) {
-		long t = System.currentTimeMillis();
-		String id = UID.id(t, op, message);
-		int i = Bean.insert(
-				V.create("id", id).set("created", t).set("system", system)
-						.set("module", module).set("op", op)
-						.set("brief", brief).set("message", message)
-						.set("uid", uid).set("ip", ip)
-						.set("type", OpLog.TYPE_WARN), OpLog.class);
-
-		if (i > 0) {
-			Category.update(system, module, op);
-
-			/**
-			 * 记录系统日志
-			 */
-			if (SystemConfig.i("logger.rsyslog", 0) == 1) {
-				Language lang = Language.getLanguage();
-
-				// 192.168.1.1#系统名称#2014-10-31#ERROR#日志消息#程序名称
-				Shell.log(ip, Shell.Logger.warn,
-						lang.get("log.module_" + module),
-						lang.get("log.opt_" + op) + "//" + brief + ", uid="
-								+ uid);
-
-			}
-
-			onChanged("tbloplog", IData.OP_CREATE, "created=? and id=?",
-					new Object[] { t, id });
-		}
-
-		return i;
+		return _log(OpLog.TYPE_WARN, system, module, op, brief, message, uid,
+				ip);
 	}
 
 	/**
@@ -1162,36 +1070,24 @@ public class OpLog extends Bean implements Exportable {
 	 */
 	public static int error(String system, String module, String op,
 			String brief, String message, int uid, String ip) {
-		long t = System.currentTimeMillis();
-		String id = UID.id(t, op, message);
-		int i = Bean.insert(
-				V.create("id", id).set("created", t).set("system", system)
-						.set("module", module).set("op", op)
-						.set("brief", brief).set("message", message)
-						.set("uid", uid).set("ip", ip)
-						.set("type", OpLog.TYPE_ERROR), OpLog.class);
+		return _log(OpLog.TYPE_ERROR, system, module, op, brief, message, uid,
+				ip);
+	}
 
-		if (i > 0) {
-			Category.update(system, module, op);
+	public String getSystem() {
+		return this.getString("system");
+	}
 
-			/**
-			 * 记录系统日志
-			 */
-			if (SystemConfig.i("logger.rsyslog", 0) == 1) {
-				Language lang = Language.getLanguage();
+	public String getModule() {
+		return this.getString("module");
+	}
 
-				// 192.168.1.1#系统名称#2014-10-31#ERROR#日志消息#程序名称
-				Shell.log(ip, Shell.Logger.error,
-						lang.get("log.module_" + module),
-						lang.get("log.opt_" + op) + "//" + brief + ", uid="
-								+ uid);
-			}
+	public String getOp() {
+		return this.getString("op");
+	}
 
-			onChanged("tbloplog", IData.OP_CREATE, "created=? and id=?",
-					new Object[] { t, id });
-		}
-
-		return i;
+	public String getMessage() {
+		return this.getString("message");
 	}
 
 }

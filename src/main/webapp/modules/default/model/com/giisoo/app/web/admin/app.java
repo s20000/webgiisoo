@@ -5,8 +5,11 @@
  */
 package com.giisoo.app.web.admin;
 
+import java.util.regex.Pattern;
+
 import net.sf.json.JSONObject;
 
+import com.giisoo.core.bean.Bean;
 import com.giisoo.core.bean.Beans;
 import com.giisoo.core.bean.UID;
 import com.giisoo.core.bean.Bean.V;
@@ -15,8 +18,8 @@ import com.giisoo.core.bean.X;
 import com.giisoo.framework.common.App;
 import com.giisoo.framework.common.OpLog;
 import com.giisoo.framework.web.Model;
-import com.giisoo.framework.web.Paging;
 import com.giisoo.framework.web.Path;
+import com.mongodb.BasicDBObject;
 
 public class app extends Model {
 
@@ -29,8 +32,23 @@ public class app extends Model {
 		int n = this.getInt("n", 10, "default.list.number");
 
 		JSONObject jo = this.getJSON();
-		W w = W.create().copy(jo, W.OP_EQ, "op");
-		w.and("module", App.class.getName(), W.OP_EQ);
+		// W w = W.create().copy(jo, W.OP_EQ, "op");
+		// w.and("module", App.class.getName(), W.OP_EQ);
+		BasicDBObject q = new BasicDBObject().append("module",
+				App.class.getName());
+		if (!X.isEmpty(jo.get("op"))) {
+			q.append("op", jo.get("op"));
+		}
+		if (!X.isEmpty(jo.get("uid"))) {
+			q.append("uid", Bean.toInt(jo.get("uid")));
+		}
+		if (!X.isEmpty(jo.get("type"))) {
+			q.append("type", Bean.toInt(jo.get("type")));
+		}
+		if (!X.isEmpty(jo.get("ip"))) {
+			q.append("ip", Pattern.compile(jo.getString("ip"),
+					Pattern.CASE_INSENSITIVE));
+		}
 
 		this.set(jo);
 
@@ -38,7 +56,7 @@ public class app extends Model {
 			this.set("currentpage", 1);
 		}
 
-		Beans<OpLog> bs = OpLog.load(w, s, n);
+		Beans<OpLog> bs = OpLog.load(q, s, n);
 		this.set(bs, s, n);
 
 		this.show("/admin/app.history.html");
@@ -181,7 +199,9 @@ public class app extends Model {
 		this.println(UID.random(24));
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.giisoo.framework.web.Model#onGet()
 	 */
 	@Path(login = true, access = "access.admin")

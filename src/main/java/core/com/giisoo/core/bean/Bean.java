@@ -867,11 +867,14 @@ public abstract class Bean extends DefaultCachable implements
 			StringBuilder sb = new StringBuilder();
 			sb.append("====================begin of thread dump=============================\r\n");
 			sb.append("outdoor:" + outdoor.size());
+
 			Map<Thread, StackTraceElement[]> m = Thread.getAllStackTraces();
 			for (Iterator<Thread> it = m.keySet().iterator(); it.hasNext();) {
 				Thread t = it.next();
 				long tid = t.getId();
 				Long[][] d0 = null;
+
+				// TODO, there is big performance issue
 				synchronized (outdoor) {
 					d0 = outdoor.values().toArray(new Long[outdoor.size()][]);
 				}
@@ -899,7 +902,7 @@ public abstract class Bean extends DefaultCachable implements
 			}
 			sb.append("====================end of thread dump=============================");
 
-			sb.toString();
+			log.error(sb.toString());
 
 			throw e1;
 		}

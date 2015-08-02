@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -33,6 +34,7 @@ import com.giisoo.framework.common.Repo.Entity;
 import com.giisoo.framework.web.Model;
 import com.giisoo.framework.web.Paging;
 import com.giisoo.framework.web.Path;
+import com.mongodb.BasicDBObject;
 
 public class dict extends Model {
 
@@ -71,7 +73,9 @@ public class dict extends Model {
 		this.response(jo);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.giisoo.framework.web.Model#onGet()
 	 */
 	@Path(login = true, access = "access.dict.query")
@@ -236,9 +240,25 @@ public class dict extends Model {
 		int n = this.getInt("n", 10, "default.list.number");
 
 		JSONObject jo = this.getJSON();
-		W w = W.create().copy(jo, W.OP_EQ, "op")
-				.copyInt(jo, W.OP_EQ, "uid", "type").copy(jo, W.OP_LIKE, "ip");
-		w.and("module", Dict.class.getName());
+		// W w = W.create().copy(jo, W.OP_EQ, "op")
+		// .copyInt(jo, W.OP_EQ, "uid", "type").copy(jo, W.OP_LIKE, "ip");
+		// w.and("module", Dict.class.getName());
+
+		BasicDBObject q = new BasicDBObject().append("module",
+				Dict.class.getName());
+		if (!X.isEmpty(jo.get("op"))) {
+			q.append("op", jo.get("op"));
+		}
+		if (!X.isEmpty(jo.get("uid"))) {
+			q.append("uid", Bean.toInt(jo.get("uid")));
+		}
+		if (!X.isEmpty(jo.get("type"))) {
+			q.append("type", Bean.toInt(jo.get("type")));
+		}
+		if (!X.isEmpty(jo.get("ip"))) {
+			q.append("ip", Pattern.compile(jo.getString("ip"),
+					Pattern.CASE_INSENSITIVE));
+		}
 
 		this.set("cate", Dict.class.getName());
 
@@ -246,7 +266,7 @@ public class dict extends Model {
 
 		this.set("currentpage", s);
 
-		Beans<OpLog> bs = OpLog.load(w, s, n);
+		Beans<OpLog> bs = OpLog.load(q, s, n);
 		this.set(bs, s, n);
 
 		this.show("/admin/dict.history.html");
