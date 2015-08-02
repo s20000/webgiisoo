@@ -135,8 +135,7 @@ public class log extends Model {
 		JSONObject jo = this.getJSON();
 		BasicDBObject w = getW(jo);
 
-		Beans<OpLog> bs = OpLog.load(w,
-				new BasicDBObject().append("created", 1), s, n);
+		Beans<OpLog> bs = OpLog.load(w, s, n);
 		this.set(bs, s, n);
 
 		this.show("/admin/oplog.index.html");
@@ -168,7 +167,6 @@ public class log extends Model {
 
 		final JSONObject jo = this.getJSON();
 		final BasicDBObject q = getW(jo);
-		final BasicDBObject order = new BasicDBObject().append("creaated", -1);
 
 		String id = UID.id(login.get("name"), jo.toString());
 		String name = "oplog_" + Bean.millis2Date(System.currentTimeMillis())
@@ -210,7 +208,7 @@ public class log extends Model {
 						sb.append(lang.get("log.message")).append("\"");
 						out.write(sb.toString() + "\r\n");
 
-						Beans<OpLog> bs = OpLog.load(q, order, s, 100);
+						Beans<OpLog> bs = OpLog.load(q, s, 100);
 						while (bs != null && bs.getList() != null
 								&& bs.getList().size() > 0) {
 							for (OpLog p : bs.getList()) {
@@ -264,7 +262,7 @@ public class log extends Model {
 								out.write(sb.toString() + "\r\n");
 							}
 							s += bs.getList().size();
-							bs = OpLog.load(q, order, s, 100);
+							bs = OpLog.load(q, s, 100);
 						}
 
 						out.close();

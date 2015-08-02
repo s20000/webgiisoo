@@ -110,7 +110,7 @@ create table tbloplog
 	type int default 0,
 	op varchar(255),
 	brief varchar(1024),
-	message varchar(8192),
+	message varchar(8196),
 	result varchar(255),
 	memo varchar(255),
 	ip varchar(50)

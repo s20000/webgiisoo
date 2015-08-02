@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -25,6 +26,7 @@ import com.giisoo.framework.common.OpLog;
 import com.giisoo.framework.common.Session;
 import com.giisoo.framework.common.Temp;
 import com.giisoo.framework.web.*;
+import com.mongodb.BasicDBObject;
 
 public class log extends Model {
 
@@ -63,41 +65,58 @@ public class log extends Model {
 
 	}
 
-	private W getW(JSONObject jo) {
+	private BasicDBObject getW(JSONObject jo) {
 
-		W w = W.create().copy(jo, W.OP_EQ, "op").copy(jo, W.OP_LIKE, "ip")
-				.copyInt(jo, W.OP_EQ, "type", "uid");
+		BasicDBObject q = new BasicDBObject();
+
+		if (!X.isEmpty(jo.get("op"))) {
+			q.append("op", jo.get("op"));
+		}
+		if (!X.isEmpty(jo.get("ip"))) {
+			q.append("ip", Pattern.compile(jo.getString("ip"),
+					Pattern.CASE_INSENSITIVE));
+		}
+		if (!X.isEmpty(jo.get("uid"))) {
+			q.append("uid", Bean.toInt(jo.get("uid")));
+		}
+		if (!X.isEmpty(jo.get("type"))) {
+			q.append("type", Bean.toInt(jo.get("type")));
+		}
 
 		if (!X.isEmpty(jo.getString("_module"))) {
-			w.and("module", jo.getString("_module"));
+			q.append("module", jo.getString("_module"));
 		}
 
 		if (!X.isEmpty(jo.getString("_system"))) {
-			w.and("system", jo.getString("_system"));
+			q.append("system", jo.getString("_system"));
 		}
 
 		if (!X.isEmpty(jo.getString("starttime"))) {
-			w.and("created", Bean.toInt(lang.format(
-					lang.parse(jo.getString("starttime"), "yyyy-MM-dd"),
-					"yyyyMMdd")), W.OP_GT_EQ);
+			q.append("created",
+					new BasicDBObject().append("$gte",
+							Bean.toInt(lang.format(lang.parse(
+									jo.getString("starttime"), "yyyy-MM-dd"),
+									"yyyyMMdd"))));
 
 		} else {
 			long today_2 = System.currentTimeMillis() - X.ADAY * 2;
 			jo.put("starttime", lang.format(today_2, "yyyy-MM-dd"));
-			w.and("created", Bean.toInt(lang.format(today_2, "yyyyMMdd")),
-					W.OP_GT_EQ);
-
+			q.append(
+					"created",
+					new BasicDBObject().append("$gte",
+							Bean.toInt(lang.format(today_2, "yyyyMMdd"))));
 		}
 
 		if (!X.isEmpty(jo.getString("endtime"))) {
-			w.and("created", Bean.toInt(lang.format(
-					lang.parse(jo.getString("endtime"), "yyyy-MM-dd"),
-					"yyyyMMdd")), W.OP_LT);
+			q.append("created", new BasicDBObject().append("$lte", Bean
+					.toInt(lang.format(
+							lang.parse(jo.getString("endtime"), "yyyy-MM-dd"),
+							"yyyyMMdd"))));
 		}
 
 		this.set(jo);
 
-		return w;
+		return q;
 	}
 
 	/*
@@ -114,7 +133,7 @@ public class log extends Model {
 		this.set("currentpage", s);
 
 		JSONObject jo = this.getJSON();
-		W w = getW(jo);
+		BasicDBObject w = getW(jo);
 
 		Beans<OpLog> bs = OpLog.load(w, s, n);
 		this.set(bs, s, n);
@@ -147,7 +166,7 @@ public class log extends Model {
 		 */
 
 		final JSONObject jo = this.getJSON();
-		final W w = getW(jo);
+		final BasicDBObject q = getW(jo);
 
 		String id = UID.id(login.get("name"), jo.toString());
 		String name = "oplog_" + Bean.millis2Date(System.currentTimeMillis())
@@ -189,13 +208,14 @@ public class log extends Model {
 						sb.append(lang.get("log.message")).append("\"");
 						out.write(sb.toString() + "\r\n");
 
-						Beans<OpLog> bs = OpLog.load(w, s, 100);
+						Beans<OpLog> bs = OpLog.load(q, s, 100);
 						while (bs != null && bs.getList() != null
 								&& bs.getList().size() > 0) {
 							for (OpLog p : bs.getList()) {
 								sb = new StringBuilder();
 								sb.append("\"")
-										.append(lang.format(p.getCreated(),
+										.append(lang.format(
+												p.getLong("created"),
 												"yyyy-MM-dd hh:mm:ss"))
 										.append("\",\"");
 
@@ -206,8 +226,8 @@ public class log extends Model {
 									sb.append("\",\"");
 								}
 
-								if (p.getIp() != null) {
-									sb.append(p.getIp()).append("\",\"");
+								if (X.isEmpty(p.get("ip"))) {
+									sb.append(p.get("ip")).append("\",\"");
 								} else {
 									sb.append("\",\"");
 								}
@@ -242,13 +262,14 @@ public class log extends Model {
 								out.write(sb.toString() + "\r\n");
 							}
 							s += bs.getList().size();
-							bs = OpLog.load(w, s, 100);
+							bs = OpLog.load(q, s, 100);
 						}
 
 						out.close();
 
-						OpLog.info(OpLog.class, "export", jo.toString(), null,
-								login.getId(), log.this.getRemoteHost());
+						OpLog.info(OpLog.class, "export", jo.toString(),
+								(String) null, login.getId(),
+								log.this.getRemoteHost());
 
 					} catch (Exception e) {
 						log.error(e.getMessage(), e);

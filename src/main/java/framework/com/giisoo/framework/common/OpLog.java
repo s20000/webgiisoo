@@ -90,7 +90,7 @@ public class OpLog extends Bean implements Exportable {
 	}
 
 	public static Beans<OpLog> load(BasicDBObject query, int offset, int limit) {
-		return load(query, new BasicDBObject().append("created", -1), offset,
+		return load(query, new BasicDBObject().append("created", 1), offset,
 				limit);
 	}
 
