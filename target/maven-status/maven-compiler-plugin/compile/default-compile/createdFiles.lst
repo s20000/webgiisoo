@@ -140,6 +140,7 @@ net/sf/json/xml/JSONTypes.class
 net/sf/json/JSONArray$JSONArrayListIterator.class
 com/giisoo/app/web/admin/exportupgrade.class
 com/giisoo/core/index/SearchResults.class
+.gitignore
 com/giisoo/app/web/counter.class
 com/giisoo/framework/utils/Shell$Logger.class
 com/giisoo/core/index/SearchEngine$PLSEStub.class
