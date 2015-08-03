@@ -2096,11 +2096,11 @@ table.tablesorter tbody tr.state_0 td {
 }
 
 #log-table th.date {
-	width: 10%;
+	width: 50px;
 }
 
 #log-table th.type {
-	width: 10%;
+	width: 50px;
 }
 
 #log-table th.user {
@@ -2112,7 +2112,7 @@ table.tablesorter tbody tr.state_0 td {
 }
 
 #log-table th.system {
-	width: 10%;
+	width: 20px;
 }
 
 #log-table th.module {
