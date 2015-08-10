@@ -2197,6 +2197,12 @@ table.tablesorter tbody tr.state_0 td {
 	word-break: break-all;
 }
 
+#hint .leanmodal-content{
+	padding: 20px;
+    background: #0AAF64;
+    border-radius: 10px;	
+}
+
 .chart {
 	width: 100%;
 	text-align: center;
