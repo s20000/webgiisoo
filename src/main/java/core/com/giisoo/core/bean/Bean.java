@@ -1023,6 +1023,7 @@ public abstract class Bean extends DefaultCachable implements
 				log.error(e);
 
 				StringBuilder sb = new StringBuilder();
+				s = s.trim();
 				for (int i = 0; i < s.length(); i++) {
 					char c = s.charAt(i);
 					if (c >= '0' && c <= '9') {
@@ -1087,6 +1088,7 @@ public abstract class Bean extends DefaultCachable implements
 				log.error(e);
 
 				StringBuilder sb = new StringBuilder();
+				s = s.trim();
 				for (int i = 0; i < s.length(); i++) {
 					char c = s.charAt(i);
 					if (c >= '0' && c <= '9') {
@@ -1139,6 +1141,7 @@ public abstract class Bean extends DefaultCachable implements
 				log.error(e);
 
 				StringBuilder sb = new StringBuilder();
+				s = s.trim();
 				for (int i = 0; i < s.length(); i++) {
 					char c = s.charAt(i);
 					if (c >= '0' && c <= '9') {
@@ -3321,6 +3324,7 @@ public abstract class Bean extends DefaultCachable implements
 				log.error(e);
 
 				StringBuilder sb = new StringBuilder();
+				s = s.trim();
 				for (int i = 0; i < s.length(); i++) {
 					char c = s.charAt(i);
 					if (c >= '0' && c <= '9') {
