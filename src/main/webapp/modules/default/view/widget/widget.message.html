@@ -1,5 +1,5 @@
 #if($error)
-	<div class='error'>$error</div>
+	$.error("$error")
 #elseif($message)
-	<div class='message'>$message</div>
+	$.hint("$message")
 #end
