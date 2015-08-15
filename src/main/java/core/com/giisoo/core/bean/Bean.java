@@ -3197,7 +3197,13 @@ public abstract class Bean extends DefaultCachable implements
 	 */
 	public boolean toJSON(JSONObject jo) {
 		if (extra != null && extra.size() > 0 && jo != null) {
-			jo.putAll(extra);
+			for (String name : extra.keySet()) {
+				Object o = extra.get(name);
+				if (o != null && !(o instanceof Bean)) {
+					jo.putAll(extra);
+				}
+			}
+
 			return true;
 		}
 		return false;
