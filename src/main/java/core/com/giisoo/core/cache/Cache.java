@@ -88,6 +88,8 @@ public class Cache {
 					} else {
 						FileCache.delete(id);
 					}
+
+					return null;
 				}
 			}
 
