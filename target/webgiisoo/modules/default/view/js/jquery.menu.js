@@ -44,7 +44,7 @@
 						}
 						s += '" mid="' + e.id + '" ';
 						if (e.click) {
-							s += ' onclick=\'' + e.click + '\' ';
+							s += ' onclick=\'$("#menu .menu .selected").removeClass("selected");$(this).addClass("selected");' + e.click + '\' ';
 						}
 						s += '> ';
 
