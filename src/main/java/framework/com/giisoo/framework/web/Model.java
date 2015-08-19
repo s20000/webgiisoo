@@ -945,6 +945,27 @@ public class Model {
     }
 
     /**
+     * get the parameter from the request, if not presented, then get from
+     * session
+     * 
+     * @param tag
+     * @param tagInSession
+     * @return
+     */
+    final protected String getString(String tag, String tagInSession) {
+        String r = getString(tag);
+        if (X.isEmpty(r)) {
+            Session s = this.getSession();
+            r = (String) s.get(tagInSession);
+        } else {
+            Session s = this.getSession();
+            s.set(tagInSession, r).store();
+        }
+
+        return r;
+    }
+
+    /**
      * Gets the int.
      * 
      * @param tag
