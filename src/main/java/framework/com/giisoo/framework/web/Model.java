@@ -950,13 +950,18 @@ public class Model {
      * 
      * @param tag
      * @param tagInSession
-     * @return
+     * @param defaultValue
+     * @return String of the value
      */
-    final protected String getString(String tag, String tagInSession) {
+    final protected String getString(String tag, String tagInSession, String defaultValue) {
         String r = getString(tag);
         if (X.isEmpty(r)) {
             Session s = this.getSession();
             r = (String) s.get(tagInSession);
+            if (X.isEmpty(r)) {
+                r = defaultValue;
+                s.set(tagInSession, r).store();
+            }
         } else {
             Session s = this.getSession();
             s.set(tagInSession, r).store();
