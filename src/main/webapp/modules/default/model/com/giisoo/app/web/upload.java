@@ -115,7 +115,7 @@ public class upload extends Model {
 			String folder = this.getString("folder");
 
 			long pos = Repo.store(folder, id, file.getName(), tag, position,
-					total, file.getInputStream(), -1, !"no".equals(share), me);
+					total, file.getInputStream(), -1, !"no".equals(share), (int)me);
 			if (pos >= 0) {
 				if (jo == null) {
 					this.put("url", "/repo/" + id + "/" + file.getName());

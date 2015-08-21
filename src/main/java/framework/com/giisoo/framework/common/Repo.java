@@ -123,7 +123,7 @@ public class Repo extends Bean {
 	 */
 	public static long store(String folder, String id, String name, String tag,
 			long position, long total, InputStream in, long expired,
-			boolean share, long uid) throws IOException {
+			boolean share, int uid) throws IOException {
 		Entity e = new Entity();
 		e.folder = folder;
 		e.name = name;
