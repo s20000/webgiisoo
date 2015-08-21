@@ -123,7 +123,7 @@ public class Repo extends Bean {
 	 */
 	public static long store(String folder, String id, String name, String tag,
 			long position, long total, InputStream in, long expired,
-			boolean share, int uid) throws IOException {
+			boolean share, long uid) throws IOException {
 		Entity e = new Entity();
 		e.folder = folder;
 		e.name = name;
@@ -436,7 +436,7 @@ public class Repo extends Bean {
 					resp.writeInt(flag);
 					resp.writeLong(expired);
 					resp.writeLong(total);
-					resp.writeLong(uid);
+					resp.writeInt((int)uid);
 					resp.writeString(id);
 					resp.writeString(name);
 					byte[] bb = resp.getBytes();
