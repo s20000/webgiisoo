@@ -118,7 +118,7 @@ public class db extends Model implements IBackupCallback {
 					Repo.store("backup",
 							UID.id(filename, System.currentTimeMillis()),
 							f.getName(), "db.backup", 0, f.length(),
-							new FileInputStream(f), -1, false, me.getId());
+							new FileInputStream(f), -1, false, (int)me.getId());
 
 					f.delete();
 				} catch (Exception e) {
