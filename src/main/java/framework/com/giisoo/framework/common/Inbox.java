@@ -40,7 +40,7 @@ public class Inbox extends Bean {
 	/**
 	 * user id
 	 */
-	int uid;
+	long uid;
 
 	/**
 	 * created timestamp
@@ -80,7 +80,7 @@ public class Inbox extends Bean {
 		return id;
 	}
 
-	public int getUid() {
+	public long getUid() {
 		return uid;
 	}
 
@@ -197,7 +197,7 @@ public class Inbox extends Bean {
 	@Override
 	protected void load(ResultSet r) throws SQLException {
 		id = r.getString("id");
-		uid = r.getInt("uid");
+		uid = r.getLong("uid");
 		created = r.getLong("created");
 		clazz = r.getString("clazz");
 		refer = r.getString("refer");
@@ -214,7 +214,7 @@ public class Inbox extends Bean {
 	 *            the uid
 	 * @return the beans
 	 */
-	public static Beans<Inbox> loadNew(int uid) {
+	public static Beans<Inbox> loadNew(long uid) {
 		return Bean.load("uid=? and flag=?", new Object[] { uid, FLAG_NEW },
 				"order by created", 0, 1, Inbox.class);
 	}

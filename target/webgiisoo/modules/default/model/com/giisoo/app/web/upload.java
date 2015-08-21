@@ -78,7 +78,7 @@ public class upload extends Model {
 
 	}
 
-	private boolean store(int me, FileItem file, JSONObject jo) {
+	private boolean store(long me, FileItem file, JSONObject jo) {
 		String tag = this.getString("tag");
 
 		try {

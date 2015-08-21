@@ -59,7 +59,7 @@ public class user extends Model {
 					// v.set("total", space);
 					// }
 
-					int id = User.create(v);
+					long id = User.create(v);
 
 					/**
 					 * set the role

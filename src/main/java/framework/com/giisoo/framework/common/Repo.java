@@ -73,7 +73,7 @@ public class Repo extends Bean {
 	 *            the limit
 	 * @return the beans
 	 */
-	public static Beans<Entity> list(int uid, int offset, int limit) {
+	public static Beans<Entity> list(long uid, int offset, int limit) {
 		return Bean.load("uid=?", new Object[] { uid },
 				"order by created desc", offset, limit, Entity.class);
 	}
@@ -123,7 +123,7 @@ public class Repo extends Bean {
 	 */
 	public static long store(String folder, String id, String name, String tag,
 			long position, long total, InputStream in, long expired,
-			boolean share, int uid) throws IOException {
+			boolean share, long uid) throws IOException {
 		Entity e = new Entity();
 		e.folder = folder;
 		e.name = name;
@@ -257,7 +257,7 @@ public class Repo extends Bean {
 	 *            the uid
 	 * @return the int
 	 */
-	public static int delete(String id, int uid) {
+	public static int delete(String id, long uid) {
 		/**
 		 * delete the file in the repo
 		 */
@@ -307,7 +307,7 @@ public class Repo extends Bean {
 		public int flag;
 		public long expired;
 		public long total;
-		public int uid;
+		public long uid;
 		public String id;
 		public String name;
 		public long created;
@@ -343,7 +343,7 @@ public class Repo extends Bean {
 			return total;
 		}
 
-		public int getUid() {
+		public long getUid() {
 			return uid;
 		}
 
@@ -436,7 +436,7 @@ public class Repo extends Bean {
 					resp.writeInt(flag);
 					resp.writeLong(expired);
 					resp.writeLong(total);
-					resp.writeInt(uid);
+					resp.writeLong(uid);
 					resp.writeString(id);
 					resp.writeString(name);
 					byte[] bb = resp.getBytes();
@@ -684,7 +684,7 @@ public class Repo extends Bean {
 		@Override
 		protected void load(ResultSet r) throws SQLException {
 			id = r.getString("id");
-			uid = r.getInt("uid");
+			uid = r.getLong("uid");
 			total = r.getLong("total");
 			expired = r.getLong("expired");
 			flag = r.getInt("flag");

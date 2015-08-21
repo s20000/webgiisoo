@@ -32,14 +32,14 @@ public class Stat extends Bean implements Comparable<Stat> {
 
 	protected String[] f;
 
-	protected int uid; // 访问权限或用户名
+	protected long uid; // 访问权限或用户名
 	protected float count; // 统计值， 总数或完成时间
 	protected long updated; // 统计时间
 
 	transient String fullname;
 	transient String name;
 
-	public int getUid() {
+	public long getUid() {
 		return uid;
 	}
 
@@ -199,7 +199,7 @@ public class Stat extends Bean implements Comparable<Stat> {
 			f[i] = r.getString("f" + i);
 		}
 
-		uid = r.getInt("uid");
+		uid = r.getLong("uid");
 		count = r.getFloat("count");
 		updated = r.getLong("updated");
 
@@ -215,7 +215,7 @@ public class Stat extends Bean implements Comparable<Stat> {
 	 * @param f
 	 * @return
 	 */
-	public static Stat create(String module, String date, int uid, float count,
+	public static Stat create(String module, String date, long uid, float count,
 			String... f) {
 		Stat s = new Stat();
 		s.module = module;
@@ -241,7 +241,7 @@ public class Stat extends Bean implements Comparable<Stat> {
 	 *            the f
 	 * @return the int
 	 */
-	public static int insertOrUpdate(String module, long date, int uid,
+	public static int insertOrUpdate(String module, long date, long uid,
 			float count, String... f) {
 		String id = UID.id(date, module, uid, Bean.toString(f));
 
@@ -305,7 +305,7 @@ public class Stat extends Bean implements Comparable<Stat> {
 		result = prime * result + Arrays.hashCode(f);
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + ((module == null) ? 0 : module.hashCode());
-		result = prime * result + uid;
+		result = (int)(prime * result + uid);
 		return result;
 	}
 

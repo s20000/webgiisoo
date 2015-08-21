@@ -42,7 +42,7 @@ public class Cart extends Bean {
 	public static final int STATE_FAIL = 4;
 
 	String id;
-	int uid;
+	long uid;
 	long exported;
 	String destclazz;
 	String destination;
@@ -69,7 +69,7 @@ public class Cart extends Bean {
 	 *            the uid
 	 * @return the int
 	 */
-	public static int clean(String destclazz, String destination, int uid) {
+	public static int clean(String destclazz, String destination, long uid) {
 		return Bean.delete(
 				"state=? and destclazz=? and destination=? and uid=?",
 				new Object[] { Cart.STATE_INIT, destclazz, destination, uid },
@@ -136,7 +136,7 @@ public class Cart extends Bean {
 	 * @param destination
 	 *            the destination
 	 */
-	public void copy(int uid, String destclazz, String destination) {
+	public void copy(long uid, String destclazz, String destination) {
 		List<Item> list = this.getList();
 		if (list != null) {
 			for (Item e : list) {
@@ -166,7 +166,7 @@ public class Cart extends Bean {
 	 * @param uid
 	 *            the uid
 	 */
-	public void copy(int uid) {
+	public void copy(long uid) {
 		copy(uid, X.EMPTY, X.EMPTY);
 	}
 
@@ -181,7 +181,7 @@ public class Cart extends Bean {
 	 *            the n
 	 * @return the beans
 	 */
-	public static Beans<Cart> current(int uid, int s, int n) {
+	public static Beans<Cart> current(long uid, int s, int n) {
 		return Bean.load("uid=? and state=?", new Object[] { uid,
 				Cart.STATE_INIT }, "order by destclazz, destination", s, n,
 				Cart.class);
@@ -194,7 +194,7 @@ public class Cart extends Bean {
 	 *            the uid
 	 * @return the int
 	 */
-	public static int count(int uid) {
+	public static int count(long uid) {
 		BigDecimal i = Bean.getOne("sum(count)", "uid=? and state=?",
 				new Object[] { uid, Cart.STATE_INIT }, null, 0, Cart.class);
 		return i == null ? 0 : i.intValue();
@@ -211,7 +211,7 @@ public class Cart extends Bean {
 	 *            the destination
 	 * @return the cart
 	 */
-	public static Cart current(int uid, String destclazz, String destination) {
+	public static Cart current(long uid, String destclazz, String destination) {
 		return Bean.load("tblcart",
 				"uid=? and state=? and destclazz=? and destination=?",
 				new Object[] { uid, Cart.STATE_INIT, destclazz, destination },
@@ -240,7 +240,7 @@ public class Cart extends Bean {
 	 *            the n
 	 * @return the beans
 	 */
-	public static Beans<Cart> loadExported(int uid, int s, int n) {
+	public static Beans<Cart> loadExported(long uid, int s, int n) {
 		return Bean.load("uid=? and state in (?, ?, ?, ?)", new Object[] { uid,
 				Cart.STATE_PENDING, Cart.STATE_FAIL, Cart.STATE_EXPORTED,
 				Cart.STATE_DOWNLOAD }, "order by exported desc", s, n,
@@ -302,7 +302,7 @@ public class Cart extends Bean {
 		id = r.getString("id");
 		destclazz = r.getString("destclazz");
 		destination = r.getString("destination");
-		uid = r.getInt("uid");
+		uid = r.getLong("uid");
 		exported = r.getLong("exported");
 		state = r.getInt("state");
 		count = r.getInt("count");
@@ -325,7 +325,7 @@ public class Cart extends Bean {
 		return id;
 	}
 
-	public int getUid() {
+	public long getUid() {
 		return uid;
 	}
 
@@ -356,7 +356,7 @@ public class Cart extends Bean {
 	 *            the uid
 	 * @return the int
 	 */
-	public static int remove(String cid, String id, int uid) {
+	public static int remove(String cid, String id, long uid) {
 		if (id != null) {
 			int r = Bean.delete("cartid=? and id=?", new Object[] { cid, id },
 					Item.class);
@@ -378,7 +378,7 @@ public class Cart extends Bean {
 	 *            the uid
 	 * @return the int
 	 */
-	public static int remove(String cid, int uid) {
+	public static int remove(String cid, long uid) {
 		return Bean.delete("tblcart", "id=? and uid=?",
 				new Object[] { cid, uid }, null);
 	}
@@ -429,7 +429,7 @@ public class Cart extends Bean {
 	 *            the v
 	 * @return the int
 	 */
-	public static int update(String id, int uid, V v) {
+	public static int update(String id, long uid, V v) {
 		return Bean.update("id=? and uid=?", new Object[] { id, uid }, v,
 				Cart.class);
 	}
@@ -454,7 +454,7 @@ public class Cart extends Bean {
 	 * @return the string
 	 */
 	public static String put(String clazz, String where, Object[] args,
-			int uid, String name, String desc, int count) {
+			long uid, String name, String desc, int count) {
 		JSONObject jo = new JSONObject();
 		jo.put("where", where);
 		jo.put("args", args);
@@ -489,7 +489,7 @@ public class Cart extends Bean {
 	 * @return the string
 	 */
 	public static String put(String clazz, String where, Object[] args,
-			int uid, String name, String desc, int count, String destclazz,
+			long uid, String name, String desc, int count, String destclazz,
 			String destination) {
 
 		JSONObject jo = new JSONObject();
@@ -514,7 +514,7 @@ public class Cart extends Bean {
 	 * @param desc
 	 * @return String
 	 */
-	private static String put(String clazz, String refer, int uid, String name,
+	private static String put(String clazz, String refer, long uid, String name,
 			String desc, int count, String destclazz, String destination) {
 
 		String cartid = Bean.getString("tblcart", "id",

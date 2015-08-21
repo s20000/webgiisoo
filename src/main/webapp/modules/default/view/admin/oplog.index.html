@@ -82,7 +82,7 @@
 			<td>$!f.system</td>
 			<td>#if($f.module)$lang.get("$f.module")#end</td>
 			<td>#if($f.op)$lang.get("$f.op")#end</td>
-			<td #if($f.message) onclick='_showmore(this);' class='more' #end>$!f.brief<p class='more'>$!f.message</p></td>
+			<td #if($f.message) onclick='_showmore(this);' class='more' #end><pre>$!f.brief</pre><p class='more'><pre>$!f.message</pre></p></td>
 		</tr>
 		#end
 	</tbody>

@@ -991,9 +991,13 @@ public class Model {
      *            the tag
      * @return the long
      */
-    final protected long getLong(String tag) {
+    final protected long getLong(String tag, long defaultvalue) {
         String v = this.getString(tag);
-        return Bean.toLong(v, 0);
+        return Bean.toLong(v, defaultvalue);
+    }
+
+    final protected long getLong(String tag) {
+        return getLong(tag, 0);
     }
 
     /**

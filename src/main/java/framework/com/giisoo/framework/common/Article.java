@@ -346,7 +346,7 @@ public class Article extends Searchable {
 
 	public User getUser() {
 		if (user == null) {
-			int uid = getInt("uid");
+			long uid = getLong("uid");
 			if (uid >= 0) {
 				user = User.loadById(uid);
 			}

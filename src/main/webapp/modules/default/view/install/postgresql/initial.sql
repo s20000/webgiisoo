@@ -39,7 +39,7 @@ create index access_log_index_created on access_log(created);
 #drop table if exists tbluser;
 create table tbluser
 (
-	id int,
+	id bigint,
 	name varchar(50),
 	nickname varchar(255),
 	email varchar(100),
@@ -85,10 +85,12 @@ create index tbluser_index_deleted on tbluser(deleted);
 create index tbluser_index_locked on tbluser(locked);
 
 insert into tbluser(id, name, certid, nickname, password, created) values(0, 'admin', '123456', 'admin', 'albqdj2cd1aun', extract(epoch from current_timestamp) * 1000::bigint);
+alter table tbluser alter id type bigint;
+
 
 create table tbluserlock
 (
-	uid int,
+	uid bigint,
 	created bigint,
 	sid varchar(50),
 	host varchar(50),
@@ -98,6 +100,7 @@ create index tbluserlock_index_uid on tbluserlock(uid);
 create index tbluserlock_index_created on tbluserlock(created);
 create index tbluserlock_index_host on tbluserlock(host);
 create index tbluserlock_index_sid on tbluserlock(sid);
+alter table tbluserlock alter uid type bigint;
 
 #drop table if exists tbloplog;
 create table tbloplog
@@ -106,7 +109,7 @@ create table tbloplog
 	created bigint,
 	system varchar(50),
 	module varchar(50),
-	uid int,
+	uid bigint,
 	type int default 0,
 	op varchar(255),
 	brief varchar(1024),
@@ -121,6 +124,7 @@ create index tbloplog_index_system on tbloplog(system);
 create index tbloplog_index_module on tbloplog(module);
 create index tbloplog_index_uid on tbloplog(uid);
 create index tbloplog_index_type on tbloplog(type);
+alter table tbloplog alter uid type bigint;
 
 create table tbloplog_cate
 (
@@ -148,13 +152,14 @@ insert into tblrole(id, name) values(0, 'admin');
 #drop table if exists tbluserrole;
 create table tbluserrole
 (
-	uid int,
+	uid bigint,
 	rid int,
 	created bigint
 );
 create index tbluserrole_index_uid on tbluserrole(uid);
 create unique index tbluserrole_index_uid_rid on tbluserrole(uid, rid);
 insert into tbluserrole(uid, rid) values(0, 0);
+alter table tbluserrole alter uid type bigint;
 
 #drop table if exists tblaccess;
 create table tblaccess
@@ -236,7 +241,7 @@ create table tblconn
   	logined bigint,
   	updated bigint,
   	address varchar(255),
-  	uid int default 0,
+  	uid bigint default 0,
   	sent bigint default 0,
   	received bigint default 0
 );
@@ -245,6 +250,7 @@ create index tblconn_index_phone on tblconn(phone);
 create index tblconn_index_alias on tblconn(alias);
 create index tblconn_index_uid on tblconn(uid);
 create index tblconn_index_password on tblconn(password);
+alter table tblconn alter uid type bigint;
 
 #drop table if exists tblurlmapping;
 create table tblurlmapping
@@ -260,7 +266,7 @@ create index tblurlmapping_index_seq on tblurlmapping(seq);
 create table tblinbox
 (
 	id varchar(20),
-	uid int,
+	uid bigint,
 	created bigint,
 	clazz varchar(255),
 	refer varchar(255),
@@ -275,11 +281,12 @@ create index tblinbox_index_flag on tblinbox(flag);
 create index tblinbox_index_attempt on tblinbox(attempt);
 create index tblinbox_index_created on tblinbox(created);
 create index tblinbox_index_state on tblinbox(state);
+alter table tblinbox alter uid type bigint;
 
 #drop table if exists tblrepo;
 create table tblrepo
 (
-	uid int,
+	uid bigint,
 	id varchar(20),
 	folder varchar(255),
 	name varchar(255),
@@ -297,6 +304,7 @@ create index tblrepo_index_name on tblrepo(name);
 create index tblrepo_index_folder on tblrepo(folder);
 create index tblrepo_index_tag on tblrepo(tag);
 create index tblrepo_index_expired on tblrepo(expired);
+alter table tblrepo alter uid type bigint;
 
 #drop table if exists tblfuzzy;
 create table tblfuzzy
@@ -328,7 +336,7 @@ create table tblarticle
 	tag varchar(255),
 	locked int default 0,
 	created bigint,
-	uid int,
+	uid bigint,
 	replies int default 0,
 	content varchar(32768)
 );
@@ -338,6 +346,7 @@ create index tblarticle_index_refer on tblarticle(refer);
 create index tblarticle_index_fid on tblarticle(fid);
 create index tblarticle_index_tag on tblarticle(tag);
 create index tblarticle_index_uid on tblarticle(uid);
+alter table tblarticle alter uid type bigint;
 
 #drop table if exists tblfeedback;
 create table tblfeedback
@@ -384,7 +393,7 @@ create index tblnamemapping_index_value on tblnamemapping(value);
 create table tblcart
 (
 	id varchar(20),
-	uid int,
+	uid bigint,
 	exported bigint,
 	state int,
 	destclazz varchar(255) default '',
@@ -402,6 +411,7 @@ create index tblcart_index_exported on tblcart(exported);
 create index tblcart_index_no on tblcart(no);
 create index tblcart_index_destclazz on tblcart(destclazz);
 create index tblcart_index_destination on tblcart(destination);
+alter table tblcart alter uid type bigint;
 
 #drop table if exists tblcartitem;
 create table tblcartitem
@@ -464,7 +474,7 @@ create index tblupgradelog_index_flag on tblupgradelog(flag);
 create table tblmessage
 (
 	id varchar(20),
-	uid int,
+	uid bigint,
 	from_uid int,
 	clazz varchar(50),
 	subject varchar(255),
@@ -476,6 +486,7 @@ create index tblmessage_index_id on tblmessage(id);
 create index tblmessage_index_uid on tblmessage(uid);
 create index tblmessage_index_clazz on tblmessage(clazz);
 create index tblmessage_index_flag on tblmessage(flag);
+alter table tblmessage alter uid type bigint;
 
 create table tblapp
 (
@@ -511,13 +522,14 @@ create unique index tbltaskstat_index_date_access on tbltaskstat(date, parent, n
 
 create table space
 (
-	uid int,
+	uid bigint,
 	total bigint,
 	free bigint,
 	used bigint,
 	usage decimal(5, 2)
 );
 create index space_index_uid on space(uid);
+alter table space alter uid type bigint;
 
 create table tblload
 (
@@ -541,7 +553,7 @@ create table tblstat
 	f2 varchar(255),
 	f3 varchar(255),
 	f4 varchar(255),
-	uid int,
+	uid bigint,
 	count decimal(20, 2),
 	updated bigint
 );
@@ -555,3 +567,4 @@ create index tblstat_index_f3 on tblstat(f3);
 create index tblstat_index_f4 on tblstat(f4);
 create index tblstat_index_uid on tblstat(uid);
 create index tblstat_index_updated on tblstat(updated);
+alter table tblstat alter uid type bigint;

@@ -135,7 +135,7 @@ public final class MQ {
 	 *            the uid
 	 * @return true, if is online
 	 */
-	public static boolean isOnline(int uid) {
+	public static boolean isOnline(long uid) {
 		List<TConn> list = TConn.loadAll(uid);
 		return list != null && list.size() > 0;
 	}
@@ -151,7 +151,7 @@ public final class MQ {
 	 *            the bb
 	 * @return the int
 	 */
-	public static int send(int uid, String message, byte[] bb) {
+	public static int send(long uid, String message, byte[] bb) {
 		List<TConn> list = TConn.loadAll(uid);
 
 		int count = 0;
@@ -256,7 +256,7 @@ public final class MQ {
 	 *            the bb
 	 * @return the int
 	 */
-	public static int response(int uid, String message, byte[] bb) {
+	public static int response(long uid, String message, byte[] bb) {
 		List<TConn> list = TConn.loadAll(uid);
 
 		int count = 0;

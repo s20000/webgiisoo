@@ -30,7 +30,7 @@ public class Rank extends Bean {
 	/**
 	 * the user id who was reviewed
 	 */
-	int uid;
+	long uid;
 
 	/**
 	 * the reviewer id
@@ -60,7 +60,7 @@ public class Rank extends Bean {
 		return refer;
 	}
 
-	public int getUid() {
+	public long getUid() {
 		return uid;
 	}
 
@@ -107,7 +107,7 @@ public class Rank extends Bean {
 	 *            the limit
 	 * @return the beans
 	 */
-	public static Beans<Rank> loadByUid(int uid, int offset, int limit) {
+	public static Beans<Rank> loadByUid(long uid, int offset, int limit) {
 		return Bean.load("uid=?", new Object[] { uid },
 				"order by created desc", offset, limit, Rank.class);
 	}
@@ -133,7 +133,7 @@ public class Rank extends Bean {
 	protected void load(ResultSet r) throws SQLException {
 		obj = r.getString("obj");
 		refer = r.getInt("refer");
-		uid = r.getInt("uid");
+		uid = r.getLong("uid");
 		reviewer = r.getInt("reviewer");
 		rank = r.getInt("rank");
 		comment = r.getString("comment");
@@ -156,7 +156,7 @@ public class Rank extends Bean {
 	 * @param comment
 	 *            the comment
 	 */
-	public static void create(String obj, int refer, int uid, int reviewer,
+	public static void create(String obj, int refer, long uid, int reviewer,
 			int rank, String comment) {
 		if (!Bean.exists("obj=? and refer=?", new Object[] { obj, refer },
 				Rank.class)) {

@@ -42,7 +42,7 @@ public class myspace extends Model {
 			}
 		}
 
-		int uid = this.getInt("uid", me.getId());
+		long uid = this.getLong("uid", me.getId());
 		if (!me.hasAccess("access.repo.admin")) {
 			uid = me.getId();
 		}

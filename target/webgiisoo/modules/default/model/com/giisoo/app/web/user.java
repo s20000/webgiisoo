@@ -84,7 +84,7 @@ public class user extends Model {
 
 			JSONObject jo = this.getJSON();
 			try {
-				int id = User.create(name, pwd, jo);
+				long id = User.create(name, pwd, jo);
 
 				this.setUser(User.loadById(id));
 				OpLog.log(User.class, "register", lang.get("create.success")
@@ -127,7 +127,7 @@ public class user extends Model {
 				JSONObject jo = this.getJSON();
 
 				try {
-					int id = User.create(name, pwd, jo);
+					long id = User.create(name, pwd, jo);
 
 					this.put(X.STATE, X.OK);
 					this.put("id", id);
@@ -280,7 +280,7 @@ public class user extends Model {
 			log.debug("login: " + sid() + "-" + me);
 			if (me != null) {
 
-				int uid = me.getId();
+				long uid = me.getId();
 				long time = System.currentTimeMillis() - X.AHOUR;
 				List<User.Lock> list = User.Lock.loadByHost(uid, time,
 						this.getRemoteHost());
@@ -862,7 +862,7 @@ public class user extends Model {
 	@Path(path = "edit", login = true, log = Model.METHOD_POST)
 	public void edit() {
 		if (method.isPost()) {
-			int id = login.getId();
+			long id = login.getId();
 			JSONObject j = this.getJSON();
 			User u = User.loadById(id);
 			if (u != null) {

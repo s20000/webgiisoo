@@ -110,7 +110,7 @@ public class TConn extends Bean {
 	String key;
 
 	int locked;
-	int uid;
+	long uid;
 	long sent;
 	long received;
 
@@ -264,7 +264,7 @@ public class TConn extends Bean {
 		password = r.getString("password");
 		created = r.getLong("created");
 		ip = r.getString("ip");
-		uid = r.getInt("uid");
+		uid = r.getLong("uid");
 		updated = r.getLong("updated");
 		address = r.getString("address");
 		key = r.getString("pubkey");
@@ -967,7 +967,7 @@ public class TConn extends Bean {
 	 *            the uid
 	 * @return the list
 	 */
-	public static List<TConn> loadAll(int uid) {
+	public static List<TConn> loadAll(long uid) {
 		return Bean.load("tblconn", null, "uid=? and uid>0",
 				new Object[] { uid }, TConn.class);
 	}
