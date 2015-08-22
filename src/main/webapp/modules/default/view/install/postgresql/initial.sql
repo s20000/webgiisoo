@@ -500,9 +500,13 @@ create table tblapp
 	email varchar(100),
 	lastlogin bigint,
 	created bigint,
-	logout varchar(255)
+	logout varchar(255),
+	setrule varchar(1024),
+	getrule varchar(1024)
 );
 create unique index tblapp_index_appid on tblapp(appid);
+alter table tblapp add setrule varchar(1024);
+alter table tblapp add getrule varchar(1024);
 
 create table tbltaskstat
 (

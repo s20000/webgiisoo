@@ -15,6 +15,12 @@
 	<div><label><h3>$lang.get('label.phone')</h3>:<input type='text' name='phone' value= #if($phone)'$phone' #else '' #end /></label></div>
 	<div><label><h3>$lang.get('label.email')</h3>:<input type='text' name='email' value= #if($email)'$email' #else '' #end /></label></div>
 	<div><label><h3>$lang.get('label.memo')</h3>:<input type='text' name='memo' value= #if($memo)'$memo' #else '' #end /></label></div>
+	<div><label><h3>$lang.get('label.setrule')</h3>:
+		<textarea name='setrule'>$setrule</textarea>
+	</label></div>
+	<div><label><h3>$lang.get('label.getrule')</h3>:
+		<textarea name='getrule'>$getrule</textarea>
+	</label></div>
 
 	<button type='submit'>$lang.get('btn.add')</button>
 </form>
