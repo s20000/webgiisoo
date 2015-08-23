@@ -8,6 +8,7 @@ package com.giisoo.app.web.admin;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.Statement;
 import java.util.Set;
 
@@ -55,7 +56,12 @@ public class system extends Model {
                         while (r.next()) {
                             String name = r.getString(1);
 
-                            log.warn("table=" + name);
+                            ResultSetMetaData rm = r.getMetaData();
+                            StringBuilder sb = new StringBuilder();
+                            for (int i = 0; i < rm.getColumnCount(); i++) {
+                                sb.append(rm.getColumnName(i + 1) + "=" + r.getString(i + 1));
+                            }
+                            log.warn("table=" + sb.toString());
                             stat = c.createStatement();
                             stat.execute("drop table " + name);
                             stat.close();

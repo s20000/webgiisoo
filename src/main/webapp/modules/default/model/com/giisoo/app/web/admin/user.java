@@ -232,7 +232,7 @@ public class user extends Model {
 	public void edit() {
 		if (method.isPost()) {
 
-			int id = this.getInt("id");
+			long id = this.getLong("id");
 			JSONObject j = this.getJSON();
 			User u = User.loadById(id);
 			if (u != null) {
@@ -304,7 +304,7 @@ public class user extends Model {
 			String ids = this.getString("id");
 			String[] ss = ids.split(",");
 			for (String s : ss) {
-				int i = Bean.toInt(s, -1);
+				long i = Bean.toLong(s, -1);
 				User u = User.loadById(i);
 				if (u != null && u.getInt("remote") == 0) {
 					JSONObject j = new JSONObject();
@@ -335,7 +335,7 @@ public class user extends Model {
 	public void detail() {
 		String id = this.getString("id");
 		if (id != null) {
-			int i = Bean.toInt(id, -1);
+			long i = Bean.toLong(id, -1);
 			User u = User.loadById(i);
 			this.set("u", u);
 
