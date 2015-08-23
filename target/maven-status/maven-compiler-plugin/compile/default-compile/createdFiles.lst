@@ -286,6 +286,7 @@ net/sf/json/processors/JsonBeanProcessorMatcher.class
 com/giisoo/framework/utils/Http$1.class
 com/giisoo/framework/utils/Host$Eth.class
 com/giisoo/framework/common/giException.class
+com/giisoo/app/web/admin/system$2.class
 com/giisoo/framework/web/QueryString.class
 com/giisoo/framework/mdc/TConnCenter$1.class
 com/giisoo/framework/web/Widget.class

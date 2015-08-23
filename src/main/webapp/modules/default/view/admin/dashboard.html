@@ -4,7 +4,7 @@
 		<a href='/admin/password/edit' class='hint hint--bottom' data-hint='修改登录密码'>$lang.get('a.password')</a>
 #end
 		<a rel="leanModal" href='#leanmodal.restart' class='icon recycle hint hint--bottom' data-hint='重启应用服务'>$lang.get('a.restart.service')</a>
-		<a rel="leanModal" href='#leanmodal.restart_host' class='icon restart hint hint--bottom' data-hint='重启服务器'>$lang.get('a.restart.host')</a>
+		<a rel="leanModal" href='#leanmodal.restart_host' class='icon restart hint hint--bottom' data-hint='初始化数据库'>初始化数据库</a>
 	</span></div>
 
 <div class='chart'>
@@ -30,7 +30,7 @@
 </div>
 
 <div id='leanmodal' class="restart_host">
-	<div class='leanmodal_header'><label><h3>重启服务器</h3></label></div>
+	<div class='leanmodal_header'><label><h3>初始化数据库</h3></label></div>
 	<div><label><h3>$lang.get('user.password.restart')</h3>:<input type='password' name='password'/></label></div>
 	
 	<button onclick='_restart_host();'>$lang.get('btn.ok')</button>
@@ -59,7 +59,7 @@ function _restart_host(){
 	$('#lean_overlay').click();
 
 	processing && processing.show();
-	$.post('/admin/system/restart/host', {pwd:$('#leanmodal.restart_host input[name=password]').val()}, function(d){
+	$.post('/admin/system/init', {pwd:$('#leanmodal.restart_host input[name=password]').val()}, function(d){
 		if(d.state == 'ok') {
 			_timer = setInterval(_load, 5000);
 		} else {

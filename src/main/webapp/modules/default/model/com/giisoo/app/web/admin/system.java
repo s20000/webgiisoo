@@ -5,51 +5,129 @@
  */
 package com.giisoo.app.web.admin;
 
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.Set;
+
 import net.sf.json.JSONObject;
 
+import com.giisoo.core.bean.Bean;
 import com.giisoo.core.worker.WorkerTask;
 import com.giisoo.framework.common.User;
 import com.giisoo.framework.web.*;
+import com.mongodb.DB;
 
 public class system extends Model {
 
-	/**
-	 * Restart.
-	 */
-	@Path(path = "restart", login = true, access = "access.config.admin", log = Model.METHOD_POST)
-	public void restart() {
+    /**
+     * Restart.
+     */
+    @Path(path = "init", login = true, access = "access.config.admin", log = Model.METHOD_POST)
+    public void init() {
+        JSONObject jo = new JSONObject();
+        User me = this.getUser();
+        String pwd = this.getString("pwd");
 
-		JSONObject jo = new JSONObject();
-		User me = this.getUser();
-		String pwd = this.getString("pwd");
+        if (me.validate(pwd)) {
+            jo.put("state", "ok");
 
-		if (me.validate(pwd)) {
-			jo.put("state", "ok");
+            new WorkerTask() {
 
-			new WorkerTask() {
+                @Override
+                public String getName() {
+                    return "init";
+                }
 
-				@Override
-				public String getName() {
-					return "restart";
-				}
+                @Override
+                public void onExecute() {
 
-				@Override
-				public void onExecute() {
-					System.exit(0);
-				}
+                    // drop all tables
+                    Connection c = null;
+                    Statement stat = null;
+                    ResultSet r = null;
 
-				@Override
-				public void onFinish() {
+                    try {
+                        c = Bean.getConnection();
+                        DatabaseMetaData d = c.getMetaData();
+                        r = d.getTables(null, null, null, new String[] { "TABLE" });
+                        while (r.next()) {
+                            String name = r.getString(1);
 
-				}
+                            log.warn("table=" + name);
+                            stat = c.createStatement();
+                            stat.execute("drop table " + name);
+                            stat.close();
+                            stat = null;
+                        }
 
-			}.schedule(1000);
-		} else {
-			jo.put("state", "fail");
-			jo.put("message", lang.get("invalid.passwd"));
-		}
+                        // drop all collections
+                        DB d1 = Bean.getDB();
+                        d1.dropDatabase();
 
-		this.response(jo);
-	}
+                    } catch (Exception e) {
+                        log.error(e.getMessage(), e);
+                    } finally {
+                        Bean.close(r, stat, c);
+                    }
+
+                    // drop all collection
+
+                    System.exit(0);
+                }
+
+                @Override
+                public void onFinish() {
+
+                }
+
+            }.schedule(1000);
+        } else {
+            jo.put("state", "fail");
+            jo.put("message", lang.get("invalid.passwd"));
+        }
+
+        this.response(jo);
+    }
+
+    /**
+     * Restart.
+     */
+    @Path(path = "restart", login = true, access = "access.config.admin", log = Model.METHOD_POST)
+    public void restart() {
+
+        JSONObject jo = new JSONObject();
+        User me = this.getUser();
+        String pwd = this.getString("pwd");
+
+        if (me.validate(pwd)) {
+            jo.put("state", "ok");
+
+            new WorkerTask() {
+
+                @Override
+                public String getName() {
+                    return "restart";
+                }
+
+                @Override
+                public void onExecute() {
+                    System.exit(0);
+                }
+
+                @Override
+                public void onFinish() {
+
+                }
+
+            }.schedule(1000);
+        } else {
+            jo.put("state", "fail");
+            jo.put("message", lang.get("invalid.passwd"));
+        }
+
+        this.response(jo);
+    }
 
 }

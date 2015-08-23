@@ -133,6 +133,44 @@ public class User extends Bean implements Exportable {
     }
 
     /**
+     * create a user from the jo
+     * 
+     * @param jo
+     * @return
+     */
+    public static int copy(JSONObject jo) {
+
+        Connection c = null;
+        PreparedStatement stat = null;
+        ResultSet r = null;
+        try {
+            c = Bean.getConnection();
+
+            stat = c.prepareStatement("select * from tbluser limit 1");
+
+            r = stat.executeQuery();
+            ResultSetMetaData m = r.getMetaData();
+
+            V v = V.create();
+            for (int i = 0; i < m.getColumnCount(); i++) {
+                String name = m.getColumnName(i + 1);
+                if (jo.containsKey(name)) {
+                    v.set(name, jo.get(name));
+                }
+            }
+
+            return Bean.insert(v, User.class);
+
+        } catch (Exception e) {
+            log.error(jo.toString(), e);
+        } finally {
+            Bean.close(r, stat, c);
+        }
+
+        return 0;
+    }
+
+    /**
      * Creates a user with the jo <br>
      * using create(V) instead <br>
      * 

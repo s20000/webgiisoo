@@ -740,20 +740,29 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
     }
 
     /**
-     * Gets the collection.
+     * get Mongo DB connection
+     * 
+     * @return
+     */
+    public static DB getDB() {
+        return getDB("prod");
+    }
+
+    /**
+     * get Mongo DB connection
      * 
      * @param database
-     *            the database
-     * @param collection
-     *            the collection
-     * @return the collection
+     * @return
      */
-    protected static DBCollection getCollection(String database, String collection) {
+    public static DB getDB(String database) {
         DB g = null;
+        if (X.isEmpty(database)) {
+            database = "prod";
+        }
+
         synchronized (mongo) {
             g = mongo.get(database);
             if (g == null) {
-
                 String url = conf.getString("mongo[" + database + "].url", X.EMPTY);
                 if (!X.EMPTY.equals(url)) {
                     String hosts[] = url.split(";");
@@ -790,6 +799,21 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
                 }
             }
         }
+
+        return g;
+    }
+
+    /**
+     * Gets the collection.
+     * 
+     * @param database
+     *            the database
+     * @param collection
+     *            the collection
+     * @return the collection
+     */
+    protected static DBCollection getCollection(String database, String collection) {
+        DB g = getDB(database);
 
         if (g != null) {
             return g.getCollection(collection);
