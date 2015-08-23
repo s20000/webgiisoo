@@ -82,7 +82,10 @@
 			<td>$!f.system</td>
 			<td>#if($f.module)$lang.get("$f.module")#end</td>
 			<td>#if($f.op)$lang.get("$f.op")#end</td>
-			<td #if($f.message) onclick='_showmore(this);' class='more' #end><pre>$!f.brief</pre><p class='more'><pre>$!f.message</pre></p></td>
+			<td #if($f.message) onclick='_showmore(this);' class='more' #end> 
+				<pre>$!f.brief</pre>
+				<div class='more'><pre>$!f.message</pre></div>
+			</td>
 		</tr>
 		#end
 	</tbody>
@@ -110,7 +113,7 @@
 <script>
 function _showmore(obj){
 	var e = $(obj);
-	e = e.parent().find('p.more');
+	e = e.parent().find('div.more');
 	if(e.css('display') == 'block') {
 		e.hide();
 	} else {

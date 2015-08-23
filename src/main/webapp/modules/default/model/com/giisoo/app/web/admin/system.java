@@ -54,12 +54,12 @@ public class system extends Model {
                         DatabaseMetaData d = c.getMetaData();
                         r = d.getTables(null, null, null, new String[] { "TABLE" });
                         while (r.next()) {
-                            String name = r.getString(1);
+                            String name = r.getString("table_name");
 
                             ResultSetMetaData rm = r.getMetaData();
                             StringBuilder sb = new StringBuilder();
                             for (int i = 0; i < rm.getColumnCount(); i++) {
-                                sb.append(rm.getColumnName(i + 1) + "=" + r.getString(i + 1));
+                                sb.append(rm.getColumnName(i + 1) + "=" + r.getString(i + 1)).append(",");
                             }
                             log.warn("table=" + sb.toString());
                             stat = c.createStatement();
