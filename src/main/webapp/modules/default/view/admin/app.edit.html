@@ -19,10 +19,10 @@
 	<div><label><h3>$lang.get('label.memo')</h3>:<input type='text' name='memo' value= #if($memo)'$memo' #else '' #end /></label></div>
 	<div><label><h3>$lang.get('label.lock')</h3>:</label><input type="checkbox" name='locked' #if($locked >0) checked="checked" #end/></label></div>
 	<div><label><h3>$lang.get('label.setrule')</h3>:
-		<textarea name='setrule'>$setrule</textarea>
+		<textarea name='setrule'>$!setrule</textarea>
 	</label></div>
 	<div><label><h3>$lang.get('label.getrule')</h3>:
-		<textarea name='getrule'>$getrule</textarea>
+		<textarea name='getrule'>$!getrule</textarea>
 	</label></div>
 
 	<button type='submit'>$lang.get('btn.save')</button>

@@ -549,3 +549,5 @@ label.mdc.repo.url=文件仓库
 user.name.format.error=用户名格式错误
 a.setting.system=系统设置
 a.setting.base=基本设置
+label.setrule=入口规则（[{collection:'.*', data:{id:'1.*'}}, ...]）
+label.getrule=出口规则（[{collection:'.*', data:{id:'1.*'}}, ...]）
