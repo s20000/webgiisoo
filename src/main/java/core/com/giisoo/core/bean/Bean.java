@@ -1778,9 +1778,11 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
      *            the d
      */
     protected void load(DBObject d) {
+
         for (String name : d.keySet()) {
             this.set(name, d.get(name));
         }
+
     }
 
     /**
@@ -3334,17 +3336,57 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
         if (extra == null) {
             extra = new HashMap<String, Object>();
         }
+
         extra.put(name, value);
+
     }
 
     /**
-     * get the extra value by name from map
+     * get the extra value by name from map <br>
+     * the name can be : "name" <br>
+     * "name.subname" to get the value in sub-map <br>
+     * "name.subname[i]" to get the value in sub-map array <br>
      * 
      * @param name
      * @return Object
      */
     public Object get(Object name) {
-        return extra == null ? null : extra.get(name);
+        if (extra == null) {
+            return null;
+        }
+        if (extra.containsKey(name)) {
+            return extra.get(name);
+        }
+
+        // name = name.subname[0]
+        String[] ss = name.toString().split("[.]");
+        Object o = extra;
+        for (String s : ss) {
+            if (o instanceof Map) {
+                // .name
+                Map m = (Map) o;
+                if (m.containsKey(s)) {
+                    o = m.get(s);
+                    if (o == null) {
+                        return null;
+                    }
+                } else {
+                    // .name[1]
+                    String[] ss1 = s.split("[\\[\\]]");
+                    if (ss1.length > 1) {
+                        o = m.get(ss1[0]);
+                        if (o != null && o instanceof List) {
+                            List l1 = (List) o;
+                            o = l1.get(Bean.toInt(ss1[1]));
+                        }
+                    }
+                }
+            } else {
+                return null;
+            }
+        }
+
+        return o;
     }
 
     @Override

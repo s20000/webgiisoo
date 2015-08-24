@@ -2123,7 +2123,7 @@ table.tablesorter tbody tr.state_0 td {
 	width: 10%;
 }
 
-#panel p.more {
+#panel div.more {
 	display: none;
 	background: #121F79;
 	color: #fff;
