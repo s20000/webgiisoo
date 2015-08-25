@@ -6,14 +6,14 @@
 	vertical-align: baseline;
 }
 
-html,body {
+html, body {
 	width: 100%;
 	font: 11pt 微软雅黑, 宋体, Arial, sans-serif;
 	background: #c8d7de;
 	text-align: center;
 }
 
-::-webkit-scrollbar,::-webkit-scrollbar-thumb {
+::-webkit-scrollbar, ::-webkit-scrollbar-thumb {
 	overflow: visible;
 }
 
@@ -227,7 +227,7 @@ img {
 	color: #c77;
 }
 
-input,select,textarea {
+input, select, textarea {
 	font-size: 11pt;
 	padding: 2px 5px;
 	outline: none;
@@ -241,13 +241,13 @@ select {
 	padding: 2px 0;
 }
 
-input[type=text],input[type=password] {
+input[type=text], input[type=password] {
 	width: 175px;
 	height: 23px;
 	display: inline-block;
 }
 
-input:focus,select:focus,textarea:focus {
+input:focus, select:focus, textarea:focus {
 	border: 1px solid #4d90fe !important;
 	outline: 0;
 	-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px
@@ -289,9 +289,13 @@ input:focus,select:focus,textarea:focus {
 	left: 220px;
 	font-size: 20pt;
 	color: #44d;
-	width: 400px;
+	width: 420px;
 	text-align: left;
 	top: 20px;
+}
+
+#head .title g {
+	font-size: 16px;
 }
 
 #panel {
@@ -315,7 +319,7 @@ input:focus,select:focus,textarea:focus {
 	text-align: left;
 }
 
-#panel input,#panel textarea {
+#panel input, #panel textarea {
 	border: 1px solid #bbb;
 	border-bottom: 1px solid #678;
 	background-color: rgba(0, 0, 0, 0);
@@ -333,7 +337,7 @@ input:focus,select:focus,textarea:focus {
 	background: #f1f1f1;
 }
 
-#panel .content .subfolder,#panel .content .submenu {
+#panel .content .subfolder, #panel .content .submenu {
 	margin-left: 20px;
 	display: none;
 	border-top: 1px solid #aaa;
@@ -524,7 +528,7 @@ textarea {
 	margin: 25px 45px;
 }
 
-#panel h3,#panel i {
+#panel h3, #panel i {
 	word-break: break-all;
 }
 
@@ -577,7 +581,7 @@ a.disabled {
 	margin: 20px;
 }
 
-label.nospace,label.nospace input {
+label.nospace, label.nospace input {
 	margin: 0;
 }
 
@@ -604,7 +608,7 @@ label.nospace,label.nospace input {
 	display: none;
 }
 
-#panel #message.message,#panel #message.error {
+#panel #message.message, #panel #message.error {
 	display: none;
 	padding-bottom: 2px;
 	border-radius: 5px;
@@ -729,8 +733,8 @@ label.nospace,label.nospace input {
 	display: inline-block
 }
 
-.toolbar .home a{
-  line-height: 40px;	
+.toolbar .home a {
+	line-height: 40px;
 }
 
 .toolbar .back {
@@ -906,7 +910,7 @@ span.folder.open {
 	background: #f1f1f1
 }
 
-#panel .content .subfolder,#panel .content .submenu {
+#panel .content .subfolder, #panel .content .submenu {
 	margin-left: 20px;
 	display: none;
 	border-top: 1px solid #aaa
@@ -1012,7 +1016,7 @@ table {
 	border: 1px solid #fff;
 }
 
-a.page_1,a.page_2 {
+a.page_1, a.page_2 {
 	margin: auto 5px;
 	padding: 0 10px;
 	border: 1px solid #CCC;
@@ -1437,7 +1441,7 @@ td a.delete {
 	background-image: url(/images/arrow-down.png);
 }
 
-.search input,.search select,.search button {
+.search input, .search select, .search button {
 	margin-right: 10px;
 }
 
@@ -1448,7 +1452,7 @@ td a.delete {
 	background-position: right center;
 }
 
-span.user,i.user {
+span.user, i.user {
 	background: url(/images/user1.png) no-repeat;
 	padding-left: 15px;
 	margin-left: 0;
@@ -1457,7 +1461,7 @@ span.user,i.user {
 	margin-right: 5px;
 }
 
-span.role,i.role {
+span.role, i.role {
 	background: url(/images/role.png) no-repeat;
 	padding-left: 15px;
 	margin-left: 10px;
@@ -1476,7 +1480,7 @@ table th.checkbox {
 	width: 30px;
 }
 
-html,body {
+html, body {
 	background: #fff;
 }
 
@@ -1605,7 +1609,7 @@ table.exported td.state_1 {
 	background-size: 16px;
 }
 
-#comments,#owners {
+#comments, #owners {
 	padding-top: 20px;
 	margin-top: 20px;
 }
@@ -1673,7 +1677,7 @@ table.exported td.state_1 {
 	margin-top: 20px;
 }
 
-#panel .task .memo,#panel .task .report {
+#panel .task .memo, #panel .task .report {
 	width: 100%;
 	display: inline-block;
 }
@@ -1704,20 +1708,20 @@ i.file {
 	margin-left: 5px;
 }
 
-span.user,i.user {
+span.user, i.user {
 	background: url(/images/user.png) no-repeat;
 	padding-left: 16px;
 	background-size: 16px;
 	cursor: pointer;
 }
 
-span.role,i.role {
+span.role, i.role {
 	background: url(/images/role.png) no-repeat;
 	padding-left: 16px;
 	background-size: 16px;
 }
 
-span.ehost,i.ehost {
+span.ehost, i.ehost {
 	background: url(/images/vms.png) no-repeat;
 	padding-left: 16px;
 	background-size: 16px;
@@ -1819,7 +1823,7 @@ tr.efile.type_zip span.icon {
 	border-bottom: 1px solid #ddd;
 }
 
-#panel .content .chart .group .date,#panel .content .chart .group .name
+#panel .content .chart .group .date, #panel .content .chart .group .name
 	{
 	font-size: 26px;
 	color: #c77;
@@ -2060,7 +2064,7 @@ label r {
 	color: #fff;
 }
 
-.memo i.file a.delete,.report i.file a.delete {
+.memo i.file a.delete, .report i.file a.delete {
 	text-decoration: none;
 	color: #fff;
 	float: right;
@@ -2079,7 +2083,7 @@ label r {
 	display: inline-block;
 }
 
-.memo i.file a.delete:hover,.report i.file a.delete:hover {
+.memo i.file a.delete:hover, .report i.file a.delete:hover {
 	background-color: #47a447;
 	border-color: #398439;
 }
@@ -2120,13 +2124,13 @@ label r {
 	border-bottom: 1px solid #aaa;
 }
 
-.baseinfo_title,.report_title,.efile_apply_notes,.md5_title {
+.baseinfo_title, .report_title, .efile_apply_notes, .md5_title {
 	font-size: 12pt;
 	background: #E1E9A3;
 	text-indent: 10px;
 }
 
-.report_title,.md5_title {
+.report_title, .md5_title {
 	margin-top: 20px;
 }
 
