@@ -3386,7 +3386,7 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
             }
         }
 
-        return o;
+        return null;
     }
 
     @Override
