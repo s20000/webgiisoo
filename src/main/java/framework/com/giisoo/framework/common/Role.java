@@ -71,11 +71,12 @@ public class Role extends Bean implements Exportable {
      * @return the int
      */
     public static int create(String name, String memo) {
-        if (Bean.exists("name=?", new String[] { name }, Role.class)) {
+        Role r = Role.loadByName(name);
+        if (r != null) {
             /**
              * exists, create failded
              */
-            return -1;
+            return r.getId();
         }
 
         int id = nextId();
