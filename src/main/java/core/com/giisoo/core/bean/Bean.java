@@ -3354,38 +3354,47 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
         if (extra == null) {
             return null;
         }
+
         if (extra.containsKey(name)) {
             return extra.get(name);
         }
 
         // name = name.subname[0]
         String[] ss = name.toString().split("[.]");
-        Object o = extra;
-        for (String s : ss) {
-            if (o instanceof Map) {
-                // .name
-                Map m = (Map) o;
-                if (m.containsKey(s)) {
-                    o = m.get(s);
-                    if (o == null) {
-                        return null;
-                    }
-                } else {
-                    // .name[1]
-                    String[] ss1 = s.split("[\\[\\]]");
-                    if (ss1.length > 1) {
-                        o = m.get(ss1[0]);
-                        if (o != null && o instanceof List) {
-                            List l1 = (List) o;
-                            o = l1.get(Bean.toInt(ss1[1]));
-                        }
-                    }
-                }
-            } else {
-                return null;
-            }
-        }
+        if (ss.length > 1) {
 
+            Object o = extra;
+            for (String s : ss) {
+                if (o instanceof Map) {
+                    // .name
+                    Map m = (Map) o;
+                    if (m.containsKey(s)) {
+                        o = m.get(s);
+                        if (o == null) {
+                            return null;
+                        }
+                    } else {
+                        // .name[1]
+                        String[] ss1 = s.split("[\\[\\]]");
+                        if (ss1.length > 1) {
+                            o = m.get(ss1[0]);
+                            if (o != null && o instanceof List) {
+                                List l1 = (List) o;
+                                int i = Bean.toInt(ss1[1]);
+                                if (i >= 0 && i < l1.size()) {
+                                    o = l1.get(i);
+                                }
+                            }
+                        } else {
+                            return null;
+                        }
+                    } // end of "containKey"
+                } else {
+                    return null;
+                } // end of if "map"
+            }
+            return o;
+        }
         return null;
     }
 
