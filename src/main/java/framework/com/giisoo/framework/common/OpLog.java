@@ -56,15 +56,21 @@ public class OpLog extends Bean implements Exportable {
         Beans<OpLog> bs = load((BasicDBObject) null, 0, 1);
         int total = bs.getTotal();
         if (total >= max) {
-            long created = Bean.getOne("created", null, null, "order by created desc", min, OpLog.class);
-            if (created > 0) {
-                int i = Bean.delete("created <?", new Object[] { created }, OpLog.class);
 
-                if (i > 0) {
-                    OpLog.log("cleanup", "cleanup log: " + i, null);
-                }
-                return i;
-            }
+            // TODO
+            Bean.delete(new BasicDBObject().append("created", new BasicDBObject().append("$lt", System.currentTimeMillis() - 5 * X.ADAY)), OpLog.class);
+
+            // long created = Bean.getOne("created", null, null,
+            // "order by created desc", min, OpLog.class);
+            // if (created > 0) {
+            // int i = Bean.delete("created <?", new Object[] { created },
+            // OpLog.class);
+            //
+            // if (i > 0) {
+            // OpLog.log("cleanup", "cleanup log: " + i, null);
+            // }
+            // return i;
+            // }
         }
 
         return 0;
