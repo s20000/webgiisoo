@@ -40,6 +40,7 @@ import com.mongodb.DBObject;
 import com.mongodb.Mongo;
 import com.mongodb.MongoOptions;
 import com.mongodb.ServerAddress;
+import com.mongodb.WriteResult;
 
 /**
  * The Class Bean. <br>
@@ -2269,8 +2270,10 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
             d.append(v.name(i), v.value(i));
         }
 
-        Bean.getCollection(collection).update(q, new BasicDBObject().append("$set", d), true, true);
+        WriteResult r = Bean.getCollection(collection).update(q, new BasicDBObject().append("$set", d), true, true);
 
+        // r.getN();
+        // r.getField("nModified");
         return 1;
     }
 
