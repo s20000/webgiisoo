@@ -48,6 +48,23 @@ jQuery.extend({
 			m.fadeOut();
 		}, delay);
 	},
+	warn : function(message, delay) {
+		if(!delay) {
+			delay = 2000;
+		}
+		var m = $('#warn.leanmodal');
+		if (m.length == 0) {
+			m = $("<div id='warn' class='leanmodal'><div class='leanmodal-content'></div></div>");
+			$('body').append(m);
+		}
+		m.find('.leanmodal-content').html(message);
+		m.css({
+					'display' : 'block'
+				});
+		setTimeout(function(){
+			m.fadeOut();
+		}, delay);
+	},	
 	error : function(message, onclick) {
 		$('#message.leanmodal').hide();
 		var m = $('#error.leanmodal');
