@@ -1188,9 +1188,9 @@ public class Model {
             JSONObject jo = new JSONObject();
             for (String name : this.getNames()) {
                 String s = this.getString(name);
-                if (!X.isEmpty(s)) {
-                    jo.put(name, this.getString(name));
-                }
+                // if (!X.isEmpty(s)) {
+                jo.put(name, s);
+                // }
             }
             return jo;
         }
