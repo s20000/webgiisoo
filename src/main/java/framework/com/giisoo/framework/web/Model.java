@@ -206,6 +206,9 @@ public class Model {
      *            the method
      */
     final protected void dispatch(String uri, HttpServletRequest req, HttpServletResponse resp, HTTPMethod method) {
+
+        created = System.currentTimeMillis();
+
         // construct var
         // init
         try {
