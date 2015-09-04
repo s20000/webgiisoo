@@ -116,7 +116,7 @@ public class Model {
     private static final ThreadLocal<Module> _currentmodule = new ThreadLocal<Module>();
 
     protected boolean expired() {
-        int expired = Module.home.getInt("request.expired");
+        long expired = Module.home.getInt("request.expired");
         if (expired > 0) {
             return System.currentTimeMillis() - created > expired * 1000;
         }
