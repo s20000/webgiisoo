@@ -53,7 +53,11 @@
 			<artifactId>httpcore-nio</artifactId>
 			<version>4.1.1</version>
 		</dependency>
-
+		<dependency>
+			<groupId>xerces</groupId>
+			<artifactId>xercesImpl</artifactId>
+			<version>2.11.0</version>
+		</dependency>
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpasyncclient</artifactId>
