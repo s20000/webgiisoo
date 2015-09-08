@@ -93,13 +93,14 @@ public class User extends Bean implements Exportable {
          * 1234567890<br>
          */
 
-        long id = SystemConfig.l("user_prefix", 10000000000000L) + UID.next("user.id");// /Bean.toInt(Module.home.get("user_prefix"))
-                                                                                       // +
-                                                                                       // (int)
-                                                                                       // UID.next("user.id");
+        long id = UID.next("user.id");
+        // /Bean.toInt(Module.home.get("user_prefix"))
+        // +
+        // (int)
+        // UID.next("user.id");
 
         while (Bean.exists("id=?", new Object[] { id }, User.class)) {
-            id = SystemConfig.l("user_prefix", 10000000000000L) + UID.next("user.id");
+            id = UID.next("user.id");
         }
 
         return id;
