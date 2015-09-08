@@ -3146,7 +3146,13 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
         if (extra != null && extra.size() > 0 && jo != null) {
             for (String name : extra.keySet()) {
                 Object o = extra.get(name);
-                if (o instanceof Integer || o instanceof Long || o instanceof Byte || o instanceof Short || o instanceof Character || o instanceof String || o instanceof List || o instanceof Map) {
+                if (o == null) {
+                    continue;
+                }
+
+                if (o instanceof Integer || o instanceof Long || o instanceof Byte || o instanceof Short || o instanceof Character || o instanceof String) {
+                    jo.put(name, o);
+                } else if ((o instanceof List || o instanceof Map) && !name.endsWith("_obj")) {
                     jo.put(name, o);
                 }
             }
