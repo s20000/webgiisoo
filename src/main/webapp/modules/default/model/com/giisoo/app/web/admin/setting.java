@@ -129,7 +129,7 @@ public class setting extends Model {
         public void get() {
 
             this.set("nodename", SystemConfig.s("node.name", null));
-            this.set("system_code", SystemConfig.l("system_code", 1));
+            this.set("system_code", SystemConfig.l("system.code", 1));
             this.set("oplog_max", SystemConfig.i("oplog.max", 50000));
             this.set("oplog_min", SystemConfig.i("oplog.min", 20000));
 
