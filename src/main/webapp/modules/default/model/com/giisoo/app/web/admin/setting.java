@@ -95,8 +95,6 @@ public class setting extends Model {
         @Override
         public void set() {
             SystemConfig.setConfig("node.name", this.getString("nodename"));
-            SystemConfig.setConfig("system.code", this.getString("systemcode"));
-            SystemConfig.setConfig("deploy.code", this.getString("deploycode"));
 
             SystemConfig.setConfig("oplog.max", this.getInt("oplog_max"));
             SystemConfig.setConfig("oplog.min", this.getInt("oplog_min"));
@@ -130,8 +128,6 @@ public class setting extends Model {
         @Override
         public void get() {
 
-            this.set("deploycode", SystemConfig.s("deploy.code", null));
-            this.set("systemcode", SystemConfig.s("system.code", null));
             this.set("nodename", SystemConfig.s("node.name", null));
 
             this.set("oplog_max", SystemConfig.i("oplog.max", 50000));

@@ -10,7 +10,6 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.Statement;
-import java.util.Set;
 
 import net.sf.json.JSONObject;
 
