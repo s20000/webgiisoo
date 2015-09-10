@@ -1,5 +1,13 @@
 #if($error)
-	$.error("$error")
+<script>
+	$(function() {
+		$.error("$error")
+	})
+</script>
 #elseif($message)
-	$.hint("$message")
+<script>
+	$(function() {
+		$.hint("$message")
+	})
+</script>
 #end

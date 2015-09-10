@@ -30,7 +30,6 @@ import org.apache.commons.logging.LogFactory;
 
 import com.giisoo.core.bean.Bean;
 import com.giisoo.core.bean.X;
-import com.giisoo.core.bean.Bean.V;
 import com.giisoo.core.conf.Config;
 import com.giisoo.core.worker.WorkerTask;
 
@@ -736,6 +735,8 @@ public class DB {
             // URL);
             // int N = conf.getInt("db[" + name + "].conns", MAX_ACTIVE_NUMBER);
 
+            String username = null;
+            String password = null;
             String D = null;
             String[] ss = url.split(":");
             if (ss.length > 2) {
@@ -745,16 +746,54 @@ public class DB {
                     D = "org.postgresql.Driver";
                 } else if (ss[1].equalsIgnoreCase("oracle")) {
                     D = "oracle.jdbc.driver.OracleDriver";
-                } else if (ss[1].equalsIgnoreCase("sqlserver")) {
+                } else if (ss[1].equalsIgnoreCase("sqlserver") || ss[1].equalsIgnoreCase("microsoft")) {
                     D = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
+
+                    // TODO, user, password
+                    int i = url.indexOf("user=");
+                    if (i > 0) {
+                        int j = url.indexOf("&", i + 1);
+                        if (j < 0) {
+                            j = url.length();
+                        }
+                        username = url.substring(i, j);
+                        String url1 = url.substring(0, i - 1);
+                        if (j < url.length()) {
+                            url = url1 + url.substring(j + 1);
+                        }
+                    }
+
+                    i = url.indexOf("password=");
+                    if (i > 0) {
+                        int j = url.indexOf("&", i + 1);
+                        if (j < 0) {
+                            j = url.length();
+                        }
+                        password = url.substring(i, j);
+                        String url1 = url.substring(0, i - 1);
+                        if (j < url.length()) {
+                            url = url1 + url.substring(j + 1);
+                        }
+                    }
+
                 }
             }
+
+            log.debug("driver=" + D + ", url=" + url + ", user=" + username + ", password=" + password);
 
             if (!X.isEmpty(D)) {
                 external = new BasicDataSource();
                 external.setDriverClassName(D);
 
                 external.setUrl(url);
+
+                if (!X.isEmpty(username)) {
+                    external.setUsername(username);
+                }
+                if (!X.isEmpty(password)) {
+                    external.setPassword(password);
+                }
+
                 external.setMaxActive(10);
                 external.setDefaultAutoCommit(true);
                 external.setMaxIdle(10);
