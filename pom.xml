@@ -83,7 +83,7 @@
 		<dependency>
 			<groupId>sql</groupId>
 			<artifactId>sqljdbc</artifactId>
-			<version>2008</version>
+			<version>4.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.mina</groupId>

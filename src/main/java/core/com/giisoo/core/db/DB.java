@@ -756,10 +756,16 @@ public class DB {
                         if (j < 0) {
                             j = url.length();
                         }
-                        username = url.substring(i, j);
+                        String[] ss1 = url.substring(i, j).split("=");
+                        if (ss1.length == 2) {
+                            username = ss1[1];
+                        }
+
                         String url1 = url.substring(0, i - 1);
                         if (j < url.length()) {
-                            url = url1 + url.substring(j + 1);
+                            url = url1 + url.substring(j);
+                        } else {
+                            url = url1;
                         }
                     }
 
@@ -769,10 +775,15 @@ public class DB {
                         if (j < 0) {
                             j = url.length();
                         }
-                        password = url.substring(i, j);
+                        String[] ss1 = url.substring(i, j).split("=");
+                        if (ss1.length == 2) {
+                            password = ss1[1];
+                        }
                         String url1 = url.substring(0, i - 1);
                         if (j < url.length()) {
                             url = url1 + url.substring(j + 1);
+                        } else {
+                            url = url1;
                         }
                     }
 
