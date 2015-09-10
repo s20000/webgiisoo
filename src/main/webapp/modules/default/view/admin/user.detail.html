@@ -15,7 +15,6 @@
 	<div><label><h3>$lang.get('user.department')</h3>:<i>$!u.department</i></label></div>
 	<div><label><h3>$lang.get('user.title')</h3>:<i>#if($u.title) $u.title #end </i></label></div>
 	<div><label><h3>$lang.get('user.phone')</h3>:<i>$!u.phone</i></label></div>
-	#parse('/admin/user.detail.external.html')
 	
 	<div><label><h3>$lang.get('user.roles')</h3>:[
 			#foreach($r in $u.role.list) 

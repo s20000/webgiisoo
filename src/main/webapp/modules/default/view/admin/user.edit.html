@@ -23,7 +23,6 @@
 	<div><label><h3>$lang.get('user.department')<r>*</r></h3>:<input type='text' name='department' value="$!department"/></label></div>
 	<div><label><h3>$lang.get('user.title')</h3>:<input type='text' name='title' value=#if($title) '$title' #else '' #end /></label></div>
 	<div><label><h3>$lang.get('user.phone')</h3>:<input type='text' name='phone' value= #if($phone)'$phone' #else '' #end /></label></div>
-	#parse('/admin/user.edit.external.html')
 
 	<div><label><h3>$lang.get('user.lock')</h3>:</label><input type="checkbox" name='locked' #if($locked=='on' || $locked==1) checked #end /></label></div>
 	<div><label><h3>$lang.get('user.failtimes')</h3>:</label><input type="text" name='failtimes' value='$failtimes' /></label></div>
