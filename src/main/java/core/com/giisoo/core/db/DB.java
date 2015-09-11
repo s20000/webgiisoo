@@ -840,10 +840,72 @@ public class DB {
 
             String D = conf.getString("db[" + name + "].driver", DRIVER);
             String EXTERNAL_URL = conf.getString("db[" + name + "].url", URL);
+
+            String username = null;
+            String password = null;
+            String[] ss = EXTERNAL_URL.split(":");
+            if (ss.length > 2) {
+                if (ss[1].equalsIgnoreCase("mysql")) {
+                    D = X.isEmpty(D) ? "com.mysql.jdbc.Driver" : D;
+                } else if (ss[1].equalsIgnoreCase("postgresql")) {
+                    D = X.isEmpty(D) ? "org.postgresql.Driver" : D;
+                } else if (ss[1].equalsIgnoreCase("oracle")) {
+                    D = X.isEmpty(D) ? "oracle.jdbc.driver.OracleDriver" : D;
+                } else if (ss[1].equalsIgnoreCase("sqlserver") || ss[1].equalsIgnoreCase("microsoft")) {
+                    D = X.isEmpty(D) ? "com.microsoft.sqlserver.jdbc.SQLServerDriver" : D;
+
+                    // TODO, user, password
+                    int i = EXTERNAL_URL.indexOf("user=");
+                    if (i > 0) {
+                        int j = EXTERNAL_URL.indexOf("&", i + 1);
+                        if (j < 0) {
+                            j = EXTERNAL_URL.length();
+                        }
+                        String[] ss1 = EXTERNAL_URL.substring(i, j).split("=");
+                        if (ss1.length == 2) {
+                            username = ss1[1];
+                        }
+
+                        String url1 = EXTERNAL_URL.substring(0, i - 1);
+                        if (j < EXTERNAL_URL.length()) {
+                            EXTERNAL_URL = url1 + EXTERNAL_URL.substring(j);
+                        } else {
+                            EXTERNAL_URL = url1;
+                        }
+                    }
+
+                    i = EXTERNAL_URL.indexOf("password=");
+                    if (i > 0) {
+                        int j = EXTERNAL_URL.indexOf("&", i + 1);
+                        if (j < 0) {
+                            j = EXTERNAL_URL.length();
+                        }
+                        String[] ss1 = EXTERNAL_URL.substring(i, j).split("=");
+                        if (ss1.length == 2) {
+                            password = ss1[1];
+                        }
+                        String url1 = EXTERNAL_URL.substring(0, i - 1);
+                        if (j < EXTERNAL_URL.length()) {
+                            EXTERNAL_URL = url1 + EXTERNAL_URL.substring(j + 1);
+                        } else {
+                            EXTERNAL_URL = url1;
+                        }
+                    }
+
+                }
+            }
+
             int N = conf.getInt("db[" + name + "].conns", MAX_ACTIVE_NUMBER);
 
             external = new BasicDataSource();
             external.setDriverClassName(D);
+
+            if (!X.isEmpty(username)) {
+                external.setUsername(username);
+            }
+            if (!X.isEmpty(password)) {
+                external.setPassword(password);
+            }
 
             external.setUrl(EXTERNAL_URL);
             if (conf.containsKey("db[" + name + "].user")) {
