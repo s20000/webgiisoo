@@ -1768,7 +1768,17 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
         ResultSetMetaData m = r.getMetaData();
         int cols = m.getColumnCount();
         for (int i = 1; i <= cols; i++) {
-            this.set(m.getColumnName(i), r.getObject(i));
+            Object o = r.getObject(i);
+            if (o instanceof java.sql.Date) {
+                o = ((java.sql.Date) o).toString();
+            } else if (o instanceof java.sql.Time) {
+                o = ((java.sql.Time) o).toString();
+            } else if (o instanceof java.sql.Timestamp) {
+                o = ((java.sql.Timestamp) o).toString();
+            } else if (o instanceof java.math.BigDecimal) {
+                o = o.toString();
+            }
+            this.set(m.getColumnName(i), o);
         }
     }
 
