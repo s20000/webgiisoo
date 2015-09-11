@@ -80,11 +80,7 @@
 			<artifactId>httpmime</artifactId>
 			<version>4.1</version>
 		</dependency>
-		<dependency>
-			<groupId>sql</groupId>
-			<artifactId>sqljdbc</artifactId>
-			<version>4.2</version>
-		</dependency>
+
 		<dependency>
 			<groupId>org.apache.mina</groupId>
 			<artifactId>mina-core</artifactId>
@@ -111,12 +107,6 @@
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
 			<version>1.2.16</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.mongodb</groupId>
-			<artifactId>mongo-java-driver</artifactId>
-			<version>2.5</version>
 		</dependency>
 
 		<dependency>
@@ -202,12 +192,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>postgresql</groupId>
-			<artifactId>postgresql</artifactId>
-			<version>9.0-801.jdbc4</version>
-		</dependency>
-
-		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpmime</artifactId>
 			<version>4.1</version>
@@ -249,11 +233,6 @@
 			<artifactId>jregex</artifactId>
 			<version>1.2_01</version>
 		</dependency>
-		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<version>5.1.30</version>
-		</dependency>
 
 		<dependency>
 			<groupId>metadata</groupId>
@@ -269,6 +248,32 @@
 			<groupId>oro</groupId>
 			<artifactId>oro</artifactId>
 			<version>2.0.8</version>
+		</dependency>
+
+		<dependency>
+			<groupId>postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>9.0-801.jdbc4</version>
+		</dependency>
+		<dependency>
+			<groupId>sql</groupId>
+			<artifactId>sqljdbc</artifactId>
+			<version>4.2</version>
+		</dependency>
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>5.1.30</version>
+		</dependency>
+		<dependency>
+			<groupId>oracle</groupId>
+			<artifactId>ojdbc</artifactId>
+			<version>14</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mongodb</groupId>
+			<artifactId>mongo-java-driver</artifactId>
+			<version>2.5</version>
 		</dependency>
 
 	</dependencies>
