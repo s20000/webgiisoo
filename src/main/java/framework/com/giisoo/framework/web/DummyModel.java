@@ -6,14 +6,12 @@
 package com.giisoo.framework.web;
 
 import java.io.*;
-import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.velocity.Template;
 
 import com.giisoo.core.bean.Bean;
-import com.giisoo.framework.common.UrlMapping;
 
 /**
  * default model for which model has not found
@@ -146,17 +144,6 @@ public class DummyModel extends Model {
 
 			show(uri + ".htm");
 			return;
-		}
-
-		List<UrlMapping> list = UrlMapping.loadAll();
-		if (list != null && list.size() > 0) {
-			for (UrlMapping m : list) {
-				if (m.matches(uri)) {
-					this.forward(m.replacement(uri));
-
-					return;
-				}
-			}
 		}
 
 		// not found
