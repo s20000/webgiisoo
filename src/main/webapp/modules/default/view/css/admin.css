@@ -453,6 +453,7 @@ table thead label {
 
 #dict-picker .btns {
 	display: inline-block;
+	padding-top:4px;
 }
 
 table th.checkbox {
@@ -656,7 +657,7 @@ label.focus g {
 
 #dict-picker .picker_class {
 	width: 160px;
-	height: 180px;
+	height: 175px;
 }
 
 .picker .item {
