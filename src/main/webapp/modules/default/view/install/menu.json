@@ -5,6 +5,7 @@
 		{name:'menu.setting',  load:'/admin/setting', classes:'icon-cogs2', seq:10},
 		{name:'menu.upgrade',  load:'/admin/upgrade/edit', classes:'icon-fire3', seq:20},
 		{name:'menu.clone',  load:'/admin/system/clone', classes:'icon-copy', seq:30},
+		{name:'menu.cluster',  load:'/admin/cluster', classes:'icon-spinner15', seq:40},
 		{name:'menu.urlmapping',  load:'load("/admin/url', classes:'icon-link3', seq:-1},
 		{name:'menu.db',  load:'load("/admin/db', classes:'icon-database2', seq:-1},
 		{name:'menu.mdc',  load:'/admin/mdc', classes:'icon-feed9', seq:-1},

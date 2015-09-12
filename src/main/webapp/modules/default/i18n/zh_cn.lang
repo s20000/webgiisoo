@@ -552,3 +552,4 @@ a.setting.base=基本设置
 label.setrule=入口规则（[{collection:'.*', id:'1.*'}, ...]）
 label.getrule=出口规则（[{collection:'.*', id:'1.*'}, ...]）
 menu.clone=复制节点
+menu.cluster=集群管理
