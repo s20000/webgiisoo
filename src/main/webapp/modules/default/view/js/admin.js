@@ -69,6 +69,14 @@ $(function() {
 
 		});
 
+function history(url) {
+	if (url && url.length > 0) {
+		if (__history[__history.length - 1] !== url) {
+			__history.push(url);
+		}
+	}
+}
+
 function back() {
 	if (__history.length > 1) {
 
