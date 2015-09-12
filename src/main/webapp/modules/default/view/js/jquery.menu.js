@@ -29,7 +29,7 @@
 
 			function tohtml(e) {
 				var s = '<div ';
-				if (e.hasChildren || e.click || e.url) {
+				if (e.hasChildren || e.click || e.url || e.load) {
 					// this is menu item
 					s += ' class="item" ';
 				}
