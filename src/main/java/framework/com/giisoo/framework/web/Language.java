@@ -12,7 +12,6 @@ import org.apache.commons.logging.*;
 
 import com.giisoo.core.bean.Bean;
 import com.giisoo.core.bean.X;
-import com.giisoo.framework.common.Dict;
 import com.giisoo.utils.base.Html;
 
 /**
@@ -209,12 +208,7 @@ public class Language {
                         continue;
                     sb.append("|").append(ss[i]);
                 }
-                Dict d = Dict.loadByPath(sb.toString());
-                if (d != null) {
-                    return d.getDisplay();
-                } else {
-                    return sb.toString();
-                }
+                return sb.toString();
             }
 
             if (name.indexOf("$") > -1) {
