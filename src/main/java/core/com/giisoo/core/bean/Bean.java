@@ -62,6 +62,9 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
     /** The mongo. */
     private static Map<String, DB> mongo = new HashMap<String, DB>();
 
+    /**
+     * @deprecated
+     */
     private static Map<Object, List<IData>> datalisteners = new HashMap<Object, List<IData>>();
 
     /**
@@ -85,6 +88,10 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
         }
     }
 
+    /**
+     * @deprecated
+     * @param json
+     */
     public static void insertJSON(String json) {
         JSONObject jo = JSONObject.fromObject(json);
         jo.convertBase64toString();
@@ -101,7 +108,7 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
 
     /**
      * add a data change listener
-     * 
+     * @deprecated
      * @param clazzes
      * @param listener
      */
@@ -123,7 +130,7 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
 
     /**
      * issue a event of data change
-     * 
+     * @deprecated
      * @param table
      * @param op
      * @param where
@@ -149,6 +156,7 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
     }
 
     /**
+     * @deprecated
      * @param clazz
      * @param where
      * @param args
@@ -158,6 +166,7 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
     }
 
     /**
+     * @deprecated
      * @param clazz
      * @param op
      * @param where
@@ -195,6 +204,7 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
     /**
      * remove a data change listener
      * 
+     * @deprecated
      * @param listener
      */
     public static void removeListener(IData listener) {
@@ -391,7 +401,7 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
 
     /**
      * convert a millis time to date with offset.
-     * 
+     * @deprecated
      * @param millis
      *            the millis
      * @param field
@@ -421,7 +431,7 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
 
     /**
      * Millis2 date.
-     * 
+     * @deprecated
      * @param millis
      *            the millis
      * @return the int
@@ -432,7 +442,7 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
 
     /**
      * Millis2 time.
-     * 
+     * @deprecated
      * @param millis
      *            the millis
      * @return the int
@@ -443,7 +453,7 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
 
     /**
      * Date2 millis.
-     * 
+     * @deprecated
      * @param date
      *            the date
      * @return the long
@@ -677,7 +687,7 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
 
     /**
      * Inits the db.
-     * 
+     * @deprecated
      * @param database
      *            the database
      * @return the db
@@ -726,7 +736,7 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
 
     /**
      * Checks for db.
-     * 
+     * @deprecated
      * @param database
      *            the database
      * @return true, if successful
@@ -1671,6 +1681,16 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
 
     }
 
+    /**
+     * 
+     * @param collection
+     * @param query
+     * @param orderBy
+     * @param offset
+     * @param limit
+     * @param clazz
+     * @return
+     */
     protected static <T extends Bean> Beans<T> load(String collection, DBObject query, DBObject orderBy, int offset, int limit, Class<T> clazz) {
         TimeStamp t = TimeStamp.create();
         DBCollection db = Bean.getCollection(collection);

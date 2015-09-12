@@ -2756,12 +2756,12 @@ public final class JSONObject extends AbstractJSON implements JSON, Map,
 		return o != null ? o.toString() : defaultValue;
 	}
 
-	public Object put(Object key, Object value) {
+	public Object put(String key, Object value) {
 		if (key == null) {
 			throw new IllegalArgumentException("key is null.");
 		}
 		Object previous = properties.get(key);
-		element(String.valueOf(key), value);
+		element(key, value);
 		return previous;
 	}
 
