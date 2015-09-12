@@ -2098,6 +2098,121 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
         return null;
     }
 
+    /**
+     * get the data
+     * 
+     * @param table
+     * @param where
+     * @param args
+     * @param orderby
+     * @param offset
+     * @param limit
+     * @param clazz
+     * @param c
+     * @return
+     */
+    protected static <T extends Bean> Beans<T> load(String table, String where, Object[] args, String orderby, int offset, int limit, Class<T> clazz, Connection c) {
+        /**
+         * create the sql statement
+         */
+        TimeStamp t = TimeStamp.create();
+
+        StringBuilder sql = new StringBuilder();
+        StringBuilder sum = new StringBuilder();
+        sql.append("select * from ").append(table);
+        sum.append("select count(*) t from ").append(table);
+        if (where != null) {
+            sql.append(" where ").append(where);
+            sum.append(" where ").append(where);
+        }
+
+        if (orderby != null) {
+            sql.append(" ").append(orderby);
+        }
+
+        if (limit > 0) {
+            sql.append(" limit ").append(limit);
+        }
+
+        if (offset > 0) {
+            sql.append(" offset ").append(offset);
+        }
+
+        // log.debug("sql:" + sql.toString());
+
+        /**
+         * search it in database
+         */
+        PreparedStatement p = null;
+        ResultSet r = null;
+
+        try {
+            if (c == null)
+                return null;
+
+            p = c.prepareStatement(sum.toString());
+
+            int order = 1;
+            if (args != null) {
+                for (int i = 0; i < args.length; i++) {
+                    Object o = args[i];
+
+                    setParameter(p, order++, o);
+                }
+            }
+
+            r = p.executeQuery();
+            Beans<T> rs = new Beans<T>();
+            if (r.next()) {
+                rs.total = r.getInt("t");
+            }
+            r.close();
+            r = null;
+            p.close();
+            p = null;
+
+            if (rs.total > 0) {
+                p = c.prepareStatement(sql.toString());
+
+                order = 1;
+                if (args != null) {
+                    for (int i = 0; i < args.length; i++) {
+                        Object o = args[i];
+
+                        setParameter(p, order++, o);
+                    }
+                }
+
+                r = p.executeQuery();
+                rs.list = new ArrayList<T>();
+                while (r.next()) {
+                    T b = clazz.newInstance();
+                    b.load(r);
+                    rs.list.add(b);
+                }
+            }
+
+            log.debug("load - cost=" + t.past() + "ms, collection=" + table + ", sql=" + sql + ", result=" + rs);
+
+            if (t.past() > 10000) {
+                OpLog.warn("bean", "load", "cost=" + t.past() + "ms", "load - cost=" + t.past() + "ms, collection=" + table + ", sql=" + sql + ", result=" + rs);
+            }
+
+            return rs;
+        } catch (Exception e) {
+
+            log.error(sql.toString() + toString(args), e);
+
+        } finally {
+            close(r, p);
+
+            if (t.past() > 2) {
+                sqllog.debug("cost:" + t.past() + "ms, sql=[" + sql + "]; [" + sum + "]");
+            }
+        }
+        return null;
+    }
+
     final static protected String getCollection(Class<?> clazz) {
         /**
          * get the require annotation onGet

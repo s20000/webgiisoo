@@ -1783,6 +1783,53 @@ public class Model {
         return false;
     }
 
+    final protected String parse(String viewname, Object[]... params) {
+
+        StringWriter writer = null;
+        try {
+
+            resp.setContentType(this.getContentType());
+
+            TimeStamp t1 = TimeStamp.create();
+            Template template = getTemplate(viewname, true);
+            log.debug("finding template = " + viewname + ", cost: " + t1.past() + "ms");
+
+            // System.out.println(viewname + "=>" + template);
+            if (template != null) {
+                writer = new StringWriter();
+
+                TimeStamp t = TimeStamp.create();
+
+                VelocityContext context = new VelocityContext();
+                if (params != null) {
+                    for (Object[] p : params) {
+                        if (p.length == 2) {
+                            context.put(p[0].toString(), p[1]);
+                        }
+                    }
+                }
+                template.merge(context, writer);
+                writer.flush();
+                log.debug("merge [" + viewname + "] cost: " + t.past() + "ms");
+
+                return writer.toString();
+            }
+
+        } catch (Exception e) {
+            log.error(viewname, e);
+        } finally {
+            if (writer != null) {
+                try {
+                    writer.close();
+                } catch (IOException e) {
+                    log.error(e);
+                }
+            }
+        }
+
+        return X.EMPTY;
+    }
+
     /**
      * On mdc.
      */
