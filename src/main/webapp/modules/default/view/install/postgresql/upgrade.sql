@@ -36,3 +36,4 @@ alter table tblapp add logout varchar(255);
 alter table tbloplog add 	brief varchar(1024);
 alter table tbluser add role varchar(255);
 alter table tblmenu add style varchar(255);
+alter table tblmenu add load varchar(255);

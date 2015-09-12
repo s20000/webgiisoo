@@ -24,455 +24,467 @@ import com.giisoo.core.bean.*;
 @DBMapping(table = "tblmenu")
 public class Menu extends Bean {
 
-	/**
+    /**
    * 
    */
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	int id;
+    int id;
 
-	/**
-	 * the name of the node, is the key of the display in language
-	 */
-	String name;
+    /**
+     * the name of the node, is the key of the display in language
+     */
+    String name;
 
-	/**
-	 * 0: no child
-	 */
-	int childs;
+    /**
+     * 0: no child
+     */
+    int childs;
 
-	/**
-	 * optional, the link of the menu
-	 */
-	String url;
+    /**
+     * optional, the link of the menu
+     */
+    String url;
 
-	/**
-	 * the class of the node
-	 */
-	String classes;
+    /**
+     * the class of the node
+     */
+    String classes;
 
-	/**
-	 * the javascript when click
-	 */
-	String click;
+    /**
+     * the javascript when click
+     */
+    String click;
 
-	/**
-	 * extra content associated this node
-	 */
-	String content;
+    /**
+     * extra content associated this node
+     */
+    String content;
 
-	/**
-	 * what's access need to access this menu
-	 */
-	String access;
+    /**
+     * what's access need to access this menu
+     */
+    String access;
 
-	/**
-	 * the sequence of the position
-	 */
-	int seq;
+    String load;
 
-	String tip;
+    /**
+     * the sequence of the position
+     */
+    int seq;
 
-	String style;
+    String tip;
 
-	/**
-	 * Insert or update.
-	 * 
-	 * @param arr
-	 *            the arr
-	 * @param tag
-	 *            the tag
-	 */
-	public static void insertOrUpdate(JSONArray arr, String tag) {
-		if (arr == null) {
-			return;
-		}
+    String style;
 
-		int len = arr.size();
-		for (int i = 0; i < len; i++) {
-			JSONObject jo = arr.getJSONObject(i);
+    String tag;
 
-			/**
-			 * test and create from the "root"
-			 */
+    /**
+     * Insert or update.
+     * 
+     * @param arr
+     *            the arr
+     * @param tag
+     *            the tag
+     */
+    public static void insertOrUpdate(JSONArray arr, String tag) {
+        if (arr == null) {
+            return;
+        }
 
-			jo.put("tag", tag);
-			insertOrUpdate(jo, 0);
-		}
-	}
+        int len = arr.size();
+        for (int i = 0; i < len; i++) {
+            JSONObject jo = arr.getJSONObject(i);
 
-	public int getId() {
-		return id;
-	}
+            /**
+             * test and create from the "root"
+             */
 
-	public String getName() {
-		return name;
-	}
+            jo.put("tag", tag);
+            insertOrUpdate(jo, 0);
+        }
+    }
 
-	public int getChilds() {
-		return childs;
-	}
+    public int getId() {
+        return id;
+    }
 
-	public String getUrl() {
-		return url;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public String getClasses() {
-		return classes;
-	}
+    public String getLoad() {
+        return load;
+    }
 
-	public String getClick() {
-		return click;
-	}
+    public int getChilds() {
+        return childs;
+    }
 
-	public String getContent() {
-		return content;
-	}
+    public String getUrl() {
+        return url;
+    }
 
-	public String getAccess() {
-		return access;
-	}
+    public String getTag() {
+        return tag;
+    }
 
-	/**
-	 * Insert or update.
-	 * 
-	 * @param jo
-	 *            the jo
-	 * @param parent
-	 *            the parent
-	 */
-	public static void insertOrUpdate(JSONObject jo, int parent) {
-		try {
-			// log.info(jo);
+    public String getClasses() {
+        return classes;
+    }
 
-			String name = jo.getString("name");
-			if (!X.isEmpty(name)) {
-				/**
-				 * create menu if not exists
-				 */
-				V v = V.create().copy(jo, "url", "click", "classes", "content",
-						"tag", "access", "seq", "tip", "style");
+    public String getClick() {
+        return click;
+    }
 
-				/**
-				 * create the access if not exists
-				 */
-				if (jo.containsKey("access")) {
-					String[] ss = jo.getString("access").split("[|&]");
-					for (String s : ss) {
-						Access.set(s);
-					}
-				}
+    public String getContent() {
+        return content;
+    }
 
-				// log.debug(jo.toString());
+    public int getSeq() {
+        return this.seq;
+    }
 
-				/**
-				 * create the menu item is not exists
-				 */
-				Menu m = insertOrUpdate(parent, name, v);
+    public String getAccess() {
+        return access;
+    }
 
-				/**
-				 * get all childs from the json
-				 */
-				if (jo.containsKey("childs")) {
-					JSONArray arr = jo.getJSONArray("childs");
-					int len = arr.size();
-					for (int i = 0; i < len; i++) {
-						JSONObject j = arr.getJSONObject(i);
-						if (jo.containsKey("tag")) {
-							j.put("tag", jo.get("tag"));
-						}
-						insertOrUpdate(j, m.getId());
-					}
-				}
-			} else {
-				// is role ?
-				String role = jo.getString("role");
-				String access = jo.getString("access");
-				if (!X.isEmpty(role) && !X.isEmpty(access)) {
-					String memo = jo.getString("memo");
-					int rid = Role.create(role, memo);
-					if (rid <= 0) {
-						Role r = Role.loadByName(role);
-						if (r != null) {
-							rid = r.getId();
-						}
-					}
-					if (rid > 0) {
-						String[] ss = access.split("[|&]");
-						for (String s : ss) {
-							Access.set(s);
-							
-							Role.setAccess(rid, s);
-						}
-					} else {
-						log.error("can not create or load the role: " + role);
-						OpLog.warn("initial",
-								"can not create or load the role:" + role, null);
-					}
-				}
-			}
+    /**
+     * Insert or update.
+     * 
+     * @param jo
+     *            the jo
+     * @param parent
+     *            the parent
+     */
+    public static void insertOrUpdate(JSONObject jo, int parent) {
+        try {
+            // log.info(jo);
 
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
-		}
-	}
+            String name = jo.getString("name");
+            if (!X.isEmpty(name)) {
+                /**
+                 * create menu if not exists
+                 */
+                V v = V.create().copy(jo, "url", "click", "classes", "content", "tag", "access", "seq", "tip", "style", "load");
 
-	/**
-	 * test and create new menu if not exists
-	 * 
-	 * @param parent
-	 * @param name
-	 * @param url
-	 * @param classes
-	 * @param click
-	 * @param content
-	 * @return Menu
-	 */
-	private static Menu insertOrUpdate(int parent, String name, V v) {
-		if (!Bean.exists("parent=? and name=?", new Object[] { parent, name },
-				Menu.class)) {
-			Bean.insert(v.set("parent", parent).set("name", name), Menu.class);
+                /**
+                 * create the access if not exists
+                 */
+                if (jo.containsKey("access")) {
+                    String[] ss = jo.getString("access").split("[|&]");
+                    for (String s : ss) {
+                        Access.set(s);
+                    }
+                }
 
-			/**
-			 * and update the child of the parent menu
-			 */
-			Connection c = null;
-			PreparedStatement stat = null;
-			ResultSet r = null;
+                // log.debug(jo.toString());
 
-			try {
-				c = Bean.getConnection();
+                /**
+                 * create the menu item is not exists
+                 */
+                Menu m = insertOrUpdate(parent, name, v);
 
-				if (c != null) {
-					/**
-					 * count the childs
-					 */
-					stat = c.prepareStatement("select count(*) t from tblmenu where parent=?");
-					stat.setInt(1, parent);
-					r = stat.executeQuery();
-					int childs = 0;
-					if (r.next()) {
-						childs = r.getInt("t");
-					}
-					r.close();
-					r = null;
-					stat.close();
+                /**
+                 * get all childs from the json
+                 */
+                if (jo.containsKey("childs")) {
+                    JSONArray arr = jo.getJSONArray("childs");
+                    int len = arr.size();
+                    for (int i = 0; i < len; i++) {
+                        JSONObject j = arr.getJSONObject(i);
+                        if (jo.containsKey("tag")) {
+                            j.put("tag", jo.get("tag"));
+                        }
+                        insertOrUpdate(j, m.getId());
+                    }
+                }
+            } else {
+                // is role ?
+                String role = jo.getString("role");
+                String access = jo.getString("access");
+                if (!X.isEmpty(role) && !X.isEmpty(access)) {
+                    String memo = jo.getString("memo");
+                    int rid = Role.create(role, memo);
+                    if (rid <= 0) {
+                        Role r = Role.loadByName(role);
+                        if (r != null) {
+                            rid = r.getId();
+                        }
+                    }
+                    if (rid > 0) {
+                        String[] ss = access.split("[|&]");
+                        for (String s : ss) {
+                            Access.set(s);
 
-					/**
-					 * update the childs field
-					 */
-					stat = c.prepareStatement("update tblmenu set childs=? where id=?");
-					stat.setInt(1, childs);
-					stat.setInt(2, parent);
-					stat.executeUpdate();
-				} else {
-					log.warn("no database confirgured!!!");
-				}
-			} catch (Exception e) {
-				log.error(e.getMessage(), e);
-			} finally {
-				Bean.close(r, stat, c);
-			}
-		} else {
-			/**
-			 * update
-			 */
-			Bean.update("parent=? and name=?", new Object[] { parent, name },
-					v, Menu.class);
+                            Role.setAccess(rid, s);
+                        }
+                    } else {
+                        log.error("can not create or load the role: " + role);
+                        OpLog.warn("initial", "can not create or load the role:" + role, null);
+                    }
+                }
+            }
 
-		}
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+    }
 
-		return Bean.load("parent=? and name=?", new Object[] { parent, name },
-				Menu.class);
-	}
+    /**
+     * test and create new menu if not exists
+     * 
+     * @param parent
+     * @param name
+     * @param url
+     * @param classes
+     * @param click
+     * @param content
+     * @return Menu
+     */
+    private static Menu insertOrUpdate(int parent, String name, V v) {
+        if (!Bean.exists("parent=? and name=?", new Object[] { parent, name }, Menu.class)) {
+            Bean.insert(v.set("parent", parent).set("name", name), Menu.class);
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.giisoo.bean.Bean#load(java.sql.ResultSet)
-	 */
-	@Override
-	protected void load(ResultSet r) throws SQLException {
-		id = r.getInt("id");
-		name = r.getString("name");
-		url = r.getString("url");
-		classes = r.getString("classes");
-		click = r.getString("click");
-		content = r.getString("content");
-		childs = r.getInt("childs");
-		access = r.getString("access");
-		seq = r.getInt("seq");
-		tip = r.getString("tip");
-		style = r.getString("style");
-	}
+            /**
+             * and update the child of the parent menu
+             */
+            Connection c = null;
+            PreparedStatement stat = null;
+            ResultSet r = null;
 
-	public String getTip() {
-		return tip;
-	}
+            try {
+                c = Bean.getConnection();
 
-	/**
-	 * Submenu.
-	 * 
-	 * @param id
-	 *            the id
-	 * @return the beans
-	 */
-	public static Beans<Menu> submenu(int id) {
-		// load it
-		Beans<Menu> bb = Bean.load("parent=?", new Object[] { id },
-				"order by seq", 0, -1, Menu.class);
-		return bb;
-	}
+                if (c != null) {
+                    /**
+                     * count the childs
+                     */
+                    stat = c.prepareStatement("select count(*) t from tblmenu where parent=?");
+                    stat.setInt(1, parent);
+                    r = stat.executeQuery();
+                    int childs = 0;
+                    if (r.next()) {
+                        childs = r.getInt("t");
+                    }
+                    r.close();
+                    r = null;
+                    stat.close();
 
-	/**
-	 * Load.
-	 * 
-	 * @param parent
-	 *            the parent
-	 * @param name
-	 *            the name
-	 * @return the menu
-	 */
-	public static Menu load(int parent, String name) {
-		Menu m = Bean.load("tblmenu", "parent=? and name=?", new Object[] {
-				parent, name }, Menu.class);
-		return m;
-	}
+                    /**
+                     * update the childs field
+                     */
+                    stat = c.prepareStatement("update tblmenu set childs=? where id=?");
+                    stat.setInt(1, childs);
+                    stat.setInt(2, parent);
+                    stat.executeUpdate();
+                } else {
+                    log.warn("no database confirgured!!!");
+                }
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+            } finally {
+                Bean.close(r, stat, c);
+            }
+        } else {
+            /**
+             * update
+             */
+            Bean.update("parent=? and name=?", new Object[] { parent, name }, v, Menu.class);
 
-	/**
-	 * Submenu.
-	 * 
-	 * @return the beans
-	 */
-	public Beans<Menu> submenu() {
-		return submenu(id);
-	}
+        }
 
-	/**
-	 * Removes the by tag.
-	 * 
-	 * @param tag
-	 *            the tag
-	 */
-	public void removeByTag(String tag) {
-		Bean.delete("tag=?", new String[] { tag }, Menu.class);
-	}
+        return Bean.load("parent=? and name=?", new Object[] { parent, name }, Menu.class);
+    }
 
-	/**
-	 * Removes the.
-	 * 
-	 * @param id
-	 *            the id
-	 */
-	public static void remove(int id) {
-		Bean.delete("id=?", new Object[] { id }, Menu.class);
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.giisoo.bean.Bean#load(java.sql.ResultSet)
+     */
+    @Override
+    protected void load(ResultSet r) throws SQLException {
+        id = r.getInt("id");
+        name = r.getString("name");
+        url = r.getString("url");
+        classes = r.getString("classes");
+        click = r.getString("click");
+        content = r.getString("content");
+        childs = r.getInt("childs");
+        access = r.getString("access");
+        seq = r.getInt("seq");
+        tip = r.getString("tip");
+        style = r.getString("style");
+        tag = r.getString("tag");
+        load = r.getString("load");
 
-		/**
-		 * remove all the sub
-		 */
-		Beans<Menu> bs = submenu(id);
-		List<Menu> list = bs.getList();
+    }
 
-		if (list != null) {
-			for (Menu m : list) {
-				remove(m.getId());
-			}
-		}
-	}
+    public String getTip() {
+        return tip;
+    }
 
-	/**
-	 * Filter access.
-	 * 
-	 * @param list
-	 *            the list
-	 * @param me
-	 *            the me
-	 * @return the collection
-	 */
-	public static Collection<Menu> filterAccess(List<Menu> list, User me) {
-		if (list == null) {
-			return null;
-		}
+    /**
+     * Submenu.
+     * 
+     * @param id
+     *            the id
+     * @return the beans
+     */
+    public static Beans<Menu> submenu(int id) {
+        // load it
+        Beans<Menu> bb = Bean.load("parent=?", new Object[] { id }, "order by seq", 0, -1, Menu.class);
+        return bb;
+    }
 
-		/**
-		 * filter according the access, and save seq
-		 */
-		Map<Integer, Menu> map = new TreeMap<Integer, Menu>();
+    /**
+     * Load.
+     * 
+     * @param parent
+     *            the parent
+     * @param name
+     *            the name
+     * @return the menu
+     */
+    public static Menu load(int parent, String name) {
+        Menu m = Bean.load("tblmenu", "parent=? and name=?", new Object[] { parent, name }, Menu.class);
+        return m;
+    }
 
-		for (Menu m : list) {
+    /**
+     * Submenu.
+     * 
+     * @return the beans
+     */
+    public Beans<Menu> submenu() {
+        return submenu(id);
+    }
 
-			boolean has = false;
-			if (X.isEmpty(m.access)) {
-				has = true;
-			}
+    /**
+     * Removes the by tag.
+     * 
+     * @param tag
+     *            the tag
+     */
+    public void removeByTag(String tag) {
+        Bean.delete("tag=?", new String[] { tag }, Menu.class);
+    }
 
-			if (!has && me != null) {
-				if (m.access.indexOf("|") > 0) {
-					String[] ss = m.access.split("\\|");
-					if (me.hasAccess(ss)) {
-						has = true;
-					}
-				} else if (m.access.indexOf("&") > 0) {
-					String[] ss = m.access.split("\\&");
-					for (String s : ss) {
-						if (!me.hasAccess(s)) {
-							has = false;
-							break;
-						}
-					}
-				} else if (me.hasAccess(m.access)) {
-					has = true;
-				}
-			}
+    /**
+     * Removes the.
+     * 
+     * @param id
+     *            the id
+     */
+    public static void remove(int id) {
+        Bean.delete("id=?", new Object[] { id }, Menu.class);
 
-			if (has) {
-				int seq = m.seq;
-				Menu m1 = map.get(seq);
-				if (m1 != null) {
-					/**
-					 * get short's name first
-					 */
-					if (m1.name.indexOf(m.name) > -1) {
-						map.put(seq, m);
-					} else if (m.name.indexOf(m1.name) > -1) {
-						map.put(seq, m1);
-					} else {
-						map.put(seq + 1, m);
-					}
-				} else {
-					map.put(seq, m);
-				}
-			}
-		}
+        /**
+         * remove all the sub
+         */
+        Beans<Menu> bs = submenu(id);
+        List<Menu> list = bs.getList();
 
-		return map.values();
-	}
+        if (list != null) {
+            for (Menu m : list) {
+                remove(m.getId());
+            }
+        }
+    }
 
-	/**
-	 * Removes the.
-	 * 
-	 * @param tag
-	 *            the tag
-	 */
-	public static void remove(String tag) {
-		Bean.delete("tag=?", new Object[] { tag }, Menu.class);
-	}
+    /**
+     * Filter access.
+     * 
+     * @param list
+     *            the list
+     * @param me
+     *            the me
+     * @return the collection
+     */
+    public static Collection<Menu> filterAccess(List<Menu> list, User me) {
+        if (list == null) {
+            return null;
+        }
 
-	/**
-	 * Reset.
-	 */
-	public static void reset() {
-		Bean.update(null, null, V.create("seq", -1), Menu.class);
-	}
+        /**
+         * filter according the access, and save seq
+         */
+        Map<Integer, Menu> map = new TreeMap<Integer, Menu>();
 
-	/**
-	 * Cleanup.
-	 */
-	public static void cleanup() {
-		Bean.delete("seq<0", null, Menu.class);
-	}
+        for (Menu m : list) {
 
-	public String getStyle() {
-		return style;
-	}
+            boolean has = false;
+            if (X.isEmpty(m.access)) {
+                has = true;
+            }
+
+            if (!has && me != null) {
+                if (m.access.indexOf("|") > 0) {
+                    String[] ss = m.access.split("\\|");
+                    if (me.hasAccess(ss)) {
+                        has = true;
+                    }
+                } else if (m.access.indexOf("&") > 0) {
+                    String[] ss = m.access.split("\\&");
+                    for (String s : ss) {
+                        if (!me.hasAccess(s)) {
+                            has = false;
+                            break;
+                        }
+                    }
+                } else if (me.hasAccess(m.access)) {
+                    has = true;
+                }
+            }
+
+            if (has) {
+                int seq = m.seq;
+                Menu m1 = map.get(seq);
+                if (m1 != null) {
+                    /**
+                     * get short's name first
+                     */
+                    if (m1.name.indexOf(m.name) > -1) {
+                        map.put(seq, m);
+                    } else if (m.name.indexOf(m1.name) > -1) {
+                        map.put(seq, m1);
+                    } else {
+                        map.put(seq + 1, m);
+                    }
+                } else {
+                    map.put(seq, m);
+                }
+            }
+        }
+
+        return map.values();
+    }
+
+    /**
+     * Removes the.
+     * 
+     * @param tag
+     *            the tag
+     */
+    public static void remove(String tag) {
+        Bean.delete("tag=?", new Object[] { tag }, Menu.class);
+    }
+
+    /**
+     * Reset.
+     */
+    public static void reset() {
+        Bean.update(null, null, V.create("seq", -1), Menu.class);
+    }
+
+    /**
+     * Cleanup.
+     */
+    public static void cleanup() {
+        Bean.delete("seq<0", null, Menu.class);
+    }
+
+    public String getStyle() {
+        return style;
+    }
 }

@@ -197,7 +197,8 @@ create table tblmenu
 	childs int default 0,
 	seq int default 1000,
 	tip varchar(255),
-	style varchar(255)
+	style varchar(255),
+	load varchar(255)
 );
 create index tblmenu_index_id on tblmenu(id);
 create index tblmenu_index_parent on tblmenu(parent);

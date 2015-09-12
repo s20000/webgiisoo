@@ -135,4 +135,14 @@ public class system extends Model {
         this.response(jo);
     }
 
+    /**
+     * clone a new system as me
+     */
+    @Path(path = "clone", login = true, access = "access.config.admin", log = Model.METHOD_POST)
+    public void clone1() {
+        
+        this.show("/admin/system.clone.html");
+        
+    }
+
 }

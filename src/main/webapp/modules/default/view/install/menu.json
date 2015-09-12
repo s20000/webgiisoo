@@ -1,21 +1,22 @@
 [{'name':'admin', seq:10, 'childs':[
-	{name:'menu.dashboard', url:'', click:'load("/admin/dashboard")', classes:'dashboard', content:'', tip:'dashboard', seq:-1},
+	{name:'menu.dashboard', load:'/admin/dashboard', classes:'dashboard', content:'', tip:'dashboard', seq:-1},
 	
-	{name:'menu.system', url:'', click:'', classes:'icon-settings', content:'', seq:10, childs:[
-		{name:'menu.setting', url:'', click:'load("/admin/setting")', classes:'icon-cogs2', content:'', seq:10, childs:[]},
-		{name:'menu.upgrade', url:'', click:'load("/admin/upgrade/edit")', classes:'icon-fire3', content:'', seq:20, childs:[]},
-		{name:'menu.urlmapping', url:'', click:'load("/admin/url")', classes:'icon-link3', content:'', seq:-1, childs:[]},
-		{name:'menu.db', url:'', click:'load("/admin/db")', classes:'icon-database2', content:'', seq:-1, childs:[]},
-		{name:'menu.mdc', url:'', click:'load("/admin/mdc")', classes:'icon-feed9', content:'', seq:-1, childs:[]},
-		{name:'menu.dict', url:'', click:'load("/admin/dict")', seq:-1, classes:'icon-book3', content:''},
-		{name:'menu.keypair', url:'', click:'load("/admin/keypair")', seq:-1, classes:'icon-key6', content:''},
-		{name:'menu.app', url:'', click:'load("/admin/app")', seq:-1, classes:'icon-power-cord2', content:''},
-		{name:'menu.module', url:'', click:'load("/admin/module")', seq:1000, classes:'icon-picassa5', content:''},
-		{name:'menu.log', url:'', click:'load("/admin/log")', seq:1010, classes:'icon-note', content:''},
+	{name:'menu.system', classes:'icon-settings', seq:10, childs:[
+		{name:'menu.setting',  load:'/admin/setting', classes:'icon-cogs2', seq:10},
+		{name:'menu.upgrade',  load:'/admin/upgrade/edit', classes:'icon-fire3', seq:20},
+		{name:'menu.clone',  load:'/admin/system/clone', classes:'icon-copy', seq:30},
+		{name:'menu.urlmapping',  load:'load("/admin/url', classes:'icon-link3', seq:-1},
+		{name:'menu.db',  load:'load("/admin/db', classes:'icon-database2', seq:-1},
+		{name:'menu.mdc',  load:'/admin/mdc', classes:'icon-feed9', seq:-1},
+		{name:'menu.dict',  load:'/admin/dict', seq:-1, classes:'icon-book3'},
+		{name:'menu.keypair',  load:'/admin/keypair', seq:-1, classes:'icon-key6'},
+		{name:'menu.app',  load:'/admin/app', seq:-1, classes:'icon-power-cord2'},
+		{name:'menu.module',  load:'/admin/module', seq:1000, classes:'icon-picassa5'},
+		{name:'menu.log',  load:'/admin/log', seq:1010, classes:'icon-note'},
 	]},
-	{name:'menu.usermgr', url:'', click:'', classes:'icon-users2', content:'', seq:20, childs:[
-		{name:'menu.user', url:'', click:'load("/admin/user")', seq:10, classes:'icon-user2', content:''},
-		{name:'menu.role', url:'', click:'load("/admin/role")', seq:20, classes:'icon-shield2', content:''},
+	{name:'menu.usermgr', classes:'icon-users2', content:'', seq:20, childs:[
+		{name:'menu.user',  load:'/admin/user', seq:10, classes:'icon-user2'},
+		{name:'menu.role',  load:'/admin/role', seq:20, classes:'icon-shield2'},
 	]},
 ]},
 {'name':'home', seq:20, childs:[]},

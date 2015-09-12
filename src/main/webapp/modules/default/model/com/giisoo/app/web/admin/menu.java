@@ -53,11 +53,7 @@ public class menu extends Model {
       jo.put("state", "ok");
     }
 
-    this.setContentType(Model.MIME_JSON);
-
-    this.put("jsonstr", jo.toString());
-
-    show("ajax/json.html");
+    this.response(jo);
 
   }
 
