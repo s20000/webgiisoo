@@ -47,7 +47,7 @@ import com.mongodb.WriteResult;
  * 
  */
 @SuppressWarnings("deprecation")
-public abstract class Bean extends DefaultCachable implements Map<String, Object>, IReferable {
+public abstract class Bean extends DefaultCachable implements Map<String, Object> {
 
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 2L;
@@ -3457,24 +3457,24 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
         return null;
     }
 
-    @Override
-    public boolean load(String where, Object o) {
-        /**
-         * not support
-         */
-        return false;
-    }
+//    @Override
+//    public boolean load(String where, Object o) {
+//        /**
+//         * not support
+//         */
+//        return false;
+//    }
 
-    /**
-     * @deprecated
-     */
-    @Override
-    public String getDisplay() {
-        /**
-         * not support
-         */
-        return null;
-    }
+//    /**
+//     * @deprecated
+//     */
+//    @Override
+//    public String getDisplay() {
+//        /**
+//         * not support
+//         */
+//        return null;
+//    }
 
     /**
      * set the extra value

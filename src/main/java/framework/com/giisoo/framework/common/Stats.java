@@ -186,7 +186,7 @@ public class Stats {
 	public String display(String name) {
 		List<Stat> list = names.get(name);
 		if (list != null && list.size() > 0) {
-			return list.get(0).getDisplay();
+			return list.get(0).toString();//.getDisplay();
 		}
 		return X.EMPTY;
 	}

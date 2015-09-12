@@ -97,22 +97,22 @@ public class Inbox extends Bean {
 		return created;
 	}
 
-	public Bean getBean() {
-		if (bean == null) {
-			try {
-				Bean b = (Bean) (Class.forName(clazz).newInstance());
-				JSONObject jo = JSONObject.fromObject(refer);
-				if (jo.containsKey("where") && jo.containsKey("args")) {
-					if (b.load(jo.getString("where"), jo.get("args"))) {
-						bean = b;
-					}
-				}
-			} catch (Exception e) {
-				log.error(clazz + "[" + refer + "]", e);
-			}
-		}
-		return bean;
-	}
+//	public Bean getBean() {
+//		if (bean == null) {
+//			try {
+//				Bean b = (Bean) (Class.forName(clazz).newInstance());
+//				JSONObject jo = JSONObject.fromObject(refer);
+//				if (jo.containsKey("where") && jo.containsKey("args")) {
+//					if (b.load(jo.getString("where"), jo.get("args"))) {
+//						bean = b;
+//					}
+//				}
+//			} catch (Exception e) {
+//				log.error(clazz + "[" + refer + "]", e);
+//			}
+//		}
+//		return bean;
+//	}
 
 	public String getClazz() {
 		return clazz;
