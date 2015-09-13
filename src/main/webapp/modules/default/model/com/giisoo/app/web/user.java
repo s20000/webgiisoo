@@ -153,8 +153,7 @@ public class user extends Model {
 
 			onMDC();
 
-			this.set("jsonstr", mockMdc.toString());
-			this.show("/ajax/json.html");
+			this.println(mockMdc.toString());
 			return;
 		}
 

@@ -1696,8 +1696,7 @@ public class Model {
      */
     final protected void responseJson(String jsonstr) {
         this.setContentType(Model.MIME_JSON);
-        this.set("jsonstr", jsonstr);
-        show("/ajax/json.html", true);
+        this.println(jsonstr);
     }
 
     /**
