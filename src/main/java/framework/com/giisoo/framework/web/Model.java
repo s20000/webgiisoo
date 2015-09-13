@@ -1696,7 +1696,7 @@ public class Model {
      */
     final protected void responseJson(String jsonstr) {
         this.setContentType(Model.MIME_JSON);
-        this.println(jsonstr);
+        this.print(jsonstr);
     }
 
     /**
@@ -2129,8 +2129,6 @@ public class Model {
         this.uri = m.uri;
     }
 
-    private transient PrintStream out;
-
     /**
      * pathmapping structure: {"method", {"path", Path|Method}}
      */
@@ -2143,18 +2141,7 @@ public class Model {
      *            the o
      */
     final protected void println(Object o) {
-        if (out == null) {
-            try {
-                out = new PrintStream(resp.getOutputStream());
-            } catch (IOException e) {
-                log.error(e.getMessage(), e);
-            }
-        }
-
-        if (out != null) {
-            out.println(o);
-            out.flush();
-        }
+        print(o);
     }
 
     /**
@@ -2164,17 +2151,13 @@ public class Model {
      *            the o
      */
     final protected void print(Object o) {
-        if (out == null) {
-            try {
-                out = new PrintStream(resp.getOutputStream());
-            } catch (IOException e) {
-                log.error(e.getMessage(), e);
-            }
-        }
+        try {
+            BufferedWriter writer = new BufferedWriter(resp.getWriter());
 
-        if (out != null) {
-            out.print(o);
-            out.flush();
+            writer.write(o.toString());
+            writer.flush();
+        } catch (Exception e) {
+            log.error(o, e);
         }
     }
 
