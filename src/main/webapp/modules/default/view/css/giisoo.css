@@ -2356,10 +2356,6 @@ html, body {
 	border: 0;
 }
 
-#panel label h3 {
-	color: #000;
-}
-
 td a.delete {
 	float: right;
 	margin-right: 18px;
@@ -3145,10 +3141,6 @@ table.tablesorter tbody tr.state_0 td {
 	color: #fff;
 }
 
-#panel label h3 {
-	
-}
-
 #panel label i {
 	margin-left: 10px;
 	color: #0A4E83;
@@ -3289,10 +3281,6 @@ table.tablesorter tbody tr.state_0 td {
 	margin: 0;
 	padding: 0;
 	border: 0;
-}
-
-#panel label h3 {
-	color: #000;
 }
 
 td a.delete {
@@ -4065,10 +4053,6 @@ table.tablesorter tbody tr.state_0 td {
 
 #panel tr.hover td a {
 	color: #0D5004;
-}
-
-#panel label h3 {
-	
 }
 
 #panel label i {

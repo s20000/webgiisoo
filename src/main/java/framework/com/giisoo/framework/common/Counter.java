@@ -36,6 +36,8 @@ public class Counter extends MBeanInfo {
 	 */
 	private static final long serialVersionUID = 1L;
 
+	private static long currenttime = 0;
+	
 	private static Map<String, Integer> counters = new HashMap<String, Integer>();
 	private static Map<String, Object[]> maxs = new HashMap<String, Object[]>();
 

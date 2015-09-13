@@ -14,6 +14,7 @@ import java.sql.Statement;
 import net.sf.json.JSONObject;
 
 import com.giisoo.core.bean.Bean;
+import com.giisoo.core.bean.X;
 import com.giisoo.core.worker.WorkerTask;
 import com.giisoo.framework.common.User;
 import com.giisoo.framework.web.*;
@@ -139,10 +140,33 @@ public class system extends Model {
      * clone a new system as me
      */
     @Path(path = "clone", login = true, access = "access.config.admin", log = Model.METHOD_POST)
-    public void clone1() {
-        
-        this.show("/admin/system.clone.html");
-        
+    public void clone0() {
+        JSONObject jo = this.getJSON();
+
+        String step = this.getString("step");
+        step = check(step, jo);
+
+        this.set(jo);
+        this.set("step", step);
+
+        this.show("/admin/system.clone" + step + ".html");
+
+    }
+
+    /**
+     * 
+     * check and return next step
+     * 
+     * @param jo
+     * @return String of nextstep
+     */
+    private String check(String step, JSONObject jo) {
+        if (X.isEmpty(step)) {
+            return "0";
+        }
+
+        this.set(X.MESSAGE, "ok");
+        return step;
     }
 
 }
