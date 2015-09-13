@@ -18,7 +18,7 @@ import org.apache.mina.core.session.*;
 
 import com.giisoo.core.bean.UID;
 import com.giisoo.core.conf.*;
-import com.giisoo.framework.common.Counter;
+import com.giisoo.framework.common.Cluster.Counter;
 import com.giisoo.framework.mdc.command.*;
 import com.giisoo.utils.base.*;
 import com.giisoo.utils.base.RSA.Key;
@@ -291,7 +291,7 @@ public abstract class MDCServer extends IoHandlerAdapter {
 	public void sessionCreated(IoSession session) throws Exception {
 		log.info("stub created:" + session.getRemoteAddress());
 
-		Counter.add("mdc.connections", 1);
+		Counter.add("mdc", "connection",  1);
 
 		TConn d = new TConn(session);
 		d.set("x-forwarded-for", session.getRemoteAddress().toString());

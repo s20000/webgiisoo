@@ -108,6 +108,7 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
 
     /**
      * add a data change listener
+     * 
      * @deprecated
      * @param clazzes
      * @param listener
@@ -130,6 +131,7 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
 
     /**
      * issue a event of data change
+     * 
      * @deprecated
      * @param table
      * @param op
@@ -401,6 +403,7 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
 
     /**
      * convert a millis time to date with offset.
+     * 
      * @deprecated
      * @param millis
      *            the millis
@@ -431,6 +434,7 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
 
     /**
      * Millis2 date.
+     * 
      * @deprecated
      * @param millis
      *            the millis
@@ -442,6 +446,7 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
 
     /**
      * Millis2 time.
+     * 
      * @deprecated
      * @param millis
      *            the millis
@@ -453,6 +458,7 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
 
     /**
      * Date2 millis.
+     * 
      * @deprecated
      * @param date
      *            the date
@@ -687,6 +693,7 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
 
     /**
      * Inits the db.
+     * 
      * @deprecated
      * @param database
      *            the database
@@ -736,6 +743,7 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
 
     /**
      * Checks for db.
+     * 
      * @deprecated
      * @param database
      *            the database
@@ -1917,6 +1925,8 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
         // sql.append(" limit ").append(limit);
         // }
         // } else {
+
+        // TODO, oracle not support limit, using rownum
         if (limit > 0) {
             sql.append(" limit ").append(limit);
         }
@@ -3457,24 +3467,24 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
         return null;
     }
 
-//    @Override
-//    public boolean load(String where, Object o) {
-//        /**
-//         * not support
-//         */
-//        return false;
-//    }
+    // @Override
+    // public boolean load(String where, Object o) {
+    // /**
+    // * not support
+    // */
+    // return false;
+    // }
 
-//    /**
-//     * @deprecated
-//     */
-//    @Override
-//    public String getDisplay() {
-//        /**
-//         * not support
-//         */
-//        return null;
-//    }
+    // /**
+    // * @deprecated
+    // */
+    // @Override
+    // public String getDisplay() {
+    // /**
+    // * not support
+    // */
+    // return null;
+    // }
 
     /**
      * set the extra value
