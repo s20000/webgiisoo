@@ -1721,10 +1721,12 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
                 limit--;
             }
 
-            log.debug("load - cost=" + t.past() + "ms, collection=" + collection + ", query=" + query + ", order=" + orderBy + ", result=" + bs);
+            log.debug("load - cost=" + t.past() + "ms, collection=" + collection + ", query=" + query + ", order=" + orderBy + ", result="
+                    + (bs == null || bs.getList() == null ? "null" : bs.getList().size()));
 
             if (t.past() > 10000) {
-                OpLog.warn("bean", "load", "cost=" + t.past() + "ms", "load - cost=" + t.past() + "ms, collection=" + collection + ", query=" + query + ", order=" + orderBy + ", result=" + bs);
+                OpLog.warn("bean", "load", "cost=" + t.past() + "ms", "load - cost=" + t.past() + "ms, collection=" + collection + ", query=" + query + ", order=" + orderBy + ", result="
+                        + (bs == null || bs.getList() == null ? "null" : bs.getList().size()));
             }
             return bs;
         } catch (Exception e) {
