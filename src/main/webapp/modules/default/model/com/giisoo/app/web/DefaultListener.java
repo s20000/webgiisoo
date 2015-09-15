@@ -24,10 +24,12 @@ import org.apache.commons.logging.LogFactory;
 
 import com.giisoo.app.web.admin.setting;
 import com.giisoo.core.bean.Bean;
+import com.giisoo.core.bean.Bean.V;
 import com.giisoo.core.bean.X;
 import com.giisoo.core.conf.SystemConfig;
 import com.giisoo.core.db.DB;
 import com.giisoo.core.worker.WorkerTask;
+import com.giisoo.framework.common.Cluster;
 import com.giisoo.framework.common.Menu;
 import com.giisoo.framework.common.OpLog;
 import com.giisoo.framework.mdc.utils.IP;
@@ -35,6 +37,7 @@ import com.giisoo.framework.utils.Shell;
 import com.giisoo.framework.web.LifeListener;
 import com.giisoo.framework.web.Model;
 import com.giisoo.framework.web.Module;
+import com.mongodb.BasicDBObject;
 
 /**
  * 启动监听器，当系统启动时，初始化数据库、资源、服务等
@@ -44,348 +47,351 @@ import com.giisoo.framework.web.Module;
  */
 public class DefaultListener implements LifeListener {
 
-	private class NtpTask extends WorkerTask {
+    private class NtpTask extends WorkerTask {
 
-		@Override
-		public void onExecute() {
-			String ntp = SystemConfig.s("ntp.server", null);
-			if (!X.isEmpty(ntp)) {
+        @Override
+        public void onExecute() {
+            String ntp = SystemConfig.s("ntp.server", null);
+            if (!X.isEmpty(ntp)) {
 
-				try {
-					String r = Shell.run("ntpdate " + ntp);
-					OpLog.info("ntp", X.EMPTY, "时钟同步： " + r);
-				} catch (Exception e) {
-					OpLog.error("ntp", X.EMPTY, "时钟同步： " + e.getMessage());
-				}
-			}
-		}
+                try {
+                    String r = Shell.run("ntpdate " + ntp);
+                    OpLog.info("ntp", X.EMPTY, "时钟同步： " + r);
+                } catch (Exception e) {
+                    OpLog.error("ntp", X.EMPTY, "时钟同步： " + e.getMessage());
+                }
+            }
+        }
 
-		@Override
-		public void onFinish() {
-			this.schedule(X.AHOUR);
-		}
-	}
+        @Override
+        public void onFinish() {
+            this.schedule(X.AHOUR);
+        }
+    }
 
-	static Log log = LogFactory.getLog(DefaultListener.class);
+    static Log log = LogFactory.getLog(DefaultListener.class);
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.giisoo.framework.web.LifeListener#onStart(org.apache.commons.
-	 * configuration.Configuration, com.giisoo.framework.web.Module)
-	 */
-	public void onStart(Configuration conf, Module module) {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.giisoo.framework.web.LifeListener#onStart(org.apache.commons.
+     * configuration.Configuration, com.giisoo.framework.web.Module)
+     */
+    public void onStart(Configuration conf, Module module) {
 
-		/**
-		 * clean up the old version's jar
-		 */
-		if (cleanup(new File(Model.HOME), new HashMap<String, Object[]>())) {
-			System.exit(0);
-			return;
-		}
+        /**
+         * clean up the old version's jar
+         */
+        if (cleanup(new File(Model.HOME), new HashMap<String, Object[]>())) {
+            System.exit(0);
+            return;
+        }
 
-		if ("true".equals(SystemConfig.s(conf.getString("node")
-				+ ".upgrade.framework.enabled", "false"))) {
-			new UpgradeTask().schedule(X.AMINUTE
-					+ (long) (2 * X.AMINUTE * Math.random()));
-		}
+        if ("true".equals(SystemConfig.s(conf.getString("node") + ".upgrade.framework.enabled", "false"))) {
+            new UpgradeTask().schedule(X.AMINUTE + (long) (2 * X.AMINUTE * Math.random()));
+        }
 
-		// cleanup
-		File f = new File(Model.HOME + "/WEB-INF/lib/mina-core-2.0.0-M4.jar");
-		if (f.exists()) {
-			f.delete();
-			System.exit(0);
-		}
+        // cleanup
+        File f = new File(Model.HOME + "/WEB-INF/lib/mina-core-2.0.0-M4.jar");
+        if (f.exists()) {
+            f.delete();
+            System.exit(0);
+        }
 
-		IP.init(conf);
+        IP.init(conf);
 
-		new NtpTask().schedule(X.AMINUTE);
+        new NtpTask().schedule(X.AMINUTE);
 
-		setting.register("system", new setting.system());
+        setting.register("system", new setting.system());
 
-	}
+        String id = Cluster.update(conf.getString("node", X.EMPTY), Model.HOME, V.create().set("status", "running").set("updated", System.currentTimeMillis()).set("ip", IP.myip().toString()).set(
+                "started", System.currentTimeMillis()));
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.giisoo.framework.web.LifeListener#onStop()
-	 */
-	public void onStop() {
-	}
+        Cluster.self = Cluster.load(id);
 
-	public static void runDBScript(File f) throws IOException, SQLException {
-		BufferedReader in = null;
-		Connection c = null;
-		Statement s = null;
-		try {
-			c = Bean.getConnection();
-			if (c != null) {
-				in = new BufferedReader(new InputStreamReader(
-						new FileInputStream(f), "utf-8"));
-				StringBuilder sb = new StringBuilder();
-				try {
-					String line = in.readLine();
-					while (line != null) {
-						line = line.trim();
-						if (!"".equals(line) && !line.startsWith("#")) {
+        new HeartbeatTask().schedule(X.AMINUTE);
 
-							sb.append(line).append("\r\n");
+    }
 
-							if (line.endsWith(";")) {
-								String sql = sb.toString().trim();
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.giisoo.framework.web.LifeListener#onStop()
+     */
+    public void onStop() {
+    }
 
-								try {
-									s = c.createStatement();
-									s.executeUpdate(sql);
-									s.close();
-								} catch (Exception e) {
-									log.error(sb.toString(), e);
-								}
-								s = null;
-								sb = new StringBuilder();
-							}
-						}
-						line = in.readLine();
-					}
+    public static void runDBScript(File f) throws IOException, SQLException {
+        BufferedReader in = null;
+        Connection c = null;
+        Statement s = null;
+        try {
+            c = Bean.getConnection();
+            if (c != null) {
+                in = new BufferedReader(new InputStreamReader(new FileInputStream(f), "utf-8"));
+                StringBuilder sb = new StringBuilder();
+                try {
+                    String line = in.readLine();
+                    while (line != null) {
+                        line = line.trim();
+                        if (!"".equals(line) && !line.startsWith("#")) {
 
-					String sql = sb.toString().trim();
-					if (!"".equals(sql)) {
-						s = c.createStatement();
-						s.executeUpdate(sql);
-					}
-				} catch (Exception e) {
-					log.error(sb.toString(), e);
-				}
-			} else {
-				log.warn("database not configured !!");
-			}
-		} finally {
-			if (in != null) {
-				in.close();
-			}
-			Bean.close(s, c);
-		}
+                            sb.append(line).append("\r\n");
 
-	}
+                            if (line.endsWith(";")) {
+                                String sql = sb.toString().trim();
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.giisoo.framework.web.LifeListener#upgrade(org.apache.commons.
-	 * configuration.Configuration, com.giisoo.framework.web.Module)
-	 */
-	public void upgrade(Configuration conf, Module module) {
-		log.debug(module + " upgrading...");
+                                try {
+                                    s = c.createStatement();
+                                    s.executeUpdate(sql);
+                                    s.close();
+                                } catch (Exception e) {
+                                    log.error(sb.toString(), e);
+                                }
+                                s = null;
+                                sb = new StringBuilder();
+                            }
+                        }
+                        line = in.readLine();
+                    }
 
-		/**
-		 * test database connection has configured?
-		 */
-		try {
-			/**
-			 * test the database has been installed?
-			 */
-			String dbname = DB.getDriver();
+                    String sql = sb.toString().trim();
+                    if (!"".equals(sql)) {
+                        s = c.createStatement();
+                        s.executeUpdate(sql);
+                    }
+                } catch (Exception e) {
+                    log.error(sb.toString(), e);
+                }
+            } else {
+                log.warn("database not configured !!");
+            }
+        } finally {
+            if (in != null) {
+                in.close();
+            }
+            Bean.close(s, c);
+        }
 
-			/**
-			 * initial the database
-			 */
-			File f = module.loadResource("/install/" + dbname + "/initial.sql",
-					false);
-			if (f != null && f.exists()) {
-				String key = module.getName() + ".db.initial." + dbname + "."
-						+ f.lastModified();
-				int b = SystemConfig.i(key, 0);
-				if (b == 0) {
-					log.warn("db[" + key
-							+ "] has not been initialized! initializing...");
+    }
 
-					try {
-						runDBScript(f);
-						SystemConfig.setConfig(key, (int) 1);
-						log.warn("db[" + key + "] has been initialized! ");
-					} catch (Exception e) {
-						log.error(f.getAbsolutePath(), e);
-					}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.giisoo.framework.web.LifeListener#upgrade(org.apache.commons.
+     * configuration.Configuration, com.giisoo.framework.web.Module)
+     */
+    public void upgrade(Configuration conf, Module module) {
+        log.debug(module + " upgrading...");
 
-				}
-			} else {
-				log.warn("db[" + module.getName() + "." + dbname
-						+ "] not exists ! ");
-			}
+        /**
+         * test database connection has configured?
+         */
+        try {
+            /**
+             * test the database has been installed?
+             */
+            String dbname = DB.getDriver();
 
-			f = module.loadResource("/install/" + dbname + "/upgrade.sql",
-					false);
-			if (f != null && f.exists()) {
-				String key = module.getName() + ".db.upgrade." + dbname + "."
-						+ f.lastModified();
-				int b = SystemConfig.i(key, 0);
+            /**
+             * initial the database
+             */
+            File f = module.loadResource("/install/" + dbname + "/initial.sql", false);
+            if (f != null && f.exists()) {
+                String key = module.getName() + ".db.initial." + dbname + "." + f.lastModified();
+                int b = SystemConfig.i(key, 0);
+                if (b == 0) {
+                    log.warn("db[" + key + "] has not been initialized! initializing...");
 
-				if (b == 0) {
+                    try {
+                        runDBScript(f);
+                        SystemConfig.setConfig(key, (int) 1);
+                        log.warn("db[" + key + "] has been initialized! ");
+                    } catch (Exception e) {
+                        log.error(f.getAbsolutePath(), e);
+                    }
 
-					try {
-						runDBScript(f);
+                }
+            } else {
+                log.warn("db[" + module.getName() + "." + dbname + "] not exists ! ");
+            }
 
-						SystemConfig.setConfig(key, (int) 1);
+            f = module.loadResource("/install/" + dbname + "/upgrade.sql", false);
+            if (f != null && f.exists()) {
+                String key = module.getName() + ".db.upgrade." + dbname + "." + f.lastModified();
+                int b = SystemConfig.i(key, 0);
 
-						log.warn("db[" + key + "] has been upgraded! ");
-					} catch (Exception e) {
-						log.error(f.getAbsolutePath(), e);
-					} finally {
-					}
+                if (b == 0) {
 
-				}
-			}
+                    try {
+                        runDBScript(f);
 
-			/**
-			 * recover all tables from db.zip
-			 */
-			f = module.loadResource("/install/db.zip", false);
-			if (f != null && f.exists()) {
-				int b = SystemConfig.i("db.zip", 0);
-				if (b == 0) {
-					DB.recover(new FileInputStream(f), (String) null);
-					SystemConfig.setConfig("db.zip", 1);
+                        SystemConfig.setConfig(key, (int) 1);
 
-					System.exit(0);
-				}
-			}
-		} catch (Exception e) {
-			log.error("database is not configured!", e);
-			return;
-		}
+                        log.warn("db[" + key + "] has been upgraded! ");
+                    } catch (Exception e) {
+                        log.error(f.getAbsolutePath(), e);
+                    } finally {
+                    }
 
-		/**
-		 * check the menus
-		 * 
-		 */
-		File f = module.getFile("/install/menu.json");
-		if (f != null && f.exists()) {
-			BufferedReader reader = null;
-			try {
-				reader = new BufferedReader(new InputStreamReader(
-						new FileInputStream(f), "UTF-8"));
-				StringBuilder sb = new StringBuilder();
-				String line = reader.readLine();
-				while (line != null) {
-					sb.append(line).append("\r\n");
-					line = reader.readLine();
-				}
+                }
+            }
 
-				/**
-				 * convert the string to json array
-				 */
-				JSONArray arr = JSONArray.fromObject(sb.toString());
-				Menu.insertOrUpdate(arr, module.getName());
+            /**
+             * recover all tables from db.zip
+             */
+            f = module.loadResource("/install/db.zip", false);
+            if (f != null && f.exists()) {
+                int b = SystemConfig.i("db.zip", 0);
+                if (b == 0) {
+                    DB.recover(new FileInputStream(f), (String) null);
+                    SystemConfig.setConfig("db.zip", 1);
 
-			} catch (Exception e) {
-				log.error(e.getMessage(), e);
-			} finally {
-				if (reader != null) {
-					try {
-						reader.close();
-					} catch (IOException e) {
-						log.error(e);
-					}
-				}
-			}
-		}
-	}
+                    System.exit(0);
+                }
+            }
+        } catch (Exception e) {
+            log.error("database is not configured!", e);
+            return;
+        }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.giisoo.framework.web.LifeListener#uninstall(org.apache.commons.
-	 * configuration.Configuration, com.giisoo.framework.web.Module)
-	 */
-	public void uninstall(Configuration conf, Module module) {
-		Menu.remove(module.getName());
-	}
+        /**
+         * check the menus
+         * 
+         */
+        File f = module.getFile("/install/menu.json");
+        if (f != null && f.exists()) {
+            BufferedReader reader = null;
+            try {
+                reader = new BufferedReader(new InputStreamReader(new FileInputStream(f), "UTF-8"));
+                StringBuilder sb = new StringBuilder();
+                String line = reader.readLine();
+                while (line != null) {
+                    sb.append(line).append("\r\n");
+                    line = reader.readLine();
+                }
 
-	private boolean cleanup(File f, Map<String, Object[]> map) {
-		/**
-		 * list and compare all jar files
-		 */
-		boolean changed = false;
+                /**
+                 * convert the string to json array
+                 */
+                JSONArray arr = JSONArray.fromObject(sb.toString());
+                Menu.insertOrUpdate(arr, module.getName());
 
-		if (f.isDirectory()) {
-			for (File f1 : f.listFiles()) {
-				if (cleanup(f1, map)) {
-					changed = true;
-				}
-			}
-		} else if (f.isFile() && f.getName().endsWith(".jar")) {
-			String name = f.getName();
-			String[] ss = name.split("[-_]");
-			if (ss.length > 1) {
-				String ver = ss[ss.length - 1];
-				name = name.substring(0, name.length() - ver.length() - 1);
-				ver = ver.substring(0, ver.length() - 4); // cut off ".jar"
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+            } finally {
+                if (reader != null) {
+                    try {
+                        reader.close();
+                    } catch (IOException e) {
+                        log.error(e);
+                    }
+                }
+            }
+        }
+    }
 
-				if (ver.matches("[\\d\\.]+")) {
-					// check the version
-					Object[] pp = map.get(name); // p[0] = version, p[1] = file
-					if (pp == null) {
-						map.put(name, new Object[] { ver, f });
-					} else {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.giisoo.framework.web.LifeListener#uninstall(org.apache.commons.
+     * configuration.Configuration, com.giisoo.framework.web.Module)
+     */
+    public void uninstall(Configuration conf, Module module) {
+        Menu.remove(module.getName());
+    }
 
-						if (ver.compareTo((String) pp[0]) > 0) {
-							/**
-							 * delete old file
-							 */
-							OpLog.warn("upgrade", X.EMPTY,
-									"delete duplicated jar file, but low version:"
-											+ ((File) pp[1]).getAbsolutePath()
-											+ ", keep: " + f.getAbsolutePath());
+    private boolean cleanup(File f, Map<String, Object[]> map) {
+        /**
+         * list and compare all jar files
+         */
+        boolean changed = false;
 
-							log.warn("delete duplicated jar file, but low version:"
-									+ ((File) pp[1]).getAbsolutePath()
-									+ ", keep: " + f.getAbsolutePath());
-							((File) pp[1]).delete();
-							changed = true;
-							map.put(name, new Object[] { ver, f });
+        if (f.isDirectory()) {
+            for (File f1 : f.listFiles()) {
+                if (cleanup(f1, map)) {
+                    changed = true;
+                }
+            }
+        } else if (f.isFile() && f.getName().endsWith(".jar")) {
+            String name = f.getName();
+            String[] ss = name.split("[-_]");
+            if (ss.length > 1) {
+                String ver = ss[ss.length - 1];
+                name = name.substring(0, name.length() - ver.length() - 1);
+                ver = ver.substring(0, ver.length() - 4); // cut off ".jar"
 
-						} else {
-							// System.out.println("yes, " + ver + "<" + pp[0]);
-							/**
-							 * delete old version
-							 */
-							OpLog.warn("upgrade", X.EMPTY,
-									"delete duplicated jar file, but low version:"
-											+ f.getAbsolutePath() + ", keep: "
-											+ ((File) pp[1]).getAbsolutePath());
+                if (ver.matches("[\\d\\.]+")) {
+                    // check the version
+                    Object[] pp = map.get(name); // p[0] = version, p[1] = file
+                    if (pp == null) {
+                        map.put(name, new Object[] { ver, f });
+                    } else {
 
-							log.warn("delete duplicated jar file, but low version:"
-									+ f.getAbsolutePath()
-									+ ", keep: "
-									+ ((File) pp[1]).getAbsolutePath());
+                        if (ver.compareTo((String) pp[0]) > 0) {
+                            /**
+                             * delete old file
+                             */
+                            OpLog.warn("upgrade", X.EMPTY, "delete duplicated jar file, but low version:" + ((File) pp[1]).getAbsolutePath() + ", keep: " + f.getAbsolutePath());
 
-							f.delete();
-							changed = true;
-							// map.put(name, new Object[] { ver, f });
+                            log.warn("delete duplicated jar file, but low version:" + ((File) pp[1]).getAbsolutePath() + ", keep: " + f.getAbsolutePath());
+                            ((File) pp[1]).delete();
+                            changed = true;
+                            map.put(name, new Object[] { ver, f });
 
-						}
-					}
-				} else {
-					System.out.println("ignore [" + ver + "] " + f.getName());
-				}
-			} else {
-				// ignore the file if no version
-			}
-		}
+                        } else {
+                            // System.out.println("yes, " + ver + "<" + pp[0]);
+                            /**
+                             * delete old version
+                             */
+                            OpLog.warn("upgrade", X.EMPTY, "delete duplicated jar file, but low version:" + f.getAbsolutePath() + ", keep: " + ((File) pp[1]).getAbsolutePath());
 
-		return changed;
-	}
+                            log.warn("delete duplicated jar file, but low version:" + f.getAbsolutePath() + ", keep: " + ((File) pp[1]).getAbsolutePath());
 
-	/**
-	 * @deprecated
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		DefaultListener d = new DefaultListener();
-		File f = new File("/home/joe/d/workspace/");
-		Map<String, Object[]> map = new HashMap<String, Object[]>();
-		d.cleanup(f, map);
-		System.out.println(map);
+                            f.delete();
+                            changed = true;
+                            // map.put(name, new Object[] { ver, f });
 
-	}
+                        }
+                    }
+                } else {
+                    System.out.println("ignore [" + ver + "] " + f.getName());
+                }
+            } else {
+                // ignore the file if no version
+            }
+        }
+
+        return changed;
+    }
+
+    /**
+     * @deprecated
+     * @param args
+     */
+    public static void main(String[] args) {
+        DefaultListener d = new DefaultListener();
+        File f = new File("/home/joe/d/workspace/");
+        Map<String, Object[]> map = new HashMap<String, Object[]>();
+        d.cleanup(f, map);
+        System.out.println(map);
+
+    }
+
+    private class HeartbeatTask extends WorkerTask {
+
+        @Override
+        public void onExecute() {
+            Cluster.update(Cluster.self.getId(), V.create("updated", System.currentTimeMillis()));
+
+            Cluster.update(new BasicDBObject().append("updated", new BasicDBObject().append("$lt", System.currentTimeMillis() - 2 * X.AMINUTE)), V.create("status", "lost"));
+            
+        }
+
+        @Override
+        public void onFinish() {
+            this.schedule(X.AMINUTE);
+        }
+
+    }
 }

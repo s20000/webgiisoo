@@ -10,25 +10,29 @@
 	<thead>
 		<tr>
 			<th>$lang.get('cluster.nodeid')</th>
+			<th>$lang.get('cluster.node')</th>
 			<th>$lang.get('cluster.ip')</th>
-			<th>$lang.get('cluster.requests')</th>
-			<th>$lang.get('cluster.response')</th>
 			<th>$lang.get('cluster.status')</th>
 			<th>$lang.get('cluster.started')</th>
 			<th>$lang.get('cluster.version')</th>
+			<th>$lang.get('cluster.home')</th>
+			<th>$lang.get('cluster.op')</th>
 		</tr>
 	</thead>
 	<tbody>
 #foreach($f in $list)
 	<tr class='cluster-status$f.status'>
-		<td><input type='checkbox' name='id' value='$f.id'/>$f.id</td>
-		<td>$f.nodeid</td>
+		<td>$f.id</td>
+		<td>$!f.node</td>
 		<td>$!f.ip</td>
-		<td>$!f.requests</td>
-		<td>$!f.response</td>
-		<td>$!lang.get("cluster.status_$!f.status")</td>
+		<td>$!f.status</td>
 		<td>$lang.format($!f.started, 'yyyy-MM-dd HH:mm')</td>
 		<td>$!f.version</td>
+		<td>$!f.home</td>
+		<td>
+			<a href='javascript:;' onclick='_delete("$f.id")'>$lang.get("a.delete")</a>
+			<a href='/admin/cluster/traffic?id=$f.id'>$lang.get("a.traffic")</a>
+		</td>
 	</tr>
 #end
 	</tbody>
@@ -38,9 +42,13 @@
 
 <div class='btns'>
 	<a href='/admin/cluster/add'>$lang.get('a.add')</a>
-	<a href='javascript:;' onclick='_post("/admin/cluster/edit", "#cluster-table", 1);'>$lang.get('a.edit')</a>
 </div>
 
 <script>
 $('#cluster-table').tablesorter();
+function _delete(id) {
+	$.post("/admin/cluster/delete", {id:id}, function(d){
+		reload();
+	})
+}
 </script>

@@ -2355,9 +2355,13 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
      * @return int
      */
     final protected static int updateCollection(Object id, V v, Class<?> t) {
+        return updateCollection(id, v, t, false);
+    }
+
+    final protected static int updateCollection(Object id, V v, Class<?> t, boolean adding) {
         String collection = getCollection(t);
         if (collection != null && !"none".equals(collection)) {
-            return updateCollection(collection, id, v);
+            return updateCollection(collection, id, v, adding);
         }
         return -1;
     }
@@ -2406,9 +2410,13 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
      * @return int
      */
     final protected static int updateCollection(String collection, Object id, V v) {
+        return updateCollection(collection, id, v, false);
+    }
+
+    final protected static int updateCollection(String collection, Object id, V v, boolean adding) {
 
         BasicDBObject q = new BasicDBObject().append(X._ID, id);
-        return updateCollection(collection, q, v);
+        return updateCollection(collection, q, v, adding);
     }
 
     /**
@@ -2420,6 +2428,10 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
      * @return int of updated
      */
     final protected static int updateCollection(String collection, DBObject q, V v) {
+        return updateCollection(collection, q, v, false);
+    }
+
+    final protected static int updateCollection(String collection, DBObject q, V v, boolean adding) {
         BasicDBObject d = new BasicDBObject();
 
         int len = v.size();
@@ -2427,7 +2439,7 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
             d.append(v.name(i), v.value(i));
         }
 
-        WriteResult r = Bean.getCollection(collection).update(q, new BasicDBObject().append("$set", d), true, true);
+        WriteResult r = Bean.getCollection(collection).update(q, new BasicDBObject().append("$set", d), adding, true);
 
         // r.getN();
         // r.getField("nModified");
