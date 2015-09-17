@@ -21,7 +21,6 @@ import com.giisoo.core.bean.Bean;
 import com.giisoo.core.bean.TimeStamp;
 import com.giisoo.core.bean.Bean.V;
 import com.giisoo.core.bean.X;
-import com.giisoo.core.conf.SystemConfig;
 import com.giisoo.framework.common.AccessLog;
 import com.giisoo.framework.common.User;
 import com.giisoo.framework.common.Cluster.Counter;
