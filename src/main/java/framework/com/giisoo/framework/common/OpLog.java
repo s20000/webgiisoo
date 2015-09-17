@@ -44,34 +44,10 @@ public class OpLog extends Bean {
     /**
      * Cleanup.
      * 
-     * @param max
-     *            the max
-     * @param min
-     *            the min
-     * @return the int
      */
-    public static int cleanup(int max, int min) {
-        Beans<OpLog> bs = load((BasicDBObject) null, 0, 1);
-        int total = bs.getTotal();
-        if (total >= max) {
-
-            // TODO
-            Bean.delete(new BasicDBObject().append("created", new BasicDBObject().append("$lt", System.currentTimeMillis() - 5 * X.ADAY)), OpLog.class);
-
-            // long created = Bean.getOne("created", null, null,
-            // "order by created desc", min, OpLog.class);
-            // if (created > 0) {
-            // int i = Bean.delete("created <?", new Object[] { created },
-            // OpLog.class);
-            //
-            // if (i > 0) {
-            // OpLog.log("cleanup", "cleanup log: " + i, null);
-            // }
-            // return i;
-            // }
-        }
-
-        return 0;
+    public static void cleanup() {
+        // TODO
+        Bean.delete(new BasicDBObject().append("created", new BasicDBObject().append("$lt", System.currentTimeMillis() - X.AMONTH)), OpLog.class);
 
     }
 
@@ -517,7 +493,7 @@ public class OpLog extends Bean {
                 "ip", ip).set("type", type), OpLog.class);
 
         if (i > 0) {
-//            Category.update(system, module, op);
+            // Category.update(system, module, op);
 
             /**
              * 记录系统日志
@@ -534,7 +510,8 @@ public class OpLog extends Bean {
                 }
             }
 
-//            onChanged("tbloplog", IData.OP_CREATE, "created=? and id=?", new Object[] { t, id });
+            // onChanged("tbloplog", IData.OP_CREATE, "created=? and id=?", new
+            // Object[] { t, id });
         }
 
         return i;

@@ -9,6 +9,7 @@ import com.giisoo.core.bean.Bean;
 import com.giisoo.core.bean.Beans;
 import com.giisoo.core.bean.DBMapping;
 import com.giisoo.core.bean.UID;
+import com.giisoo.core.bean.X;
 import com.mongodb.BasicDBObject;
 
 /**
@@ -43,6 +44,10 @@ public class AccessLog extends Bean {
 
     public static Beans<AccessLog> load(BasicDBObject q, BasicDBObject order, int s, int n) {
         return Bean.load(q, order, s, n, AccessLog.class);
+    }
+
+    public static void cleanup() {
+        Bean.delete(new BasicDBObject().append("created", new BasicDBObject().append("$lt", System.currentTimeMillis() - X.AMONTH)), AccessLog.class);
     }
 
 }

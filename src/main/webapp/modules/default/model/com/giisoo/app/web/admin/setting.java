@@ -96,9 +96,6 @@ public class setting extends Model {
         public void set() {
             SystemConfig.setConfig("node.name", this.getString("nodename"));
 
-            SystemConfig.setConfig("oplog.max", this.getInt("oplog_max"));
-            SystemConfig.setConfig("oplog.min", this.getInt("oplog_min"));
-
             // if (!X.isEmpty(this.getString("prikey"))) {
             // SystemConfig.setConfig("pri_key", this.getString("prikey")
             // .trim());
@@ -130,8 +127,6 @@ public class setting extends Model {
 
             this.set("nodename", SystemConfig.s("node.name", null));
             this.set("system_code", SystemConfig.l("system.code", 1));
-            this.set("oplog_max", SystemConfig.i("oplog.max", 50000));
-            this.set("oplog_min", SystemConfig.i("oplog.min", 20000));
 
             // this.set("prikey", SystemConfig.s("pri_key", null));
             this.set("pubkey", SystemConfig.s("pub_key", null));

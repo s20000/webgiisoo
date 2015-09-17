@@ -132,19 +132,6 @@ public class log extends Model {
     }
 
     /**
-     * Clear.
-     */
-    @Path(path = "clear", login = true, access = "access.log.admin")
-    public void clear() {
-        OpLog.cleanup(SystemConfig.i("oplog.min", 20000), SystemConfig.i("oplog.min", 20000));
-
-        JSONObject jo = new JSONObject();
-        jo.put(X.STATE, 200);
-
-        this.response(jo);
-    }
-
-    /**
      * Export.
      */
     @Path(path = "export", login = true, access = "access.log.export")
