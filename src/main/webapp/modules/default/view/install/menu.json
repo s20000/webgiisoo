@@ -14,6 +14,7 @@
 		{name:'menu.app',  load:'/admin/app', seq:-1, classes:'icon-power-cord2'},
 		{name:'menu.module',  load:'/admin/module', seq:1000, classes:'icon-joomla2'},
 		{name:'menu.log',  load:'/admin/log', seq:1010, classes:'icon-note'},
+		{name:'menu.accesslog',  load:'/admin/accesslog', seq:1020, classes:'icon-list3'},
 	]},
 	{name:'menu.usermgr', classes:'icon-users2', content:'', seq:20, childs:[
 		{name:'menu.user',  load:'/admin/user', seq:10, classes:'icon-user2'},

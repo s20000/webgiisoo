@@ -11,13 +11,13 @@ public class accesslog extends Model {
 
     @Path(login = true, access = "acess.config.admin")
     public void onGet() {
-        String uri = this.getString("uri");
+        String uri = this.getString("guri");
         String ip = this.getString("ip");
 
         BasicDBObject q = new BasicDBObject();
         if (!X.isEmpty(uri)) {
-            q.append("uri", uri);
-            this.set("uri", uri);
+            q.append("url", uri);
+            this.set("guri", uri);
         }
         if (!X.isEmpty(ip)) {
             q.append("ip", ip);

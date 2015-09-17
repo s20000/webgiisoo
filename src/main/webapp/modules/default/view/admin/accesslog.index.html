@@ -7,7 +7,7 @@
 </div>
 
 <form action='/admin/accesslog' method='post' class='form'>
-	<div><label><h3>URI</h3>:<input type='text' name='uri' value="$!uri" /></label></div>
+	<div><label><h3>URI</h3>:<input type='text' name='guri' value="$!guri" /></label></div>
 	<div><label><h3>IP</h3>:<input type='text' name='ip' value="$!ip" /></label></div>
 
 	<div class='submit'>
@@ -18,7 +18,7 @@
 <table id='accesslog-table' class='tablesorter nospace' border="0" cellpadding="0" cellspacing="1">
 	<thead>
 		<tr>
-			<th>URI</th>
+			<th>URL</th>
 			<th>IP</th>
 			<th>Cost(ms)</th>
 			<th>SID</th>
@@ -30,7 +30,7 @@
 	<tbody>
 #foreach($f in $list)
 	<tr>
-		<td>$!f.uri</td>
+		<td>$!f.url</td>
 		<td>$!f.ip</td>
 		<td>$!f.cost</td>
 		<td>$!f.sid</td>
