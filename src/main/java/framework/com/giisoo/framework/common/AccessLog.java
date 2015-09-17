@@ -15,7 +15,7 @@ import com.giisoo.core.bean.UID;
  * @author joe
  * 
  */
-@DBMapping(collection = "access_log")
+@DBMapping(collection = "gi_accesslog")
 public class AccessLog extends Bean {
 
     /**
@@ -23,17 +23,17 @@ public class AccessLog extends Bean {
 	 */
     private static final long serialVersionUID = 1L;
 
-    String id;
-    String ip;
-    String method;
-    String agent;
-    String url;
-    String sid;
-    String header;
-    String query;
-    long created;
-    long cost;
-    String handler;
+//    String id;
+//    String ip;
+//    String method;
+//    String agent;
+//    String url;
+//    String sid;
+//    String header;
+//    String query;
+//    long created;
+//    long cost;
+//    String handler;
 
     /**
      * Creates the AccessLog.

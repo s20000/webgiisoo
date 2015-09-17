@@ -10,6 +10,7 @@ public class cluster extends Model {
 
     @Override
     public void onGet() {
+        
         BasicDBObject q = new BasicDBObject();
 
         int s = this.getInt("s");
@@ -24,14 +25,18 @@ public class cluster extends Model {
 
     @Path(login = true, path = "delete")
     public void delete() {
+        
         String id = this.getString("id");
         Cluster.remove(id);
         this.print("ok");
+        
     }
 
     @Path(login = true, path = "traffic")
     public void traffic() {
 
+        
+        
     }
 
 }

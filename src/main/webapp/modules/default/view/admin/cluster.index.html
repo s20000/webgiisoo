@@ -21,7 +21,7 @@
 	</thead>
 	<tbody>
 #foreach($f in $list)
-	<tr class='cluster-status$f.status'>
+	<tr class='cluster-status-$f.status'>
 		<td>$f.id</td>
 		<td>$!f.node</td>
 		<td>$!f.ip</td>
@@ -45,10 +45,13 @@
 </div>
 
 <script>
-$('#cluster-table').tablesorter();
+$(function(){
+	$('#cluster-table').tablesorter();
+})
+
 function _delete(id) {
 	$.post("/admin/cluster/delete", {id:id}, function(d){
-		reload();
+		//reload();
 	})
 }
 </script>

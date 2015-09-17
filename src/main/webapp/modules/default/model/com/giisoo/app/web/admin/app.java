@@ -196,21 +196,15 @@ public class app extends Model {
      */
     @Path(login = true, access = "access.admin")
     public void onGet() {
-        JSONObject jo = this.getJSON();
-        W w = getW(jo);
         int s = this.getInt("s");
         int n = this.getInt("n");
 
-        Beans<App> bs = App.load(w, s, n);
+        BasicDBObject q = new BasicDBObject();
+        BasicDBObject order = new BasicDBObject(X._ID, 1);
+        Beans<App> bs = App.load(q, order, s, 10);
         this.set(bs, s, n);
 
         show("/admin/app.index.html");
     }
 
-    private W getW(JSONObject jo) {
-        if ("add".equals(this.path) || "edit".equals(this.path) || "lock".equals(this.path))
-            return null;
-
-        return W.create().copy(jo, W.OP_LIKE, "appid", "company", "contact", "phone");
-    }
 }

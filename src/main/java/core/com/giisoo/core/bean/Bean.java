@@ -1731,6 +1731,26 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
             return bs;
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+
+            // sort
+            if (query != null) {
+                Set<String> set = query.keySet();
+                for (String name : set) {
+                    if (!name.startsWith("$")) {
+                        db.ensureIndex(name);
+                    }
+                }
+            }
+
+            if (orderBy != null) {
+                Set<String> set = query.keySet();
+                for (String name : set) {
+                    if (!name.startsWith("$")) {
+                        db.ensureIndex(name);
+                    }
+                }
+            }
+
         } finally {
             if (cur != null)
                 cur.close();

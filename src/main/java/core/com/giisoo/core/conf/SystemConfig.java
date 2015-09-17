@@ -1,32 +1,23 @@
 package com.giisoo.core.conf;
 
-import java.sql.*;
 import java.util.*;
 
 import com.giisoo.core.bean.*;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 
 /**
  * The Class SystemConfig.
  * 
  * @author yjiang
  */
-@DBMapping(table = "tblconfig")
+@DBMapping(collection = "gi_config")
 public class SystemConfig extends Bean {
 
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
 
-    /** The s. */
-    String s;
-
-    /** The i. */
-    int i;
-
-    /** The l. */
-    long l;
-
-    /** The d. */
-    double d;
+    Object var;
 
     private static SystemConfig owner = new SystemConfig();
 
@@ -46,18 +37,18 @@ public class SystemConfig extends Bean {
     public static int i(String name, int defaultValue) {
         SystemConfig c = getConfig(name);
         if (c != null) {
-            return c.i;
+            return Bean.toInt(c.var);
         }
 
-        c = Bean.load("name=?", new Object[] { name }, SystemConfig.class);
+        c = Bean.load(new BasicDBObject(X._ID, name), SystemConfig.class);
         if (c != null) {
             data.put(name, c);
-            return c.i;
+            return Bean.toInt(c.var);
         } else {
             c = new SystemConfig();
-            c.i = conf.getInt(name, defaultValue);
+            c.var = conf.getInt(name, defaultValue);
             data.put(name, c);
-            return c.i;
+            return Bean.toInt(c.var);
         }
     }
 
@@ -73,18 +64,18 @@ public class SystemConfig extends Bean {
     public static double d(String name, double defaultValue) {
         SystemConfig c = getConfig(name);
         if (c != null) {
-            return c.d;
+            return Bean.toDouble(c.var);
         }
 
-        c = Bean.load("name=?", new Object[] { name }, SystemConfig.class);
+        c = Bean.load(new BasicDBObject(X._ID, name), SystemConfig.class);
         if (c != null) {
             data.put(name, c);
-            return c.d;
+            return Bean.toDouble(c.var);
         } else {
             c = new SystemConfig();
-            c.d = conf.getDouble(name, defaultValue);
+            c.var = conf.getDouble(name, defaultValue);
             data.put(name, c);
-            return c.d;
+            return Bean.toDouble(c.var);
         }
     }
 
@@ -100,18 +91,18 @@ public class SystemConfig extends Bean {
     public static String s(String name, String defaultValue) {
         SystemConfig c = getConfig(name);
         if (c != null) {
-            return c.s;
+            return String.valueOf(c.var);
         }
 
-        c = Bean.load("name=?", new Object[] { name }, SystemConfig.class);
+        c = Bean.load(new BasicDBObject(X._ID, name), SystemConfig.class);
         if (c != null) {
             data.put(name, c);
-            return c.s;
+            return String.valueOf(c.var);
         } else {
             c = new SystemConfig();
-            c.s = conf.getString(name, defaultValue);
+            c.var = conf.getString(name, defaultValue);
             data.put(name, c);
-            return c.s;
+            return String.valueOf(c.var);
         }
     }
 
@@ -127,18 +118,18 @@ public class SystemConfig extends Bean {
     public static long l(String name, long defaultValue) {
         SystemConfig c = getConfig(name);
         if (c != null) {
-            return c.l;
+            return Bean.toLong(c.var);
         }
 
-        c = Bean.load("name=?", new Object[] { name }, SystemConfig.class);
+        c = Bean.load(new BasicDBObject(X._ID, name), SystemConfig.class);
         if (c != null) {
             data.put(name, c);
-            return c.l;
+            return Bean.toLong(c.var);
         } else {
             c = new SystemConfig();
-            c.l = conf.getLong(name, defaultValue);
+            c.var = conf.getLong(name, defaultValue);
             data.put(name, c);
-            return c.l;
+            return Bean.toLong(c.var);
         }
     }
 
@@ -162,43 +153,20 @@ public class SystemConfig extends Bean {
         data.remove(name);
 
         if (o == null) {
-            Bean.delete("name=?", new Object[] { name }, SystemConfig.class);
+            Bean.delete(new BasicDBObject(X._ID, name), SystemConfig.class);
             return;
         }
 
-        if (Bean.exists("name=?", new Object[] { name }, SystemConfig.class)) {
-            if (o instanceof Long) {
-                Bean.update("name=?", new Object[] { name }, V.create("l", o), SystemConfig.class);
-            } else if (o instanceof Integer) {
-                Bean.update("name=?", new Object[] { name }, V.create("i", o), SystemConfig.class);
-            } else if (o instanceof Double || o instanceof Float) {
-                Bean.update("name=?", new Object[] { name }, V.create("d", o), SystemConfig.class);
-            } else {
-                Bean.update("name=?", new Object[] { name }, V.create("s", o.toString()), SystemConfig.class);
-            }
+        if (Bean.exists(new BasicDBObject(X._ID, name), SystemConfig.class)) {
+            Bean.updateCollection(name, V.create("var", o), SystemConfig.class);
         } else {
-            if (o instanceof Long) {
-                Bean.insert(V.create("l", o).set("name", name), SystemConfig.class);
-            } else if (o instanceof Integer) {
-                Bean.insert(V.create("i", o).set("name", name), SystemConfig.class);
-            } else if (o instanceof Double || o instanceof Float) {
-                Bean.insert(V.create("d", o).set("name", name), SystemConfig.class);
-            } else {
-                Bean.insert(V.create("s", o.toString()).set("name", name), SystemConfig.class);
-            }
+            Bean.insertCollection(V.create("var", o).set(X._ID, name), SystemConfig.class);
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.giisoo.bean.Bean#load(java.sql.ResultSet)
-     */
-    protected void load(ResultSet r) throws SQLException {
-        s = r.getString("s");
-        i = r.getInt("i");
-        l = r.getLong("l");
-        d = r.getDouble("d");
+    @Override
+    protected void load(DBObject d) {
+        var = d.get("var");
     }
 
     /**

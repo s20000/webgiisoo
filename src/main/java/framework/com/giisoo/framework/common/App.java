@@ -14,8 +14,9 @@ import com.giisoo.core.bean.Bean;
 import com.giisoo.core.bean.Beans;
 import com.giisoo.core.bean.DBMapping;
 import com.giisoo.core.bean.X;
+import com.mongodb.BasicDBObject;
 
-@DBMapping(table = "tblapp")
+@DBMapping(collection = "gi_app")
 public class App extends Bean {
 
     /**
@@ -23,69 +24,69 @@ public class App extends Bean {
 	 */
     private static final long serialVersionUID = 1L;
 
-    String appid;
-    String key;
-    String memo;
-    String company;
-    String contact;
-    String phone;
-    String email;
-    String logout;
-
-    String setrule;
-    String getrule;
-
-    int locked;
-    long lastlogin;
-    long created;
+    // String appid;
+    // String key;
+    // String memo;
+    // String company;
+    // String contact;
+    // String phone;
+    // String email;
+    // String logout;
+    //
+    // String setrule;
+    // String getrule;
+    //
+    // int locked;
+    // long lastlogin;
+    // long created;
 
     public String getLogout() {
-        return logout;
+        return getString("logout");
     }
 
     public String getAppid() {
-        return appid;
+        return getString("appid");
     }
 
     public String getKey() {
-        return key;
+        return getString("key");
     }
 
-    public String getMemo() {
-        return memo;
-    }
-
-    public String getCompany() {
-        return company;
-    }
-
-    public String getContact() {
-        return contact;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public int getLocked() {
-        return locked;
-    }
-
-    public long getCreated() {
-        return created;
-    }
-
-    public String getSetrule() {
-        return setrule;
-    }
-
-    public String getGetrule() {
-        return getrule;
-    }
+    // public String getMemo() {
+    // return memo;
+    // }
+    //
+    // public String getCompany() {
+    // return company;
+    // }
+    //
+    // public String getContact() {
+    // return contact;
+    // }
+    //
+    // public String getPhone() {
+    // return phone;
+    // }
+    //
+    // public String getEmail() {
+    // return email;
+    // }
+    //
+    // public int getLocked() {
+    // return locked;
+    // }
+    //
+    // public long getCreated() {
+    // return created;
+    // }
+    //
+    // public String getSetrule() {
+    // return setrule;
+    // }
+    //
+    // public String getGetrule() {
+    // return getrule;
+    // }
 
     /**
      * Creates the.
@@ -97,8 +98,8 @@ public class App extends Bean {
      * @return the int
      */
     public static int create(String appid, V v) {
-        if (!Bean.exists("appid=?", new Object[] { appid }, App.class)) {
-            return Bean.insert(v.set("appid", appid).set("created", System.currentTimeMillis()), App.class);
+        if (!Bean.exists(new BasicDBObject().append(X.ID, appid), App.class)) {
+            return Bean.insertCollection(v.set(X._ID, appid).set("appid", appid).set("created", System.currentTimeMillis()), App.class);
         }
         return 0;
     }
@@ -111,15 +112,15 @@ public class App extends Bean {
      * @return the app
      */
     public static App load(String appid) {
-        return Bean.load("appid=?", new Object[] { appid }, App.class);
+        return Bean.load(new BasicDBObject().append(X._ID, appid), App.class);
     }
 
     public boolean isLocked() {
-        return locked > 0;
+        return getInt("locked") > 0;
     }
 
     public long getLastlogin() {
-        return lastlogin;
+        return getLong("lastlogin");
     }
 
     /**
@@ -132,56 +133,56 @@ public class App extends Bean {
      * @return the int
      */
     public static int update(String appid, V v) {
-        return Bean.update("appid=?", new Object[] { appid }, v, App.class);
+        return Bean.updateCollection(appid, v, App.class);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.giisoo.bean.Bean#load(java.sql.ResultSet)
-     */
-    @Override
-    protected void load(ResultSet r) throws SQLException {
-        appid = r.getString("appid");
-        key = r.getString("_key");
-
-        setrule = r.getString("setrule");
-        getrule = r.getString("getrule");
-
-        memo = r.getString("memo");
-        company = r.getString("company");
-        contact = r.getString("contact");
-        phone = r.getString("phone");
-        email = r.getString("email");
-        locked = r.getInt("locked");
-        lastlogin = r.getLong("lastlogin");
-        created = r.getLong("created");
-        logout = r.getString("logout");
-    }
+    // /*
+    // * (non-Javadoc)
+    // *
+    // * @see com.giisoo.bean.Bean#load(java.sql.ResultSet)
+    // */
+    // @Override
+    // protected void load(ResultSet r) throws SQLException {
+    // appid = r.getString("appid");
+    // key = r.getString("_key");
+    //
+    // setrule = r.getString("setrule");
+    // getrule = r.getString("getrule");
+    //
+    // memo = r.getString("memo");
+    // company = r.getString("company");
+    // contact = r.getString("contact");
+    // phone = r.getString("phone");
+    // email = r.getString("email");
+    // locked = r.getInt("locked");
+    // lastlogin = r.getLong("lastlogin");
+    // created = r.getLong("created");
+    // logout = r.getString("logout");
+    // }
 
     /*
      * (non-Javadoc)
      * 
      * @see com.giisoo.bean.Bean#toJSON(net.sf.json.JSONObject)
      */
-    @Override
-    public boolean toJSON(JSONObject jo) {
-        jo.put("appid", appid);
-        jo.put("key", key);
-        jo.put("memo", memo);
-        jo.put("company", company);
-        jo.put("contact", contact);
-        jo.put("phone", phone);
-        jo.put("email", email);
-        jo.put("locked", locked);
-        jo.put("lastlogin", lastlogin);
-        jo.put("created", created);
-        jo.put("logout", logout);
-        jo.put("setrule", setrule);
-        jo.put("getrule", getrule);
-
-        return true;
-    }
+    // @Override
+    // public boolean toJSON(JSONObject jo) {
+    // jo.put("appid", appid);
+    // jo.put("key", key);
+    // jo.put("memo", memo);
+    // jo.put("company", company);
+    // jo.put("contact", contact);
+    // jo.put("phone", phone);
+    // jo.put("email", email);
+    // jo.put("locked", locked);
+    // jo.put("lastlogin", lastlogin);
+    // jo.put("created", created);
+    // jo.put("logout", logout);
+    // jo.put("setrule", setrule);
+    // jo.put("getrule", getrule);
+    //
+    // return true;
+    // }
 
     /**
      * Load.
@@ -194,8 +195,8 @@ public class App extends Bean {
      *            the n
      * @return the beans
      */
-    public static Beans<App> load(W w, int s, int n) {
-        return Bean.load(w == null ? null : w.where(), w == null ? null : w.args(), (w == null || X.isEmpty(w.orderby())) ? "order by appid" : w.orderby(), s, n, App.class);
+    public static Beans<App> load(BasicDBObject q, BasicDBObject order, int s, int n) {
+        return Bean.load(q, order, s, n, App.class);
     }
 
 }

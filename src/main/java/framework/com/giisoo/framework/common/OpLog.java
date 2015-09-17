@@ -5,8 +5,6 @@
  */
 package com.giisoo.framework.common;
 
-import java.sql.*;
-import java.util.List;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
@@ -25,8 +23,8 @@ import com.mongodb.BasicDBObject;
  * @author yjiang
  * 
  */
-@DBMapping(collection = "oplog")
-public class OpLog extends Bean implements Exportable {
+@DBMapping(collection = "gi_oplog")
+public class OpLog extends Bean {
 
     private static final long serialVersionUID = 1L;
 
@@ -353,131 +351,6 @@ public class OpLog extends Bean implements Exportable {
     }
 
     /**
-     * Load category.
-     * 
-     * @param type
-     *            the type
-     * @param cate
-     *            the cate
-     * @return the list
-     */
-    public static List<String> loadCategory(String type, String cate) {
-        return Category.load(type, cate);
-    }
-
-    @DBMapping(table = "tbloplog_cate")
-    public static class Category extends Bean {
-
-        String type;
-        String cate;
-        String name;
-
-        long updated;
-
-        public String getCate() {
-            return cate;
-        }
-
-        /**
-         * Load.
-         * 
-         * @param type
-         *            the type
-         * @param cate
-         *            the cate
-         * @return the list
-         */
-        public static List<String> load(String type, String cate) {
-            W w = W.create();
-            if (!X.isEmpty(type)) {
-                w.and("type", type);
-            }
-            if (!X.isEmpty(cate)) {
-                w.and("cate", cate);
-            }
-            w.and("updated", System.currentTimeMillis() - X.AYEAR, W.OP_GT_EQ);
-            return Bean.getList("distinct name", w.where(), w.args(), "order by name", 0, 1000, Category.class);
-        }
-
-        public String getType() {
-            return type;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public long getUpdated() {
-            return updated;
-        }
-
-        /**
-         * Update.
-         * 
-         * @param system
-         *            the system
-         * @param module
-         *            the module
-         * @param op
-         *            the op
-         */
-        public static void update(String system, String module, String op) {
-            /**
-             * record system
-             */
-            Long update = Bean.getOne("tbloplog_cate", "updated", "type=? and cate=? and name=?", new Object[] { "system", X.EMPTY, system }, null, 0, null);
-            if (update == null) {
-                // insert
-                Bean.insert(V.create("type", "system").set("cate", X.EMPTY).set("name", system).set("updated", System.currentTimeMillis()), Category.class);
-            } else if (System.currentTimeMillis() - update > X.AWEEK) {
-                // update
-                Bean.update("type=? and cate=? and name=?", new Object[] { "system", X.EMPTY, system }, V.create("updated", System.currentTimeMillis()), Category.class);
-            }
-
-            /**
-             * record module
-             */
-            update = Bean.getOne("tbloplog_cate", "updated", "type=? and cate=? and name=?", new Object[] { "module", system, module }, null, 0, null);
-            if (update == null) {
-                // insert
-                Bean.insert(V.create("type", "module").set("cate", system).set("name", module).set("updated", System.currentTimeMillis()), Category.class);
-            } else if (System.currentTimeMillis() - update > X.AWEEK) {
-                // update
-                Bean.update("type=? and cate=? and name=?", new Object[] { "module", system, module }, V.create("updated", System.currentTimeMillis()), Category.class);
-            }
-
-            /**
-             * record op
-             */
-            update = Bean.getOne("tbloplog_cate", "updated", "type=? and cate=? and name=?", new Object[] { "op", module, op }, null, 0, null);
-            if (update == null) {
-                // insert
-                Bean.insert(V.create("type", "op").set("cate", module).set("name", op).set("updated", System.currentTimeMillis()), Category.class);
-            } else if (System.currentTimeMillis() - update > X.AWEEK) {
-                // update
-                Bean.update("type=? and cate=? and name=?", new Object[] { "op", module, op }, V.create("updated", System.currentTimeMillis()), Category.class);
-            }
-
-        }
-
-        /*
-         * (non-Javadoc)
-         * 
-         * @see com.giisoo.bean.Bean#load(java.sql.ResultSet)
-         */
-        @Override
-        protected void load(ResultSet r) throws SQLException {
-            type = r.getString("type");
-            cate = r.getString("cate");
-            name = r.getString("name");
-        }
-    }
-
-    public boolean isExportable() {
-        return true;
-    }
-
-    /**
      * Info.
      * 
      * @param op
@@ -644,7 +517,7 @@ public class OpLog extends Bean implements Exportable {
                 "ip", ip).set("type", type), OpLog.class);
 
         if (i > 0) {
-            Category.update(system, module, op);
+//            Category.update(system, module, op);
 
             /**
              * 记录系统日志
@@ -661,7 +534,7 @@ public class OpLog extends Bean implements Exportable {
                 }
             }
 
-            onChanged("tbloplog", IData.OP_CREATE, "created=? and id=?", new Object[] { t, id });
+//            onChanged("tbloplog", IData.OP_CREATE, "created=? and id=?", new Object[] { t, id });
         }
 
         return i;

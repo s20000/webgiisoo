@@ -9,6 +9,7 @@ import net.sf.json.JSONObject;
 
 /**
  * 
+ * @deprecated
  * @author joe
  * 
  */

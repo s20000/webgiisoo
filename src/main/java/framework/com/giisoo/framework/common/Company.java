@@ -9,7 +9,7 @@ import com.giisoo.core.bean.UID;
 import com.giisoo.core.bean.X;
 import com.mongodb.BasicDBObject;
 
-@DBMapping(collection = "company")
+@DBMapping(collection = "gi_company")
 public class Company extends Bean {
 
 	/**

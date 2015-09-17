@@ -21,9 +21,7 @@ import com.giisoo.core.bean.X;
 import com.giisoo.core.conf.SystemConfig;
 import com.giisoo.framework.common.App;
 import com.giisoo.framework.common.Cluster.Counter;
-import com.giisoo.framework.common.Message;
 import com.giisoo.framework.common.OpLog;
-import com.giisoo.framework.common.Role;
 import com.giisoo.framework.common.Session;
 import com.giisoo.framework.common.User;
 import com.giisoo.framework.mdc.TConn;
@@ -32,6 +30,7 @@ import com.giisoo.framework.web.Module;
 import com.giisoo.framework.web.Path;
 import com.giisoo.utils.base.Base64;
 import com.giisoo.utils.base.DES;
+import com.mongodb.BasicDBObject;
 
 /**
  * Web接口： /user/register, /user/login, /user/logout, /user/forget,
@@ -156,29 +155,29 @@ public class user extends Model {
 
     }
 
-    /**
-     * Message_unread.
-     */
-    @Path(path = "message/unread", login = true, method = Model.METHOD_GET | Model.METHOD_POST)
-    public void message_unread() {
-        String ids = this.getString("id");
-        int updated = 0;
-        if (ids != null) {
-            String[] ss = ids.split(",");
-            V v = V.create("flag", Message.FLAG_NEW);
-            for (String s : ss) {
-                updated += Message.update(login.getId(), s, v);
-            }
-        }
-
-        if (updated > 0) {
-            this.set(X.MESSAGE, lang.get("set_success"));
-        } else {
-            this.set(X.MESSAGE, lang.get("select.required"));
-        }
-
-        message();
-    }
+//    /**
+//     * Message_unread.
+//     */
+//    @Path(path = "message/unread", login = true, method = Model.METHOD_GET | Model.METHOD_POST)
+//    public void message_unread() {
+//        String ids = this.getString("id");
+//        int updated = 0;
+//        if (ids != null) {
+//            String[] ss = ids.split(",");
+//            V v = V.create("flag", Message.FLAG_NEW);
+//            for (String s : ss) {
+//                updated += Message.update(login.getId(), s, v);
+//            }
+//        }
+//
+//        if (updated > 0) {
+//            this.set(X.MESSAGE, lang.get("set_success"));
+//        } else {
+//            this.set(X.MESSAGE, lang.get("select.required"));
+//        }
+//
+//        message();
+//    }
 
     /**
      * Go.
@@ -505,7 +504,9 @@ public class user extends Model {
         }
 
         int s = 0;
-        Beans<App> bs = App.load(null, s, 10);
+        BasicDBObject q = new BasicDBObject();
+        BasicDBObject order = new BasicDBObject(X._ID, 1);
+        Beans<App> bs = App.load(q, order, s, 10);
         while (bs != null && bs.getList() != null && bs.getList().size() > 0) {
             for (App a : bs.getList()) {
                 String key = "sso.oauth." + a.getAppid();
@@ -518,7 +519,7 @@ public class user extends Model {
                 }
             }
             s += bs.getList().size();
-            bs = App.load(null, s, 10);
+            bs = App.load(q, order, s, 10);
 
         }
 
@@ -638,151 +639,151 @@ public class user extends Model {
 
     }
 
-    /**
-     * Message_count.
-     */
-    @Path(path = "message/count", login = true)
-    public void message_count() {
-        JSONObject jo = new JSONObject();
-        Beans<Message> bs = Message.load(login.getId(), W.create("flag", Message.FLAG_NEW), 0, 1);
-        if (bs != null && bs.getTotal() > 0) {
-            jo.put("count", bs.getTotal());
-        } else {
-            jo.put("count", 0);
-        }
-        jo.put(X.STATE, 200);
-        this.response(jo);
-    }
+//    /**
+//     * Message_count.
+//     */
+//    @Path(path = "message/count", login = true)
+//    public void message_count() {
+//        JSONObject jo = new JSONObject();
+//        Beans<Message> bs = Message.load(login.getId(), W.create("flag", Message.FLAG_NEW), 0, 1);
+//        if (bs != null && bs.getTotal() > 0) {
+//            jo.put("count", bs.getTotal());
+//        } else {
+//            jo.put("count", 0);
+//        }
+//        jo.put(X.STATE, 200);
+//        this.response(jo);
+//    }
 
-    /**
-     * Message_delete.
-     */
-    @Path(path = "message/delete", login = true)
-    public void message_delete() {
-        String ids = this.getString("id");
-        int updated = 0;
-        if (ids != null) {
-            String[] ss = ids.split(",");
-            for (String s : ss) {
-                updated += Message.delete(login.getId(), s);
-            }
-        }
+//    /**
+//     * Message_delete.
+//     */
+//    @Path(path = "message/delete", login = true)
+//    public void message_delete() {
+//        String ids = this.getString("id");
+//        int updated = 0;
+//        if (ids != null) {
+//            String[] ss = ids.split(",");
+//            for (String s : ss) {
+//                updated += Message.delete(login.getId(), s);
+//            }
+//        }
+//
+//        if (updated > 0) {
+//            this.set(X.MESSAGE, lang.get("delete_success"));
+//        } else {
+//            this.set(X.MESSAGE, lang.get("select.required"));
+//        }
+//
+//        message();
+//    }
 
-        if (updated > 0) {
-            this.set(X.MESSAGE, lang.get("delete_success"));
-        } else {
-            this.set(X.MESSAGE, lang.get("select.required"));
-        }
+//    /**
+//     * Message_detail.
+//     */
+//    @Path(path = "message/detail", login = true)
+//    public void message_detail() {
+//        String id = this.getString("id");
+//        if (id == null) {
+//            message();
+//            return;
+//        }
+//
+//        Message m = Message.load(login.getId(), id);
+//        if (m == null) {
+//            message();
+//            return;
+//        }
+//
+//        this.set("m", m);
+//
+//        this.show("/user/message.detail.html");
+//    }
 
-        message();
-    }
+//    /**
+//     * Message_mark.
+//     */
+//    @Path(path = "message/mark", login = true)
+//    public void message_mark() {
+//        String ids = this.getString("id");
+//        int updated = 0;
+//        if (ids != null) {
+//            String[] ss = ids.split(",");
+//            V v = V.create("flag", Message.FLAG_MARK);
+//            for (String s : ss) {
+//                updated += Message.update(login.getId(), s, v);
+//            }
+//        }
+//
+//        if (updated > 0) {
+//            this.set(X.MESSAGE, lang.get("save.success"));
+//        } else {
+//            this.set(X.MESSAGE, lang.get("select.required"));
+//        }
+//
+//        message();
+//    }
 
-    /**
-     * Message_detail.
-     */
-    @Path(path = "message/detail", login = true)
-    public void message_detail() {
-        String id = this.getString("id");
-        if (id == null) {
-            message();
-            return;
-        }
+//    /**
+//     * Message_done.
+//     */
+//    @Path(path = "message/done", login = true)
+//    public void message_done() {
+//        String ids = this.getString("id");
+//        int updated = 0;
+//        if (ids != null) {
+//            String[] ss = ids.split(",");
+//            V v = V.create("flag", Message.FLAG_DONE);
+//            for (String s : ss) {
+//                updated += Message.update(login.getId(), s, v);
+//            }
+//        }
+//
+//        if (updated > 0) {
+//            this.set(X.MESSAGE, lang.get("save.success"));
+//        } else {
+//            this.set(X.MESSAGE, lang.get("select.required"));
+//        }
+//
+//        message();
+//
+//    }
 
-        Message m = Message.load(login.getId(), id);
-        if (m == null) {
-            message();
-            return;
-        }
-
-        this.set("m", m);
-
-        this.show("/user/message.detail.html");
-    }
-
-    /**
-     * Message_mark.
-     */
-    @Path(path = "message/mark", login = true)
-    public void message_mark() {
-        String ids = this.getString("id");
-        int updated = 0;
-        if (ids != null) {
-            String[] ss = ids.split(",");
-            V v = V.create("flag", Message.FLAG_MARK);
-            for (String s : ss) {
-                updated += Message.update(login.getId(), s, v);
-            }
-        }
-
-        if (updated > 0) {
-            this.set(X.MESSAGE, lang.get("save.success"));
-        } else {
-            this.set(X.MESSAGE, lang.get("select.required"));
-        }
-
-        message();
-    }
-
-    /**
-     * Message_done.
-     */
-    @Path(path = "message/done", login = true)
-    public void message_done() {
-        String ids = this.getString("id");
-        int updated = 0;
-        if (ids != null) {
-            String[] ss = ids.split(",");
-            V v = V.create("flag", Message.FLAG_DONE);
-            for (String s : ss) {
-                updated += Message.update(login.getId(), s, v);
-            }
-        }
-
-        if (updated > 0) {
-            this.set(X.MESSAGE, lang.get("save.success"));
-        } else {
-            this.set(X.MESSAGE, lang.get("select.required"));
-        }
-
-        message();
-
-    }
-
-    /**
-     * Message.
-     */
-    @Path(path = "message", login = true)
-    public void message() {
-
-        JSONObject jo = this.getJSON();
-        if (!"message".equals(this.path)) {
-            Object o = this.getSession().get("query");
-            if (o != null && o instanceof JSONObject) {
-                jo.clear();
-                jo.putAll((JSONObject) o);
-            }
-        } else {
-            this.getSession().set("query", jo).store();
-        }
-        W w = W.create();
-        w.copy(jo, W.OP_LIKE, "subject").copy(jo, W.OP_EQ, "flag");
-        this.set(jo);
-
-        int s = this.getInt(jo, "s");
-        int n = this.getInt(jo, "n", 10, "default.list.number");
-
-        Beans<Message> bs = Message.load(login.getId(), w, s, n);
-        this.set(bs, s, n);
-        if (bs != null && bs.getList() != null && bs.getList().size() > 0) {
-            for (Message m : bs.getList()) {
-                if (Message.FLAG_NEW.equals(m.getFlag())) {
-                    m.update(V.create("flag", Message.FLAG_READ));
-                }
-            }
-        }
-
-        this.show("/user/user.message.html");
-    }
+//    /**
+//     * Message.
+//     */
+//    @Path(path = "message", login = true)
+//    public void message() {
+//
+//        JSONObject jo = this.getJSON();
+//        if (!"message".equals(this.path)) {
+//            Object o = this.getSession().get("query");
+//            if (o != null && o instanceof JSONObject) {
+//                jo.clear();
+//                jo.putAll((JSONObject) o);
+//            }
+//        } else {
+//            this.getSession().set("query", jo).store();
+//        }
+//        W w = W.create();
+//        w.copy(jo, W.OP_LIKE, "subject").copy(jo, W.OP_EQ, "flag");
+//        this.set(jo);
+//
+//        int s = this.getInt(jo, "s");
+//        int n = this.getInt(jo, "n", 10, "default.list.number");
+//
+//        Beans<Message> bs = Message.load(login.getId(), w, s, n);
+//        this.set(bs, s, n);
+//        if (bs != null && bs.getList() != null && bs.getList().size() > 0) {
+//            for (Message m : bs.getList()) {
+//                if (Message.FLAG_NEW.equals(m.getFlag())) {
+//                    m.update(V.create("flag", Message.FLAG_READ));
+//                }
+//            }
+//        }
+//
+//        this.show("/user/user.message.html");
+//    }
 
     /**
      * Dashboard.
@@ -793,15 +794,16 @@ public class user extends Model {
         /**
          * get the total of user messages, new messages
          */
-        Beans<Message> bs = Message.load(login.getId(), W.create("flag", Message.FLAG_NEW), 0, 1);
-        if (bs != null && bs.getTotal() > 0) {
-            this.set("message_new", bs.getTotal());
-        }
-
-        bs = Message.load(login.getId(), W.create(), 0, 1);
-        if (bs != null && bs.getTotal() > 0) {
-            this.set("message_total", bs.getTotal());
-        }
+        // Beans<Message> bs = Message.load(login.getId(), W.create("flag",
+        // Message.FLAG_NEW), 0, 1);
+        // if (bs != null && bs.getTotal() > 0) {
+        // this.set("message_new", bs.getTotal());
+        // }
+        //
+        // bs = Message.load(login.getId(), W.create(), 0, 1);
+        // if (bs != null && bs.getTotal() > 0) {
+        // this.set("message_total", bs.getTotal());
+        // }
 
         this.show("/user/user.dashboard.html");
 

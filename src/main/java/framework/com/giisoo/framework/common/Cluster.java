@@ -51,7 +51,7 @@ public class Cluster extends Bean {
 
     public static int remove(String id) {
         Cluster c = Cluster.load(id);
-        if (id != null) {
+        if (id != null && c != null) {
             Bean.delete(new BasicDBObject().append("node", c.getNode()), Counter.class);
             return Bean.delete(new BasicDBObject().append(X._ID, id), Cluster.class);
         }
