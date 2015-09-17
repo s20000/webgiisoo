@@ -1108,8 +1108,8 @@ public class Model {
          * set back to the domain
          */
         // c.setDomain(SystemConfig.s("domain", this.getHeader("Host")));
-        String domain = SystemConfig.s("domain", null);
-        if (domain != null && !"".equals(domain)) {
+        String domain = Module._conf.getString("domain", null);
+        if (!X.isEmpty(domain)) {
             c.setDomain(domain);
         }
 
