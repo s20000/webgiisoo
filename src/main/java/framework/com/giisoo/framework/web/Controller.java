@@ -23,6 +23,7 @@ import com.giisoo.core.bean.Bean.V;
 import com.giisoo.core.bean.X;
 import com.giisoo.core.conf.SystemConfig;
 import com.giisoo.framework.common.AccessLog;
+import com.giisoo.framework.common.User;
 import com.giisoo.framework.common.Cluster.Counter;
 import com.giisoo.framework.mdc.ICallback;
 import com.giisoo.framework.mdc.MQ;
@@ -242,11 +243,13 @@ public class Controller implements ICallback {
             mo.dispatch(uri, req, resp, method);
 
             log.info(method + " " + uri + " - " + t.past() + "ms -" + mo.getRemoteHost() + " " + mo);
-
-            if ("true".equals(SystemConfig.s("access.log.enabled", "false"))) {
-                AccessLog.create(mo.getRemoteHost(), uri, V.create("method", method.toString()).set("cost", t.past()).set("agent", mo.browser()).set("sid", mo.sid(false))
-                        .set("module", mo.module.name).set("handler", mo.getClass().getName()).set("header", Bean.toString(mo.getHeaders())).set("query", Bean.toString(mo.getQueries())));
+            V v = V.create("method", method.toString()).set("cost", t.past()).set("sid", mo.sid());
+            User u1 = mo.getUser();
+            if (u1 != null) {
+                v.set("uid", u1.getId()).set("username", u1.get("name"));
             }
+            AccessLog.create(mo.getRemoteHost(), uri, v);
+
             // Counter.max("web.request.max", t.past(), uri);
             return;
         }
@@ -375,11 +378,12 @@ public class Controller implements ICallback {
                 mo.dispatch(uri, req, resp, method);
 
                 log.info(method + " " + uri + " - " + t.past() + "ms -" + mo.getRemoteHost() + " " + mo);
-
-                if ("true".equals(SystemConfig.s("access.log.enabled", "false"))) {
-                    AccessLog.create(mo.getRemoteHost(), uri, V.create("method", method.toString()).set("cost", t.past()).set("agent", mo.browser()).set("sid", mo.sid(false)).set("module",
-                            mo.module.name).set("handler", mo.getClass().getName()).set("header", Bean.toString(mo.getHeaders())).set("query", Bean.toString(mo.getQueries())));
+                V v = V.create("method", method.toString()).set("cost", t.past()).set("sid", mo.sid());
+                User u1 = mo.getUser();
+                if (u1 != null) {
+                    v.set("uid", u1.getId()).set("username", u1.get("name"));
                 }
+                AccessLog.create(mo.getRemoteHost(), uri, v);
 
                 // Counter.max("web.request.max", t.past(), uri);
                 return;
@@ -392,11 +396,12 @@ public class Controller implements ICallback {
                     mo.dispatch(uri, req, resp, method);
 
                     log.info(method + " " + uri + " - " + t.past() + "ms -" + mo.getRemoteHost() + " " + mo);
-
-                    if ("true".equals(SystemConfig.s("access.log.enabled", "false"))) {
-                        AccessLog.create(mo.getRemoteHost(), uri, V.create("method", method.toString()).set("cost", t.past()).set("agent", mo.browser()).set("sid", mo.sid(false)).set("module",
-                                mo.module.name).set("handler", mo.getClass().getName()).set("header", Bean.toString(mo.getHeaders())).set("query", Bean.toString(mo.getQueries())));
+                    V v = V.create("method", method.toString()).set("cost", t.past()).set("sid", mo.sid());
+                    User u1 = mo.getUser();
+                    if (u1 != null) {
+                        v.set("uid", u1.getId()).set("username", u1.get("name"));
                     }
+                    AccessLog.create(mo.getRemoteHost(), uri, v);
 
                     // Counter.max("web.request.max", t.past(), uri);
                     return;
@@ -415,11 +420,12 @@ public class Controller implements ICallback {
                             mo.dispatch(u, req, resp, method);
 
                             log.info(method + " " + uri + " - " + t.past() + "ms -" + mo.getRemoteHost() + " " + mo);
-
-                            if ("true".equals(SystemConfig.s("access.log.enabled", "false"))) {
-                                AccessLog.create(mo.getRemoteHost(), uri, V.create("method", method.toString()).set("cost", t.past()).set("agent", mo.browser()).set("sid", mo.sid(false)).set(
-                                        "module", mo.module.name).set("handler", mo.getClass().getName()).set("header", Bean.toString(mo.getHeaders())).set("query", Bean.toString(mo.getQueries())));
+                            V v = V.create("method", method.toString()).set("cost", t.past()).set("sid", mo.sid());
+                            User u1 = mo.getUser();
+                            if (u1 != null) {
+                                v.set("uid", u1.getId()).set("username", u1.get("name"));
                             }
+                            AccessLog.create(mo.getRemoteHost(), uri, v);
 
                             // Counter.max("web.request.max", t.past(), uri);
                             return;
@@ -441,11 +447,12 @@ public class Controller implements ICallback {
                     mo.dispatch(uri, req, resp, method);
 
                     log.info(method + " " + uri + " - " + t.past() + "ms -" + mo.getRemoteHost() + " " + mo);
-
-                    if ("true".equals(SystemConfig.s("access.log.enabled", "false"))) {
-                        AccessLog.create(mo.getRemoteHost(), uri, V.create("method", method.toString()).set("cost", t.past()).set("agent", mo.browser()).set("sid", mo.sid(false)).set("module",
-                                mo.module.name).set("handler", mo.getClass().getName()).set("header", Bean.toString(mo.getHeaders())).set("query", Bean.toString(mo.getQueries())));
+                    V v = V.create("method", method.toString()).set("cost", t.past()).set("sid", mo.sid());
+                    User u1 = mo.getUser();
+                    if (u1 != null) {
+                        v.set("uid", u1.getId()).set("username", u1.get("name"));
                     }
+                    AccessLog.create(mo.getRemoteHost(), uri, v);
 
                     // Counter.max("web.request.max", t.past(), uri);
                 }
