@@ -19,11 +19,12 @@
 	<thead>
 		<tr>
 			<th>URL</th>
-			<th>IP</th>
+			<th>Method</th>
 			<th>Cost(ms)</th>
 			<th>SID</th>
 			<th>UID</th>
 			<th>USERNAME</th>
+			<th>IP</th>
 			<th>Created</th>
 		</tr>
 	</thead>
@@ -31,11 +32,12 @@
 #foreach($f in $list)
 	<tr>
 		<td>$!f.url</td>
-		<td>$!f.ip</td>
+		<td>$!f.method</td>
 		<td>$!f.cost</td>
 		<td>$!f.sid</td>
 		<td>$!f.uid</td>
 		<td>$!f.username</td>
+		<td>$!f.ip</td>
 		<td>$lang.format($!f.created, 'yyyy-MM-dd HH:mm')</td>
 	</tr>
 #end
