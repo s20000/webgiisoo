@@ -38,7 +38,7 @@
 #foreach($f in $list)
 	<tr #if($f.isLocked()) class='deleted' #end>
 		<td><input type='checkbox' name='appid' value='$f.appid'/>$f.appid</td>
-		<td>$f.key</td>
+		<td>$!f.key</td>
 		<td>#if($f.company)$f.company#end</td>
 		<td>#if($f.contact) $f.contact #end</td>
 		<td>#if($f.phone) $f.phone #end</td>

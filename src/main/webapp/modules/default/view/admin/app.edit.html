@@ -10,7 +10,7 @@
 <form action='/admin/app/edit'  method='post' class='form' enctype="multipart/form-data">
 	<input type='hidden' name="appid" value="$appid">
 	<div><label><h3>$lang.get('label.appid')</h3>:<i>$appid</i></label></div>
-	<div><label><h3>$lang.get('head.key')</h3>:<input type='text' name='_key' readonly="readonly"  value=#if($key) '$key' #else '' #end/><a class='btn' style='margin-left: 10px;' href='javascript:;' onclick='_newkey();'>$lang.get('a.newkey')</a></label></div>
+	<div><label><h3>$lang.get('head.key')</h3>:<input type='text' name='key' readonly="readonly"  value=#if($key) '$key' #else '' #end/><a class='btn' style='margin-left: 10px;' href='javascript:;' onclick='_newkey();'>$lang.get('a.newkey')</a></label></div>
 	<div><label><h3>$lang.get('label.logout')</h3>:<input type='text' name='logout' value= #if($logout)'$logout' #else '' #end /></label></div>
 	<div><label><h3>$lang.get('label.company')</h3>:<input type='text' name='company' value= #if($company)'$company' #else '' #end /></label></div>
 	<div><label><h3>$lang.get('label.contact')</h3>:<input type='text' name='contact' value= #if($contact)'$contact' #else '' #end /></label></div>
@@ -31,7 +31,7 @@
 <script>
 function _newkey(){
 	$.post('/admin/app/newkey', {}, function(d){
-		$('form input[name="_key"]').val(d);
+		$('form input[name=key]').val(d);
 	})
 }
 </script>

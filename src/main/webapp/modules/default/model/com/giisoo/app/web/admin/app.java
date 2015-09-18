@@ -93,7 +93,7 @@ public class app extends Model {
             JSONObject jo = this.getJSON();
             String appid = this.getString("appid");
             if (App.create(appid, V.create("appid", appid).copy(jo, "memo", "company", "contact", "phone", "logout", "email").set("setrule", this.getHtml("setrule")).set("getrule",
-                    this.getHtml("getrule")).set("_key", UID.random(24))) > 0) {
+                    this.getHtml("getrule")).set("key", UID.random(24))) > 0) {
                 this.set(X.MESSAGE, lang.get("add.success"));
 
                 onGet();
@@ -147,7 +147,7 @@ public class app extends Model {
         String appid = this.getString("appid");
         if (method.isPost()) {
             JSONObject jo = this.getJSON();
-            V v = V.create().copy(jo, "memo", "_key", "company", "contact", "phone", "logout", "email").set("locked", "on".equals(this.getString("locked")) ? 1 : 0).set("setrule",
+            V v = V.create().copy(jo, "memo", "key", "company", "contact", "phone", "logout", "email").set("locked", "on".equals(this.getString("locked")) ? 1 : 0).set("setrule",
                     this.getHtml("setrule")).set("getrule", this.getHtml("getrule"));
 
             if (App.update(appid, v) > 0) {

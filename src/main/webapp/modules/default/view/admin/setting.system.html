@@ -3,9 +3,9 @@
 
 	<div><label><h3>$lang.get('label.deploycode')</h3>:<i>$!system_code</i></label></div>
 	<div><label><h3>$lang.get('label.systemcode')</h3>:<i>$lang.get("node.type_$module.node_type")</i></label></div>
-	<div><label><h3>$lang.get('label.nodename')</h3>:<input type='text' name='nodename' value=#if($nodename)'$nodename' #else '' #end/></label></div>
+	<div><label><h3>$lang.get('label.nodename')</h3>:<input type='text' name='nodename' value="$!nodename"/></label></div>
 
-	<div><label class='full'><h3>$lang.get('label.pubkey')</h3>:<textarea name='pubkey'>#if($pubkey)$pubkey#end</textarea></label></div>
+	<div><label class='full'><h3>$lang.get('label.pubkey')</h3>:<textarea name='pubkey'>$!pubkey</textarea></label></div>
 
 <div id='leanmodal' class='settime'>
 	<div class='leanmodal_header'><label><h3>$lang.get('system.settime')</h3>:<i></i></label></div>

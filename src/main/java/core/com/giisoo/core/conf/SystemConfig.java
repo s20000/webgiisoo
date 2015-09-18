@@ -91,18 +91,18 @@ public class SystemConfig extends Bean {
     public static String s(String name, String defaultValue) {
         SystemConfig c = getConfig(name);
         if (c != null) {
-            return String.valueOf(c.var);
+            return c.var != null ? c.var.toString() : null;
         }
 
         c = Bean.load(new BasicDBObject(X._ID, name), SystemConfig.class);
         if (c != null) {
             data.put(name, c);
-            return String.valueOf(c.var);
+            return c.var != null ? c.var.toString() : null;
         } else {
             c = new SystemConfig();
             c.var = conf.getString(name, defaultValue);
             data.put(name, c);
-            return String.valueOf(c.var);
+            return c.var != null ? c.var.toString() : null;
         }
     }
 
