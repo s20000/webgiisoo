@@ -80,18 +80,25 @@ public class data extends Model {
     @Path(path = "update", login = true, access = "access.config.admin", log = Model.METHOD_POST)
     public void update() {
         String collection = this.getString("collection");
-        String body = this.getHtml("body");
-
-        this.set("collection", collection);
-        this.set("body", body);
+        String id = this.getString("id");
 
         if (method.isPost()) {
+            String body = this.getHtml("body");
+
             if (!X.isEmpty(collection) && !X.isEmpty(body)) {
                 Data.update(collection, JSONObject.fromObject(body));
 
                 detail();
 
                 return;
+            }
+        } else {
+            this.set("collection", collection);
+            this.set("id", id);
+
+            Data d = Data.load(collection, id);
+            if (d != null) {
+                this.set("body", d.getAll().toString());
             }
         }
 
