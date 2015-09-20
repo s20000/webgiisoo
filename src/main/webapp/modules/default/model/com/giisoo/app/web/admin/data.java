@@ -98,7 +98,7 @@ public class data extends Model {
 
             Data d = Data.load(collection, id);
             if (d != null) {
-                this.set("body", d.getAll().toString());
+                this.set("body", d.getJSON().toString());
             }
         }
 

@@ -3745,6 +3745,18 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
 
     private Map<String, Object> extra = null;
 
+    public JSONObject getJSON() {
+        if (extra == null) {
+            return null;
+        }
+
+        JSONObject jo = new JSONObject();
+
+        toJSON(jo);
+
+        return jo;
+    }
+
     /**
      * used to create SQL "where" conditions
      * 
