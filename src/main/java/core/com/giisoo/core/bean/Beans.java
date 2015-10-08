@@ -23,58 +23,58 @@ import com.giisoo.core.cache.DefaultCachable;
  */
 public class Beans<T extends Bean> extends DefaultCachable {
 
-	/** The Constant serialVersionUID. */
-	private static final long serialVersionUID = 2L;
+    /** The Constant serialVersionUID. */
+    private static final long serialVersionUID = 2L;
 
-	/** The log. */
-	protected static Log log = LogFactory.getLog(Beans.class);
+    /** The log. */
+    protected static Log log = LogFactory.getLog(Beans.class);
 
-	/** The total. */
-	int total;
+    /** The total. */
+    int total;
 
-	/** The list. */
-	List<T> list;
+    /** The list. */
+    List<T> list;
 
-	/**
-	 * Gets the total.
-	 *
-	 * @return the total
-	 */
-	public int getTotal() {
-		return total;
-	}
+    /**
+     * Gets the total.
+     *
+     * @return the total
+     */
+    public int getTotal() {
+        return total;
+    }
 
-	/**
-	 * Sets the total.
-	 *
-	 * @param total
-	 *            the new total
-	 */
-	public void setTotal(int total) {
-		this.total = total;
-	}
+    /**
+     * Sets the total.
+     *
+     * @param total
+     *            the new total
+     */
+    public void setTotal(int total) {
+        this.total = total;
+    }
 
-	/**
-	 * Gets the list.
-	 *
-	 * @return the list
-	 */
-	public List<T> getList() {
-		return list;
-	}
+    /**
+     * Gets the list.
+     *
+     * @return the list
+     */
+    public List<T> getList() {
+        return list;
+    }
 
-	/**
-	 * Sets the list.
-	 *
-	 * @param list
-	 *            the new list
-	 */
-	public void setList(List<T> list) {
-		this.list = list;
-	}
+    /**
+     * Sets the list.
+     *
+     * @param list
+     *            the new list
+     */
+    public void setList(List<T> list) {
+        this.list = list;
+    }
 
-	public String toString() {
-		return "Beans[total=" + total + ", list=" + list + "]";
-	}
+    public String toString() {
+        return "Beans[total=" + total + ", list.size=" + (list == null ? null : list.size()) + "]";
+    }
 
 }

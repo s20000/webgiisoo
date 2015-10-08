@@ -16,47 +16,62 @@ import com.giisoo.framework.web.*;
 
 public class setting extends Model {
 
-    private static Map<String, setting> settings = new LinkedHashMap<String, setting>();
+    private static Map<String, Class<? extends setting>> settings = new LinkedHashMap<String, Class<? extends setting>>();
 
-    final public static void register(String name, setting m) {
+    final public static void register(String name, Class<? extends setting> m) {
         settings.put(name, m);
     }
 
     @Path(path = "get/(.*)", login = true, access = "access.config.admin")
     final public void get(String name) {
-        setting s = settings.get(name);
-        if (s != null) {
-            s.req = this.req;
-            s.resp = this.resp;
-            s.login = this.login;
-            s.lang = this.lang;
-            s.module = this.module;
-            s.get();
+        Class<? extends setting> c = settings.get(name);
+        log.debug("/get/" + c);
+        if (c != null) {
+            try {
+                setting s = c.newInstance();
+                s.req = this.req;
+                s.resp = this.resp;
+                s.login = this.login;
+                s.lang = this.lang;
+                s.module = this.module;
+                s.get();
 
-            s.set("lang", lang);
-            s.set("module", module);
-            s.set("name", name);
-            s.set("settings", settings.keySet());
-            s.show("/admin/setting.html");
+                s.set("lang", lang);
+                s.set("module", module);
+                s.set("name", name);
+                s.set("settings", settings.keySet());
+                s.show("/admin/setting.html");
+
+            } catch (Exception e) {
+                log.error(name, e);
+                this.show("/admin/setting.html");
+            }
         }
     }
 
     @Path(path = "set/(.*)", login = true, access = "access.config.admin", log = Model.METHOD_POST)
     final public void set(String name) {
-        setting s = settings.get(name);
-        if (s != null) {
-            s.req = this.req;
-            s.resp = this.resp;
-            s.lang = this.lang;
-            s.login = this.login;
-            s.module = this.module;
-            s.set();
+        Class<? extends setting> c = settings.get(name);
+        log.debug("/set/" + c);
+        if (c != null) {
+            try {
+                setting s = c.newInstance();
+                s.req = this.req;
+                s.resp = this.resp;
+                s.lang = this.lang;
+                s.login = this.login;
+                s.module = this.module;
+                s.set();
 
-            s.set("lang", lang);
-            s.set("module", module);
-            s.set("name", name);
-            s.set("settings", settings.keySet());
-            s.show("/admin/setting.html");
+                s.set("lang", lang);
+                s.set("module", module);
+                s.set("name", name);
+                s.set("settings", settings.keySet());
+                s.show("/admin/setting.html");
+            } catch (Exception e) {
+                log.error(name, e);
+                this.show("/admin/setting.html");
+            }
         }
     }
 

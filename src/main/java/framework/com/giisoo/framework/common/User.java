@@ -19,6 +19,7 @@ import com.giisoo.core.cache.Cache;
 import com.giisoo.core.conf.SystemConfig;
 import com.giisoo.framework.common.Company.Department;
 import com.giisoo.framework.web.Module;
+import com.mongodb.BasicDBObject;
 
 /**
  * User
@@ -27,7 +28,7 @@ import com.giisoo.framework.web.Module;
  * 
  */
 @DBMapping(table = "tbluser")
-public class User extends Bean implements Exportable {
+public class User extends Bean {
 
     /**
    * 
@@ -126,7 +127,6 @@ public class User extends Bean implements Exportable {
         long id = nextId();
 
         if (Bean.insert(v.set("id", id).set("created", System.currentTimeMillis()).set("updated", System.currentTimeMillis()), User.class) > 0) {
-            Bean.onChanged("tbluser", IData.OP_CREATE, "id=?", new Object[] { id });
 
             return id;
         }
@@ -212,7 +212,6 @@ public class User extends Bean implements Exportable {
         v.copy(jo, "company", "title", "department", "address", "email", "nickname", "description", "special", "certid").copyLong(jo, "total");
 
         if (Bean.insert(v, User.class) > 0) {
-            Bean.onChanged("tbluser", IData.OP_CREATE, "id=?", new Object[] { id });
 
             return id;
         }
@@ -863,7 +862,7 @@ public class User extends Bean implements Exportable {
         return getId() > 0;
     }
 
-    @DBMapping(table = "tbluserlock")
+    @DBMapping(collection = "gi_userlock")
     public static class Lock extends Bean {
 
         /**
@@ -872,63 +871,59 @@ public class User extends Bean implements Exportable {
         private static final long serialVersionUID = 1L;
 
         public static int locked(long uid, String sid, String host, String useragent) {
-            return Bean.insert(V.create("uid", uid).set("sid", sid).set("host", host).set("useragent", useragent).set("created", System.currentTimeMillis()), Lock.class);
+            return Bean.insertCollection(V.create("uid", uid).set("sid", sid).set("host", host).set("useragent", useragent).set("created", System.currentTimeMillis()), Lock.class);
         }
 
         public static int removed(long uid) {
-            return Bean.delete("uid=?", new Object[] { uid }, Lock.class);
+            return Bean.delete(new BasicDBObject("uid", uid), Lock.class);
         }
 
         public static int removed(long uid, String sid) {
-            return Bean.delete("uid=? and sid=?", new Object[] { uid, sid }, Lock.class);
+            return Bean.delete(new BasicDBObject("uid", uid).append("sid", sid), Lock.class);
         }
 
         public static List<Lock> load(long uid, long time) {
-            return Bean.load(null, "uid=? and created>?", new Object[] { uid, time }, null, 0, -1, Lock.class);
+            Beans<Lock> bs = Bean.load(new BasicDBObject("uid", uid).append("created", new BasicDBObject("$gt", time)), new BasicDBObject("created", 1), 0, Integer.MAX_VALUE, Lock.class);
+            return bs == null ? null : bs.getList();
         }
 
         public static List<Lock> loadBySid(long uid, long time, String sid) {
-            return Bean.load(null, "uid=? and created>? and sid=?", new Object[] { uid, time, sid }, null, 0, -1, Lock.class);
+            Beans<Lock> bs = Bean.load(new BasicDBObject("uid", uid).append("created", new BasicDBObject("$gt", time)).append("sid", sid), new BasicDBObject("created", 1), 0, Integer.MAX_VALUE,
+                    Lock.class);
+            return bs == null ? null : bs.getList();
         }
 
         public static List<Lock> loadByHost(long uid, long time, String host) {
-            return Bean.load(null, "uid=? and created>? and host=?", new Object[] { uid, time, host }, null, 0, -1, Lock.class);
-        }
-
-        @Override
-        protected void load(ResultSet r) throws SQLException {
-            uid = r.getLong("uid");
-            created = r.getLong("created");
-            sid = r.getString("sid");
-            host = r.getString("host");
-            useragent = r.getString("useragent");
+            Beans<Lock> bs = Bean.load(new BasicDBObject("uid", uid).append("created", new BasicDBObject("$gt", time)).append("host", host), new BasicDBObject("created", 1), 0, Integer.MAX_VALUE,
+                    Lock.class);
+            return bs == null ? null : bs.getList();
         }
 
         public long getUid() {
-            return uid;
+            return getLong("uid");
         }
 
         public long getCreated() {
-            return created;
+            return getLong("created");
         }
 
         public String getSid() {
-            return sid;
+            return getString("sid");
         }
 
         public String getHost() {
-            return host;
+            return getString("host");
         }
 
         public String getUseragent() {
-            return useragent;
+            return getString("useragent");
         }
 
-        long uid;
-        long created;
-        String sid;
-        String host;
-        String useragent;
+        // long uid;
+        // long created;
+        // String sid;
+        // String host;
+        // String useragent;
 
     }
 

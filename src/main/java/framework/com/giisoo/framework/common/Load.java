@@ -5,103 +5,82 @@
  */
 package com.giisoo.framework.common;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 import com.giisoo.core.bean.Bean;
 import com.giisoo.core.bean.DBMapping;
+import com.giisoo.core.bean.UID;
 import com.giisoo.core.bean.X;
+import com.mongodb.BasicDBObject;
 
-@DBMapping(table = "tblload")
+@DBMapping(collection = "gi_load")
 public class Load extends Bean {
 
-	String name;
-	String node;
-	int count;
-	long updated;
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * Update.
-	 * 
-	 * @param name
-	 *            the name
-	 * @param node
-	 *            the node
-	 * @param count
-	 *            the count
-	 * @return the int
-	 */
-	public static int update(String name, String node, int count) {
-		if (Bean.exists("name=? and node=?", new Object[] { name, node },
-				Load.class)) {
-			return Bean.update(
-					"name=? and node=?",
-					new Object[] { name, node },
-					V.create("count", count).set("updated",
-							System.currentTimeMillis()), Load.class);
-		} else {
-			return Bean.insert(
-					V.create("count", count)
-							.set("updated", System.currentTimeMillis())
-							.set("name", name).set("node", node), Load.class);
-		}
-	}
+    // String name;
+    // String node;
+    // int count;
+    // long updated;
 
-	/* (non-Javadoc)
-	 * @see com.giisoo.bean.Bean#load(java.sql.ResultSet)
-	 */
-	@Override
-	protected void load(ResultSet r) throws SQLException {
-		name = r.getString("name");
-		node = r.getString("node");
-		count = r.getInt("count");
-		updated = r.getLong("updated");
-	}
+    /**
+     * Update.
+     * 
+     * @param name
+     *            the name
+     * @param node
+     *            the node
+     * @param count
+     *            the count
+     * @return the int
+     */
+    public static int update(String name, String node, int count) {
 
-	public String getName() {
-		return name;
-	}
+        String id = UID.id(name, node);
+        if (Bean.exists(new BasicDBObject(X._ID, id), Load.class)) {
+            return Bean.updateCollection(id, V.create("count", count).set("updated", System.currentTimeMillis()), Load.class);
+        } else {
+            return Bean.insertCollection(V.create(X._ID, id).set("count", count).set("updated", System.currentTimeMillis()).set("name", name).set("node", node), Load.class);
+        }
+    }
 
-	public String getNode() {
-		return node;
-	}
+    public String getName() {
+        return this.getString("name");
+    }
 
-	public int getCount() {
-		return count;
-	}
+    public String getNode() {
+        return this.getString("node");
+    }
 
-	public long getUpdated() {
-		return updated;
-	}
+    public int getCount() {
+        return this.getInt("count");
+    }
 
-	/**
-	 * Last.
-	 * 
-	 * @param name
-	 *            the name
-	 * @return the load
-	 */
-	public static Load last(String name) {
-		return Bean
-				.load("name =? and updated>?",
-						new Object[] { name,
-								System.currentTimeMillis() - 2 * X.AMINUTE },
-						"order by count", Load.class);
-	}
+    public long getUpdated() {
+        return this.getLong("updated");
+    }
 
-	/**
-	 * Top.
-	 * 
-	 * @param name
-	 *            the name
-	 * @return the load
-	 */
-	public static Load top(String name) {
-		return Bean
-				.load("name=? and updated>?",
-						new Object[] { name,
-								System.currentTimeMillis() - 2 * X.AMINUTE },
-						"order by count desc", Load.class);
-	}
+    /**
+     * Last.
+     * 
+     * @param name
+     *            the name
+     * @return the load
+     */
+    public static Load last(String name) {
+        return Bean.load(new BasicDBObject("name", name).append("updated", new BasicDBObject("$gt", System.currentTimeMillis() - 2 * X.AMINUTE)), new BasicDBObject("count", 1), Load.class);
+    }
+
+    /**
+     * Top.
+     * 
+     * @param name
+     *            the name
+     * @return the load
+     */
+    public static Load top(String name) {
+        return Bean.load(new BasicDBObject("name", name).append("updated", new BasicDBObject("$gt", System.currentTimeMillis() - 2 * X.AMINUTE)), new BasicDBObject("count", -1), Load.class);
+    }
 
 }

@@ -3,8 +3,8 @@
 #if($system.s('oauth.enabled', '') != 'true')
 		<a href='/admin/password/edit' class='hint hint--bottom' data-hint='修改登录密码'>$lang.get('a.password')</a>
 #end
-		<a rel="leanModal" href='#leanmodal.restart' class='icon recycle hint hint--bottom' data-hint='重启应用服务'>$lang.get('a.restart.service')</a>
-		<a rel="leanModal" href='#leanmodal.restart_host' class='icon restart hint hint--bottom' data-hint='初始化数据库'>初始化数据库</a>
+		<a rel="leanModal" href='#leanmodal.restart' class='recycle hint hint--bottom' data-hint='重启应用服务'>$lang.get('a.restart.service')</a>
+		<a rel="leanModal" href='#leanmodal.restart_host' class='restart hint hint--bottom' data-hint='初始化数据库'>初始化数据库</a>
 	</span></div>
 
 <div class='chart'>

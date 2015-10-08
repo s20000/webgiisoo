@@ -26,13 +26,15 @@ import net.sf.json.util.PropertyFilter;
  * @author Andres Almiray <aalmiray@users.sourceforge.net>
  */
 public class CompositePropertyFilter implements PropertyFilter {
-   private List filters = new ArrayList();
+   @SuppressWarnings("rawtypes")
+private List filters = new ArrayList();
 
    public CompositePropertyFilter() {
       this( null );
    }
 
-   public CompositePropertyFilter( List filters ) {
+   @SuppressWarnings({ "rawtypes", "unchecked" })
+public CompositePropertyFilter( List filters ) {
       if( filters != null ){
          for( Iterator i = filters.iterator(); i.hasNext(); ){
             Object filter = i.next();
@@ -43,13 +45,15 @@ public class CompositePropertyFilter implements PropertyFilter {
       }
    }
 
-   public void addPropertyFilter( PropertyFilter filter ) {
+   @SuppressWarnings("unchecked")
+public void addPropertyFilter( PropertyFilter filter ) {
       if( filter != null ){
          filters.add( filter );
       }
    }
 
-   public boolean apply( Object source, String name, Object value ) {
+   @SuppressWarnings("rawtypes")
+public boolean apply( Object source, String name, Object value ) {
       for( Iterator i = filters.iterator(); i.hasNext(); ){
          PropertyFilter filter = (PropertyFilter) i.next();
          if( filter.apply( source, name, value ) ){

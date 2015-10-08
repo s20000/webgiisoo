@@ -146,6 +146,7 @@ public class system extends Model {
         String step = this.getString("step");
         step = check(step, jo);
 
+        
         this.set(jo);
         this.set("step", step);
 

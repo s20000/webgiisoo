@@ -16,6 +16,7 @@
 			<th>$lang.get('cluster.started')</th>
 			<th>$lang.get('cluster.version')</th>
 			<th>$lang.get('cluster.home')</th>
+			<th>Master</th>
 			<th>$lang.get('cluster.op')</th>
 		</tr>
 	</thead>
@@ -29,6 +30,7 @@
 		<td>$lang.format($!f.started, 'yyyy-MM-dd HH:mm')</td>
 		<td>$!f.version</td>
 		<td>$!f.home</td>
+		<td>#if($f.master) YES #end</td>
 		<td>
 			<a href='javascript:;' onclick='_delete("$f.id")'>$lang.get("a.delete")</a>
 			<a href='/admin/cluster/traffic?id=$f.id'>$lang.get("a.traffic")</a>
@@ -47,6 +49,14 @@
 <script>
 $(function(){
 	$('#cluster-table').tablesorter();
+	
+	if($('#cluster-table .cluster-status-installing').length > 0) {
+		if('#cluster-table'.length >0) {
+			setTimeout(function(){
+				reload();
+			}, 10000);
+		}
+	}
 })
 
 function _delete(id) {

@@ -9,7 +9,7 @@ import java.io.*;
 import java.util.Map;
 import java.util.regex.*;
 
-import javax.jms.Session;
+import javax.jms.JMSException;
 import javax.servlet.http.*;
 
 import net.sf.json.JSONObject;
@@ -21,11 +21,11 @@ import com.giisoo.core.bean.Bean;
 import com.giisoo.core.bean.TimeStamp;
 import com.giisoo.core.bean.Bean.V;
 import com.giisoo.core.bean.X;
+import com.giisoo.core.mq.IStub;
+import com.giisoo.core.mq.MQ;
 import com.giisoo.framework.common.AccessLog;
 import com.giisoo.framework.common.User;
 import com.giisoo.framework.common.Cluster.Counter;
-import com.giisoo.framework.mdc.ICallback;
-import com.giisoo.framework.mdc.MQ;
 import com.giisoo.framework.mdc.command.MDCHttpRequest;
 import com.giisoo.framework.mdc.command.MDCHttpResponse;
 import com.giisoo.framework.web.Model.HTTPMethod;
@@ -36,7 +36,7 @@ import com.giisoo.framework.web.Model.HTTPMethod;
  * @author yjiang
  * 
  */
-public class Controller implements ICallback {
+public class Controller implements IStub {
 
     static Log log = LogFactory.getLog(Controller.class);
 
@@ -93,87 +93,92 @@ public class Controller implements ICallback {
              * mq enabled, create a web queue
              */
             if ("true".equals(conf.getString("mq.web.enabled", "true"))) {
-                MQ.createQueue("web", owner, Session.AUTO_ACKNOWLEDGE);
+                try {
+                    MQ.bind("web", owner);
+                } catch (JMSException e) {
+                    log.error(e.getMessage(), e);
+                }
             }
 
             if ("true".equals(conf.getString("mq.webadmin.enabled", "true"))) {
                 /**
                  * create web topic also, to collect load report
                  */
-                MQ.createTopic("webadmin", owner);
+                try {
+                    MQ.bind("webadmin", owner, MQ.Mode.TOPIC);
+                } catch (JMSException e) {
+                    log.error(e.getMessage(), e);
+                }
             }
 
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.giisoo.framework.mdc.ICallback#run(int, java.lang.Object[])
-     */
-    @SuppressWarnings("unused")
-    public void run(int command, Object... o) {
-        if (o != null && o.length > 0) {
-            try {
-                // String to = o.length > 0 ? (String) o[0] : null;
-                String from = o.length > 1 ? (String) o[1] : null;
-                String src = o.length > 2 ? (String) o[2] : null;
-                byte flag = o.length > 3 ? (Byte) o[3] : 0;
-                final JSONObject header = o.length > 4 ? (JSONObject) o[4] : null;
-                JSONObject msg = o.length > 5 ? (JSONObject) o[5] : null;
-                byte[] bb = o.length > 6 ? (byte[]) o[6] : null;
+    @SuppressWarnings("serial")
+    @Override
+    public void onRequest(long seq, String to, String from, String src, final JSONObject header, JSONObject msg, byte[] bb) {
+        // TODO Auto-generated method stub
 
-                // log.debug(Bean.toString(o));
+        try {
+            // String to = o.length > 0 ? (String) o[0] : null;
+            // log.debug(Bean.toString(o));
 
-                /**
-                 * create mock http request
-                 */
-                Map<String, Object> h1 = new Bean() {
+            /**
+             * create mock http request
+             */
+            Map<String, Object> h1 = new Bean() {
 
-                    public Object get(String name) {
-                        return header == null ? null : header.get(name);
-                    }
-
-                };
-                MDCHttpRequest req = MDCHttpRequest.create(msg, bb, h1);
-
-                JSONObject r = new JSONObject();
-
-                final JSONObject header2 = new JSONObject();
-                Map<String, Object> h2 = new Bean() {
-
-                    public void set(String name, Object o) {
-                        header2.put(name, o);
-                    }
-
-                };
-
-                MDCHttpResponse resp = MDCHttpResponse.create(r, h2);
-
-                /**
-                 * send http request to controller
-                 */
-                Controller.dispatch(msg.getString(X.URI), req, resp, new HTTPMethod(Model.METHOD_MDC));
-
-                /**
-                 * write back to client
-                 */
-                if (r.size() > 0) {
-                    JSONObject r1 = new JSONObject();
-                    r1.put(X.SEQ, msg.getLong(X.SEQ));
-                    r1.put(X.RESULT, r);
-                    if (r.has(X.STATE)) {
-                        r1.put(X.STATE, r.get(X.STATE));
-                    } else {
-                        r1.put(X.STATE, X.OK);
-                    }
-
-                    MQ.response(src, from, ICallback.RESPONSE, r1.toString(), bb, null, null, header2.toString());
+                @SuppressWarnings("unused")
+                public Object get(String name) {
+                    return header == null ? null : header.get(name);
                 }
-            } catch (Exception e) {
-                log.error(Bean.toString(o), e);
+
+            };
+            MDCHttpRequest req = MDCHttpRequest.create(msg, bb, h1);
+
+            JSONObject r = new JSONObject();
+
+            final JSONObject header2 = new JSONObject();
+            Map<String, Object> h2 = new Bean() {
+
+                public void set(String name, Object o) {
+                    header2.put(name, o);
+                }
+
+            };
+
+            MDCHttpResponse resp = MDCHttpResponse.create(r, h2);
+
+            /**
+             * send http request to controller
+             */
+            Controller.dispatch(msg.getString(X.URI), req, resp, new HTTPMethod(Model.METHOD_MDC));
+
+            /**
+             * write back to client
+             */
+            if (r.size() > 0) {
+                JSONObject r1 = new JSONObject();
+                r1.put(X.SEQ, msg.getLong(X.SEQ));
+                r1.put(X.RESULT, r);
+                if (r.has(X.STATE)) {
+                    r1.put(X.STATE, r.get(X.STATE));
+                } else {
+                    r1.put(X.STATE, X.OK);
+                }
+
+                MQ.response(seq, src, from, r1, bb, null, null, header2);
             }
+        } catch (Exception e) {
+            log.error(msg.toString(), e);
         }
+
+    }
+
+    @Override
+    public void onResponse(long seq, String to, String from, String src, JSONObject header, JSONObject msg, byte[] attachment) {
+        // TODO Auto-generated method stub
+
     }
 
     /**
@@ -226,7 +231,6 @@ public class Controller implements ICallback {
      * @param method
      *            the method
      */
-    @SuppressWarnings("unchecked")
     public static void dispatch(String uri, HttpServletRequest req, HttpServletResponse resp, Model.HTTPMethod method) {
 
         Counter.add("web", "request", 1);

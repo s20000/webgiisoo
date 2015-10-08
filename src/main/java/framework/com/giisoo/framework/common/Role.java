@@ -24,7 +24,7 @@ import com.giisoo.framework.web.Module;
  * 
  */
 @DBMapping(table = "tblrole")
-public class Role extends Bean implements Exportable {
+public class Role extends Bean {
 
     /**
    * 
@@ -82,10 +82,10 @@ public class Role extends Bean implements Exportable {
         int id = nextId();
 
         if (Bean.insert(V.create("id", id).set("name", name).set("memo", memo).set("updated", System.currentTimeMillis()), Role.class) > 0) {
-            Bean.onChanged("tblrole", IData.OP_CREATE, "id=?", id);
+            return id;
         }
 
-        return id;
+        return -1;
     }
 
     /**

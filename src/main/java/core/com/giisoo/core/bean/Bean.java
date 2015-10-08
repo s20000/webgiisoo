@@ -46,7 +46,6 @@ import com.mongodb.WriteResult;
  * The Class Bean. <br>
  * 
  */
-@SuppressWarnings("deprecation")
 public abstract class Bean extends DefaultCachable implements Map<String, Object> {
 
     /** The Constant serialVersionUID. */
@@ -63,167 +62,21 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
     private static Map<String, DB> mongo = new HashMap<String, DB>();
 
     /**
-     * @deprecated
-     */
-    private static Map<Object, List<IData>> datalisteners = new HashMap<Object, List<IData>>();
-
-    /**
-     * @deprecated
-     * @param tables
-     * @param listener
-     */
-    public synchronized static void addListener(String[] tables, IData listener) {
-        synchronized (datalisteners) {
-            for (String table : tables) {
-                List<IData> list = datalisteners.get(table);
-                if (list == null) {
-                    list = new ArrayList<IData>();
-                    datalisteners.put(table, list);
-                }
-
-                if (!list.contains(listener)) {
-                    list.add(listener);
-                }
-            }
-        }
-    }
-
-    /**
-     * @deprecated
      * @param json
      */
     public static void insertJSON(String json) {
         JSONObject jo = JSONObject.fromObject(json);
         jo.convertBase64toString();
 
+        String table = jo.getString("table");
+        jo.remove("table");
+
         V v = V.create();
         for (Object name : jo.keySet()) {
-            if (!"table".equals(name)) {
-                v.set(name.toString(), jo.get(name));
-            }
+            v.set(name.toString(), jo.get(name));
         }
 
-        Bean.insert(jo.getString("table"), v, null);
-    }
-
-    /**
-     * add a data change listener
-     * 
-     * @deprecated
-     * @param clazzes
-     * @param listener
-     */
-    public synchronized static void addListener(Class<? extends Bean>[] clazzes, IData listener) {
-        synchronized (datalisteners) {
-            for (Class<? extends Bean> clazz : clazzes) {
-                List<IData> list = datalisteners.get(clazz);
-                if (list == null) {
-                    list = new ArrayList<IData>();
-                    datalisteners.put(clazz, list);
-                }
-
-                if (!list.contains(listener)) {
-                    list.add(listener);
-                }
-            }
-        }
-    }
-
-    /**
-     * issue a event of data change
-     * 
-     * @deprecated
-     * @param table
-     * @param op
-     * @param where
-     * @param args
-     */
-    public static void onChanged(String table, byte op, String where, Object... args) {
-        synchronized (datalisteners) {
-            List<IData> list = datalisteners.get(table);
-            if (list != null && list.size() > 0) {
-                JSONObject jo = new JSONObject();
-                // jo.put("table", table);
-                // jo.put("op", op);
-                jo.put("where", where);
-                jo.put("args", args);
-                /**
-                 * support referable
-                 */
-                for (IData d : list) {
-                    d.onChanged(table, op, jo);
-                }
-            }
-        }
-    }
-
-    /**
-     * @deprecated
-     * @param clazz
-     * @param where
-     * @param args
-     */
-    public static void onChanged(Class<? extends Bean> clazz, String where, Object... args) {
-        onChanged(clazz, IData.OP_UPDATE, where, args);
-    }
-
-    /**
-     * @deprecated
-     * @param clazz
-     * @param op
-     * @param where
-     * @param args
-     */
-    public static void onChanged(Class<? extends Bean> clazz, byte op, String where, Object... args) {
-
-        /**
-         * get the require annotation onGet
-         */
-        DBMapping mapping = (DBMapping) clazz.getAnnotation(DBMapping.class);
-        if (mapping == null) {
-            log.error("mapping missed in [" + clazz + "] declaretion");
-            return;
-        }
-
-        synchronized (datalisteners) {
-            List<IData> list = datalisteners.get(mapping.table());
-            if (list != null && list.size() > 0) {
-                JSONObject jo = new JSONObject();
-                // jo.put("table", table);
-                // jo.put("op", op);
-                jo.put("where", where);
-                jo.put("args", args);
-                /**
-                 * support referable
-                 */
-                for (IData d : list) {
-                    d.onChanged(mapping.table(), op, jo);
-                }
-            }
-        }
-    }
-
-    /**
-     * remove a data change listener
-     * 
-     * @deprecated
-     * @param listener
-     */
-    public static void removeListener(IData listener) {
-        if (listener == null)
-            return;
-
-        synchronized (datalisteners) {
-            String[] names = datalisteners.keySet().toArray(new String[datalisteners.size()]);
-
-            for (String name : names) {
-                List<IData> list = datalisteners.get(name);
-                list.remove(listener);
-                if (list.size() == 0) {
-                    datalisteners.remove(name);
-                }
-            }
-        }
+        Bean.insert(table, v, null);
     }
 
     /**
@@ -1213,14 +1066,8 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
         int i = 0;
         if (exists(table, where, args, db)) {
             i = update(table, where, args, sets, db);
-            if (i > 0) {
-                onChanged(table, IData.OP_UPDATE, where, args);
-            }
         } else {
             i = insert(table, sets, db);
-            if (i > 0) {
-                onChanged(table, IData.OP_CREATE, where, args);
-            }
         }
 
         return i;
@@ -1395,10 +1242,6 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
             log.error(sql.toString() + toString(whereArgs) + sets.toString(), e);
         } finally {
             close(p, c);
-        }
-
-        if (updated > 0) {
-            onChanged(table, IData.OP_UPDATE, where, whereArgs);
         }
 
         return updated;
@@ -1654,7 +1497,7 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
                 }
             }
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            log.error("query=" + query + ", order=" + order, e);
         } finally {
             if (cur != null) {
                 cur.close();
@@ -1730,7 +1573,7 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
             }
             return bs;
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            log.error("query=" + query + ", order=" + orderBy, e);
 
             // sort
             if (query != null) {
@@ -1742,13 +1585,8 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
                 }
             }
 
-            if (orderBy != null) {
-                Set<String> set = query.keySet();
-                for (String name : set) {
-                    if (!name.startsWith("$")) {
-                        db.ensureIndex(name);
-                    }
-                }
+            if (orderBy != null && orderBy.keySet().size() > 0) {
+                db.ensureIndex(orderBy);
             }
 
         } finally {
@@ -2451,6 +2289,7 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
         return updateCollection(collection, q, v, false);
     }
 
+    @SuppressWarnings("unused")
     final protected static int updateCollection(String collection, DBObject q, V v, boolean adding) {
         BasicDBObject d = new BasicDBObject();
 
@@ -3544,6 +3383,7 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
      * @param name
      * @return Object
      */
+    @SuppressWarnings("rawtypes")
     public Object get(Object name) {
         if (extra == null) {
             return null;

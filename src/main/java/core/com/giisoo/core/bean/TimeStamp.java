@@ -6,59 +6,62 @@ package com.giisoo.core.bean;
  */
 public class TimeStamp {
 
-	/** The start. */
-	long start;
+    /** The start. */
+    long start;
 
-	/**
-	 * Creates the.
-	 *
-	 * @return the time stamp
-	 */
-	public static TimeStamp create() {
-		return new TimeStamp();
-	}
+    /**
+     * Creates the.
+     *
+     * @return the time stamp
+     */
+    public static TimeStamp create() {
+        return new TimeStamp();
+    }
 
-	/**
-	 * Instantiates a new time stamp.
-	 */
-	public TimeStamp() {
-		start = System.currentTimeMillis();
-	}
+    /**
+     * Instantiates a new time stamp.
+     */
+    public TimeStamp() {
+        start = System.currentTimeMillis();
+    }
 
-	/**
-	 * Sets the.
-	 *
-	 * @param s the s
-	 * @return the time stamp
-	 */
-	public TimeStamp set(long s) {
-		start = s;
+    /**
+     * Sets the.
+     *
+     * @param s
+     *            the s
+     * @return the time stamp
+     */
+    public TimeStamp set(long s) {
+        start = s;
 
-		return this;
-	}
+        return this;
+    }
 
-	/**
-	 * Past.
-	 *
-	 * @return the long
-	 */
-	public long past() {
-		return System.currentTimeMillis() - start;
-	}
+    /**
+     * Past.
+     *
+     * @return the long
+     */
+    public long past() {
+        return System.currentTimeMillis() - start;
+    }
 
-	/**
-	 * Gets the.
-	 *
-	 * @return the long
-	 */
-	public long get() {
-		return start;
-	}
+    /**
+     * Gets the.
+     *
+     * @return the long
+     */
+    public long get() {
+        return start;
+    }
 
-	/**
-	 * Reset.
-	 */
-	public void reset() {
-		start = System.currentTimeMillis();
-	}
+    /**
+     * Reset.
+     */
+    public long reset() {
+        long r = past();
+        start = System.currentTimeMillis();
+        return r;
+    }
 }

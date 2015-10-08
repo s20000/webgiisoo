@@ -7,10 +7,10 @@ package com.giisoo.app.web.admin;
 
 import net.sf.json.JSONObject;
 
-import com.giisoo.app.web.bean.Keypair;
 import com.giisoo.core.bean.Beans;
 import com.giisoo.core.bean.Bean.V;
 import com.giisoo.core.bean.X;
+import com.giisoo.framework.common.Keypair;
 import com.giisoo.framework.web.Model;
 import com.giisoo.framework.web.Paging;
 

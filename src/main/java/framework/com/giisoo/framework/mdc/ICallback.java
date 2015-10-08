@@ -5,31 +5,36 @@
  */
 package com.giisoo.framework.mdc;
 
+/**
+ * @deprecated
+ * @author joe
+ *
+ */
 public interface ICallback {
 
-	/**
-	 * web request command
-	 */
-	public static final int REQUEST = 1;
+    /**
+     * web request command
+     */
+    public static final int REQUEST = 1;
 
-	/**
-	 * response back to connection
-	 */
-	public static final int RESPONSE = 2;
+    /**
+     * response back to connection
+     */
+    public static final int RESPONSE = 2;
 
-	/**
-	 * close a connection
-	 */
-	public static final int CLOSE = 3;
+    /**
+     * close a connection
+     */
+    public static final int CLOSE = 3;
 
-	/**
-	 * Run.
-	 * 
-	 * @param command
-	 *            the command
-	 * @param o
-	 *            the o
-	 */
-	public void run(int command, Object... o);
+    /**
+     * Run.
+     * 
+     * @param command
+     *            the command
+     * @param o
+     *            the o
+     */
+    public void run(int command, Object... o);
 
 }

@@ -198,6 +198,15 @@ public class UID extends Bean {
     }
 
     /**
+     * global id
+     * 
+     * @return
+     */
+    public static String uuid() {
+        return UUID.randomUUID().toString();
+    }
+
+    /**
      * Hash.
      * 
      * @param s

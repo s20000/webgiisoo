@@ -8,24 +8,34 @@ package com.giisoo.app.web;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
 
 import com.giisoo.app.web.admin.setting;
 import com.giisoo.core.bean.Bean;
 import com.giisoo.core.bean.Bean.V;
 import com.giisoo.core.bean.X;
+import com.giisoo.core.conf.Config;
 import com.giisoo.core.conf.SystemConfig;
 import com.giisoo.core.db.DB;
 import com.giisoo.core.worker.WorkerTask;
@@ -33,6 +43,7 @@ import com.giisoo.framework.common.Cluster;
 import com.giisoo.framework.common.Menu;
 import com.giisoo.framework.common.OpLog;
 import com.giisoo.framework.mdc.utils.IP;
+import com.giisoo.framework.utils.FileUtil;
 import com.giisoo.framework.utils.Shell;
 import com.giisoo.framework.web.LifeListener;
 import com.giisoo.framework.web.Model;
@@ -55,7 +66,7 @@ public class DefaultListener implements LifeListener {
             if (!X.isEmpty(ntp)) {
 
                 try {
-                    String r = Shell.run("ntpdate " + ntp);
+                    String r = Shell.run("ntpdate -u " + ntp);
                     OpLog.info("ntp", X.EMPTY, "时钟同步： " + r);
                 } catch (Exception e) {
                     OpLog.error("ntp", X.EMPTY, "时钟同步： " + e.getMessage());
@@ -82,7 +93,7 @@ public class DefaultListener implements LifeListener {
         /**
          * clean up the old version's jar
          */
-        if (cleanup(new File(Model.HOME), new HashMap<String, Object[]>())) {
+        if (cleanup(new File(Model.HOME), new HashMap<String, FileUtil>())) {
             System.exit(0);
             return;
         }
@@ -102,10 +113,11 @@ public class DefaultListener implements LifeListener {
 
         new NtpTask().schedule(X.AMINUTE);
 
-        setting.register("system", new setting.system());
+        setting.register("system", setting.system.class);
 
-        String id = Cluster.update(conf.getString("node", X.EMPTY), Model.HOME, V.create().set("status", "running").set("updated", System.currentTimeMillis()).set("ip", IP.myip().toString()).set(
-                "started", System.currentTimeMillis()));
+        V v = V.create().set("status", "running").set("updated", System.currentTimeMillis()).set("ip", IP.myip().toString()).set("started", System.currentTimeMillis()).set("master",
+                conf.containsKey("master") && "yes".equals(conf.getString("master")) ? 1 : 0);
+        String id = Cluster.update(conf.getString("node", X.EMPTY), Model.HOME, v);
 
         Cluster.self = Cluster.load(id);
 
@@ -301,7 +313,13 @@ public class DefaultListener implements LifeListener {
         Menu.remove(module.getName());
     }
 
-    private boolean cleanup(File f, Map<String, Object[]> map) {
+    /**
+     * 
+     * @param f
+     * @param map
+     * @return
+     */
+    private boolean cleanup(File f, Map<String, FileUtil> map) {
         /**
          * list and compare all jar files
          */
@@ -314,51 +332,24 @@ public class DefaultListener implements LifeListener {
                 }
             }
         } else if (f.isFile() && f.getName().endsWith(".jar")) {
-            String name = f.getName();
-            String[] ss = name.split("[-_]");
-            if (ss.length > 1) {
-                String ver = ss[ss.length - 1];
-                name = name.substring(0, name.length() - ver.length() - 1);
-                ver = ver.substring(0, ver.length() - 4); // cut off ".jar"
+            FileUtil f1 = new FileUtil(f);
+            String name = f1.getName();
 
-                if (ver.matches("[\\d\\.]+")) {
-                    // check the version
-                    Object[] pp = map.get(name); // p[0] = version, p[1] = file
-                    if (pp == null) {
-                        map.put(name, new Object[] { ver, f });
-                    } else {
-
-                        if (ver.compareTo((String) pp[0]) > 0) {
-                            /**
-                             * delete old file
-                             */
-                            OpLog.warn("upgrade", X.EMPTY, "delete duplicated jar file, but low version:" + ((File) pp[1]).getAbsolutePath() + ", keep: " + f.getAbsolutePath());
-
-                            log.warn("delete duplicated jar file, but low version:" + ((File) pp[1]).getAbsolutePath() + ", keep: " + f.getAbsolutePath());
-                            ((File) pp[1]).delete();
-                            changed = true;
-                            map.put(name, new Object[] { ver, f });
-
-                        } else {
-                            // System.out.println("yes, " + ver + "<" + pp[0]);
-                            /**
-                             * delete old version
-                             */
-                            OpLog.warn("upgrade", X.EMPTY, "delete duplicated jar file, but low version:" + f.getAbsolutePath() + ", keep: " + ((File) pp[1]).getAbsolutePath());
-
-                            log.warn("delete duplicated jar file, but low version:" + f.getAbsolutePath() + ", keep: " + ((File) pp[1]).getAbsolutePath());
-
-                            f.delete();
-                            changed = true;
-                            // map.put(name, new Object[] { ver, f });
-
-                        }
-                    }
-                } else {
-                    System.out.println("ignore [" + ver + "] " + f.getName());
-                }
+            FileUtil f2 = map.get(name);
+            if (f2 == null) {
+                map.put(f1.getName(), f1);
             } else {
-                // ignore the file if no version
+                FileUtil.R r = f1.compareTo(f2);
+                if (r == FileUtil.R.HIGH || r == FileUtil.R.SAME) {
+                    // remove f2
+                    log.warn("delete duplicated jar file, but low version:" + f2.getFile().getAbsolutePath() + ", keep: " + f2.getFile().getAbsolutePath());
+                    f2.getFile().delete();
+                    map.put(name, f1);
+                } else if (r == FileUtil.R.LOW) {
+                    // remove f1;
+                    log.warn("delete duplicated jar file, but low version:" + f1.getFile().getAbsolutePath() + ", keep: " + f1.getFile().getAbsolutePath());
+                    f1.getFile().delete();
+                }
             }
         }
 
@@ -372,7 +363,7 @@ public class DefaultListener implements LifeListener {
     public static void main(String[] args) {
         DefaultListener d = new DefaultListener();
         File f = new File("/home/joe/d/workspace/");
-        Map<String, Object[]> map = new HashMap<String, Object[]>();
+        Map<String, FileUtil> map = new HashMap<String, FileUtil>();
         d.cleanup(f, map);
         System.out.println(map);
 
@@ -385,12 +376,225 @@ public class DefaultListener implements LifeListener {
             Cluster.update(Cluster.self.getId(), V.create("updated", System.currentTimeMillis()));
 
             Cluster.update(new BasicDBObject().append("updated", new BasicDBObject().append("$lt", System.currentTimeMillis() - 2 * X.AMINUTE)), V.create("status", "lost"));
-            
+
         }
 
         @Override
         public void onFinish() {
             this.schedule(X.AMINUTE);
+        }
+
+    }
+
+    /**
+     * 自动升级类，根據節點配置，支持并行中的单一节点、多模块升级。
+     * 
+     * @author joe
+     * 
+     */
+    public class UpgradeTask extends WorkerTask {
+
+        long interval = X.AMINUTE;
+
+        @Override
+        public String getName() {
+            return "upgrade.task";
+        }
+
+        /*
+         * (non-Javadoc)
+         * 
+         * @see com.giisoo.worker.WorkerTask#onExecute()
+         */
+        @Override
+        public void onExecute() {
+
+            interval = X.AMINUTE;
+
+            Configuration conf = Config.getConfig();
+
+            String url = SystemConfig.s(conf.getString("node") + ".upgrade.framework.url", null);
+
+            if (X.isEmpty(url)) {
+                OpLog.log("autoupgrade", "upgrade.framework.url missed", null);
+                interval = X.AHOUR;
+                return;
+            }
+
+            try {
+                DefaultHttpClient client = new DefaultHttpClient();
+                HttpGet get = new HttpGet(url + "/admin/upgrade/ver?modules=" + getModules());
+
+                HttpResponse resp = client.execute(get);
+                HttpEntity e = resp.getEntity();
+                if (e == null) {
+                    // OpLog.log("autoupgrade",
+                    // "can not get the ver info from remote");
+                    interval = X.AMINUTE;
+                    return;
+                }
+
+                BufferedReader reader = new BufferedReader(new InputStreamReader(e.getContent(), "utf8"));
+
+                StringBuilder sb = new StringBuilder();
+                String line = reader.readLine();
+                while (line != null) {
+                    sb.append(line).append("\r\n");
+                    line = reader.readLine();
+                }
+                reader.close();
+                try {
+                    JSONObject jo = JSONObject.fromObject(sb.toString());
+
+                    String release = jo.has("release") ? jo.getString("release") : null;
+                    String build = jo.has("build") ? jo.getString("build") : null;
+                    if (release == null || build == null) {
+                        // OpLog.log("autoupgrade", "response error: " +
+                        // sb.toString());
+                        interval = X.AMINUTE;
+                        return;
+                    }
+
+                    if (!checkBuild(jo)) {
+                        /**
+                         * server has different version or build
+                         */
+
+                        get = new HttpGet(url + "/admin/upgrade/get?modules=" + getModules());
+
+                        resp = client.execute(get);
+                        e = resp.getEntity();
+                        if (e == null) {
+                            // OpLog.log("autoupgrade",
+                            // "can not get the ver info from remote");
+                            interval = X.AMINUTE;
+                            return;
+                        }
+
+                        try {
+                            // TODO, enhancement, during unzip, the system was
+                            // shutdown ?!
+                            StringBuilder getmodules = new StringBuilder("framework;default");
+                            String modules = getModules();
+                            if (modules != null) {
+                                String[] ss = modules.split(",");
+                                for (String s : ss) {
+                                    if (!X.isEmpty(s)) {
+                                        if (jo.has(s)) {
+                                            JSONObject j = jo.getJSONObject(s);
+                                            getmodules.append(";").append(s).append(":").append(j.getString("version")).append(".").append(j.getString("build"));
+                                        }
+                                    }
+                                }
+                            }
+
+                            OpLog.info("upgrade", "upgrade", "url=" + url + ", modules=" + getmodules.toString() + ", release=" + release + ", build=" + build, null);
+
+                            /**
+                             * catch all error avoid "jvm" hot-plug-in issue
+                             */
+                            ZipInputStream in = new ZipInputStream(e.getContent());
+                            ZipEntry e1 = in.getNextEntry();
+                            while (e1 != null) {
+                                File f = new File(Model.HOME + e1.getName());
+                                if (e1.isDirectory()) {
+                                    f.mkdirs();
+                                } else {
+                                    f.getParentFile().mkdirs();
+                                    OutputStream out = new FileOutputStream(f);
+                                    Model.copy(in, out, false);
+                                    out.close();
+                                }
+
+                                e1 = in.getNextEntry();
+                            }
+
+                            // SystemConfig.setConfig(conf.getString("node")
+                            // + ".build", build);
+                            // SystemConfig.setConfig(conf.getString("node")
+                            // + ".release", release);
+
+                            OpLog.log("autoupgrade", "upgrade success to " + release + "_" + build, null);
+                        } catch (Throwable e2) {
+                            /**
+                             * because of the libary changed, this method may
+                             * inaccessiable
+                             */
+                            log.error(e2.getMessage(), e2);
+                        }
+
+                        /**
+                         * upgrade success, shutdown the application and let's
+                         * appdog to restart it
+                         */
+                        System.exit(0);
+                    } else {
+                        interval = X.AHOUR;
+                    }
+                } catch (Exception e1) {
+                    interval = X.AMINUTE;
+                    log.error(sb.toString(), e1);
+                }
+            } catch (Exception e) {
+                // OpLog.log("autoupgrade", "upgrade failed");
+
+                interval = X.AMINUTE;
+                log.error(e.getMessage(), e);
+            }
+        }
+
+        private String getModules() {
+            return SystemConfig.s(conf.getString("node") + ".upgrade.framework.modules", "");
+        }
+
+        private boolean checkBuild(JSONObject jo) {
+            String release = jo.getString("release");
+            String build = jo.getString("build");
+
+            /**
+             * 比较框架的版本和build
+             */
+            if (!release.equals(Module.load("default").getVersion())) {
+                return false;
+            }
+
+            if (!build.equals(Module.load("default").getBuild())) {
+                return false;
+            }
+
+            /**
+             * check each modules
+             */
+            String modules = getModules();
+            if (modules != null) {
+                String[] ss = modules.split(",");
+                for (String s : ss) {
+                    if (!X.isEmpty(s)) {
+                        if (jo.has(s)) {
+                            JSONObject j = jo.getJSONObject(s);
+                            Module m = Module.load(s);
+                            JSONObject j1 = new JSONObject();
+                            j1.put("version", m.getVersion());
+                            j1.put("build", m.getBuild());
+                            if (!j.equals(j1)) {
+                                return false;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        /*
+         * (non-Javadoc)
+         * 
+         * @see com.giisoo.worker.WorkerTask#onFinish()
+         */
+        @Override
+        public void onFinish() {
+            this.schedule(interval);
         }
 
     }

@@ -25,6 +25,7 @@ import com.giisoo.framework.common.Access;
 import com.giisoo.framework.common.Menu;
 import com.giisoo.framework.common.OpLog;
 import com.giisoo.framework.common.User;
+import com.giisoo.framework.utils.FileUtil;
 
 /**
  * module includes: a module.ini, a group of model/view/images/css/js/language,
@@ -1439,26 +1440,67 @@ public class Module {
     /**
      * Merge.
      */
-    public void merge() {
-        String webinf = this.path + "/WEB-INF";
+    public boolean merge() {
+
+        String webinf = this.path + File.separator + "WEB-INF";
         File f = new File(webinf);
+
         if (f.exists() && f.isDirectory()) {
             /**
              * copy all files to application, and remove original one
              */
-            move(f, Model.HOME);
+            return move(f, Model.HOME);
+        } else {
+            log.debug("no files need merge!");
         }
+        return false;
     }
 
-    private void move(File f, String dest) {
+    private boolean move(File f, String dest) {
+
+        // log.debug("moving ..." + f.getAbsolutePath());
+
+        boolean r1 = false;
         if (f.isDirectory()) {
             File[] list = f.listFiles();
             if (list != null && list.length > 0) {
                 for (File f1 : list) {
-                    move(f1, dest + File.separator + f.getName());
+                    if (move(f1, dest + File.separator + f.getName())) {
+                        r1 = true;
+                    }
                 }
             }
         } else {
+            /**
+             * check the file version, and remove all the related version (may
+             * newer or elder); <br>
+             * looking for all the "f.getName()" in "classpath", and remove the
+             * same package but different "version"<br>
+             */
+            {
+                FileUtil f1 = new FileUtil(f);
+
+                log.debug("checking [" + f1.getName() + "]");
+
+                // check the version
+                File m = new File(Model.HOME + File.separator + "WEB-INF" + File.separator + "lib");
+                File[] list = m.listFiles();
+                if (list != null) {
+                    for (File f2 : list) {
+                        FileUtil.R r = f1.compareTo(f2);
+                        if (r != FileUtil.R.DIFF) {
+                            log.warn("same jar file, but different varsion, remove [" + f2.getAbsolutePath() + "]");
+                            f2.delete();
+                            r1 = true;
+                        }
+                    }
+                } else {
+                    log.debug("no file in [" + m.getAbsolutePath() + "]");
+                }
+            }
+
+            // ------
+
             File d = new File(dest + File.separator + f.getName());
             if (d.exists()) {
                 d.delete();
@@ -1467,9 +1509,12 @@ public class Module {
             }
 
             f.renameTo(d);
+
         }
 
         f.delete();
+
+        return r1;
     }
 
     /**
@@ -1528,4 +1573,5 @@ public class Module {
 
         return list;
     }
+
 }

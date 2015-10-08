@@ -4,13 +4,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.giisoo.core.bean.Bean;
-import com.giisoo.core.bean.Bean.V;
 import com.giisoo.core.bean.Beans;
 import com.giisoo.core.bean.DBMapping;
 import com.giisoo.core.bean.UID;
 import com.giisoo.core.bean.X;
 import com.mongodb.BasicDBObject;
 
+/**
+ * cluster, used to sync code, files
+ * 
+ * @author joe
+ *
+ */
 @DBMapping(collection = "gi_cluster")
 public class Cluster extends Bean {
 
@@ -27,6 +32,10 @@ public class Cluster extends Bean {
 
     public String getNode() {
         return this.getString("node");
+    }
+
+    public boolean getMaster() {
+        return this.getInt("master") == 1;
     }
 
     // ---------------
@@ -47,6 +56,10 @@ public class Cluster extends Bean {
 
     public static Cluster load(String id) {
         return Bean.load(new BasicDBObject().append(X._ID, id), Cluster.class);
+    }
+
+    public static Cluster loadMaster() {
+        return Bean.load(new BasicDBObject().append("master", 1), Cluster.class);
     }
 
     public static int remove(String id) {
@@ -124,7 +137,7 @@ public class Cluster extends Bean {
         // -------------------------
 
         public static String update(String node, long time, V v) {
-            String id = UID.id(node, time);
+            String id = node;
             if (Bean.exists(new BasicDBObject().append(X._ID, id), Counter.class)) {
                 // update
                 Bean.updateCollection(id, v, Counter.class);
@@ -146,6 +159,18 @@ public class Cluster extends Bean {
 
     public static void update(BasicDBObject query, V v) {
         Bean.updateCollection(query, v, Cluster.class, false);
+    }
+
+    public static String add(String home, V v) {
+        int n = 0;
+        String id = "n" + n;
+        while (Cluster.exists(new BasicDBObject().append(X._ID, id), Cluster.class)) {
+            id = "n" + (++n);
+        }
+
+        Bean.insertCollection(v.set(X._ID, id).set("home", home), Cluster.class);
+
+        return id;
     }
 
 }

@@ -16,7 +16,6 @@
 # Description:       starts appdog using start-stop-daemon
 ### END INIT INFO
 
-
 import re, os, sys, time, socket, threading, subprocess, ConfigParser, smtplib, httplib,urllib
 from email.mime.text import MIMEText
 

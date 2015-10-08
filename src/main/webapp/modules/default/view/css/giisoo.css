@@ -3605,39 +3605,39 @@ table th.checkbox {
 	width: 30px;
 }
 
-.btns a.icon.recycle {
+.btns a.recycle {
 	background: #228A08;
 }
 
-.btns a.icon.recycle:hover {
+.btns a.recycle:hover {
 	background: #127A08;
 }
 
-.btns a.icon.recycle:active {
+.btns a.recycle:active {
 	background: #026A08;
 }
 
-.btns a.icon.restart {
+.btns a.restart {
 	background: #CC2323;
 }
 
-.btns a.icon.restart:hover {
+.btns a.restart:hover {
 	background: #E23232;
 }
 
-.btns a.icon.restart:active {
+.btns a.restart:active {
 	background: #884103;
 }
 
-.btns a.icon.shutdown {
+.btns a.shutdown {
 	background: #9E0E0E;
 }
 
-.btns a.icon.shutdown:hover {
+.btns a.shutdown:hover {
 	background: #8E0E0E;
 }
 
-.btns a.icon.shutdown:active {
+.btns a.shutdown:active {
 	background: #7E0E0E;
 }
 

@@ -13,9 +13,10 @@ public class Pool<E> {
 	private int initial = 10;
 	private int max = 10;
 	private int created = 0;
-	private ICreator creator;
+	@SuppressWarnings("rawtypes")
+    private ICreator creator;
 
-	public static <T> Pool<T> create(int initial, int max, ICreator creator) {
+	public static <T> Pool<T> create(int initial, int max, ICreator<?> creator) {
 		Pool<T> p = new Pool<T>();
 		p.initial = initial;
 		p.max = max;
@@ -24,7 +25,8 @@ public class Pool<E> {
 		return p;
 	}
 
-	private synchronized void init() {
+	@SuppressWarnings("unchecked")
+    private synchronized void init() {
 		for (int i = 0; i < initial; i++) {
 			E t = (E)creator.create();
 			if (t != null) {
@@ -34,7 +36,8 @@ public class Pool<E> {
 		created = list.size();
 	}
 
-	public synchronized void release(E t) {
+	@SuppressWarnings("unchecked")
+    public synchronized void release(E t) {
 		if (t == null) {
 			created--;
 		} else {
@@ -43,7 +46,8 @@ public class Pool<E> {
 		}
 	}
 
-	public synchronized E get(long timeout) {
+	@SuppressWarnings("unchecked")
+    public synchronized E get(long timeout) {
 		try {
 			if (list.size() == 0) {
 				if (created < max) {

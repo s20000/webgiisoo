@@ -1,6 +1,6 @@
 #!/bin/bash
-PSQL="psql -d doogoo -A -t"
-for file in /var/lib/pgsql/doogooback/tbl*; do
+PSQL="sudo -u postgres psql -d demo -A -t"
+for file in /opt/bb/db/tbl*; do
  table=$(basename $file)
  echo "restore $table"
  $PSQL -c "truncate table $table"

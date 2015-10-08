@@ -577,7 +577,13 @@ public class Model {
 
         String request = this.getHeader("X-Requested-With");
         if ("XMLHttpRequest".equals(request)) {
-            this.redirect("/user/login/popup");
+            JSONObject jo = new JSONObject();
+            jo.put(X.STATE, 202);
+            jo.put(X.MESSAGE, "请重现登录！");
+            jo.put(X.ERROR, "没有登录信息！");
+            // this.redirect("/user/login/popup");
+            this.response(jo);
+
         } else {
             this.redirect("/user/login");
         }
@@ -1962,9 +1968,19 @@ public class Model {
      *            the error
      */
     final protected void deny(String error) {
-        this.set("me", this.getUser());
-        this.set(X.ERROR, error);
-        this.show("/deny.html", true);
+        String request = this.getHeader("X-Requested-With");
+        if ("XMLHttpRequest".equals(request)) {
+            JSONObject jo = new JSONObject();
+            jo.put(X.STATE, 202);
+            jo.put(X.MESSAGE, "你没有权限访问！");
+            jo.put(X.ERROR, error);
+            // this.redirect("/user/login/popup");
+            this.response(jo);
+        } else {
+            this.set("me", this.getUser());
+            this.set(X.ERROR, error);
+            this.show("/deny.html", true);
+        }
     }
 
     /**
