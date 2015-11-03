@@ -263,21 +263,6 @@
 			<version>9.0-801.jdbc4</version>
 		</dependency>
 		<dependency>
-			<groupId>sql</groupId>
-			<artifactId>sqljdbc</artifactId>
-			<version>4.2</version>
-		</dependency>
-		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<version>5.1.30</version>
-		</dependency>
-		<dependency>
-			<groupId>oracle</groupId>
-			<artifactId>ojdbc</artifactId>
-			<version>14</version>
-		</dependency>
-		<dependency>
 			<groupId>org.mongodb</groupId>
 			<artifactId>mongo-java-driver</artifactId>
 			<version>2.5</version>
