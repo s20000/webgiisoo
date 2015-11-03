@@ -5,11 +5,6 @@
  */
 package com.giisoo.framework.common;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
-import net.sf.json.JSONObject;
-
 import com.giisoo.core.bean.Bean;
 import com.giisoo.core.bean.Beans;
 import com.giisoo.core.bean.DBMapping;

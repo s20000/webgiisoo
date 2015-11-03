@@ -880,36 +880,20 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
                 return (int) ((Double) v).doubleValue();
             }
             String s = v.toString();
-            if (X.EMPTY.equals(s)) {
-                return defaultValue;
-            }
-            try {
-                if (s.indexOf(".") > 0) {
-                    return (int) toFloat(s);
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < s.length(); i++) {
+                char c = X.getNumber(s.charAt(i));
+                if (c >= '0' && c <= '9') {
+                    sb.append(c);
+                } else if (sb.length() > 0) {
+                    break;
                 }
+            }
+
+            try {
                 return Integer.parseInt(s);
             } catch (Exception e) {
                 log.error(e);
-
-                StringBuilder sb = new StringBuilder();
-                s = s.trim();
-                for (int i = 0; i < s.length(); i++) {
-                    char c = s.charAt(i);
-                    if (c >= '0' && c <= '9') {
-                        sb.append(c);
-                    } else {
-                        break;
-                    }
-                }
-                // log.debug("s=" + sb.toString());
-
-                if (sb.length() > 0) {
-                    try {
-                        return Integer.parseInt(sb.toString());
-                    } catch (Exception e1) {
-                        log.error(e1);
-                    }
-                }
             }
         }
 
@@ -948,35 +932,28 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
                 return (float) ((Double) v).doubleValue();
             }
             String s = v.toString();
-            if (X.EMPTY.equals(s)) {
-                return defaultValue;
+
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < s.length(); i++) {
+                char c = X.getNumber(s.charAt(i));
+                if (c >= '0' && c <= '9') {
+                    sb.append(c);
+                } else if (c == '.') {
+                    if (sb.indexOf(".") > -1) {
+                        break;
+                    } else {
+                        sb.append(c);
+                    }
+                } else if (sb.length() > 0) {
+                    break;
+                }
             }
+
             try {
                 return Float.parseFloat(s);
             } catch (Exception e) {
                 log.error(e);
 
-                StringBuilder sb = new StringBuilder();
-                s = s.trim();
-                for (int i = 0; i < s.length(); i++) {
-                    char c = s.charAt(i);
-                    if (c >= '0' && c <= '9') {
-                        sb.append(c);
-                    } else if (c == '.') {
-                        if (sb.indexOf(".") > -1) {
-                            break;
-                        } else {
-                            sb.append(c);
-                        }
-                    } else {
-                        break;
-                    }
-                }
-                try {
-                    return Float.parseFloat(sb.toString());
-                } catch (Exception e1) {
-                    log.error(e1);
-                }
             }
         }
         return defaultValue;
@@ -1000,36 +977,27 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
             if (v instanceof Double) {
                 return ((Double) v).doubleValue();
             }
-            String s = v.toString();
-            if (X.EMPTY.equals(s)) {
-                return 0;
+            String s = v.toString().trim();
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < s.length(); i++) {
+                char c = s.charAt(i);
+                if (c >= '0' && c <= '9') {
+                    sb.append(c);
+                } else if (c == '.') {
+                    if (sb.indexOf(".") > -1) {
+                        break;
+                    } else {
+                        sb.append(c);
+                    }
+                } else if (sb.length() > 0) {
+                    break;
+                }
             }
+            
             try {
                 return Double.parseDouble(s);
             } catch (Exception e) {
                 log.error(e);
-
-                StringBuilder sb = new StringBuilder();
-                s = s.trim();
-                for (int i = 0; i < s.length(); i++) {
-                    char c = s.charAt(i);
-                    if (c >= '0' && c <= '9') {
-                        sb.append(c);
-                    } else if (c == '.') {
-                        if (sb.indexOf(".") > -1) {
-                            break;
-                        } else {
-                            sb.append(c);
-                        }
-                    } else {
-                        break;
-                    }
-                }
-                try {
-                    return Double.parseDouble(sb.toString());
-                } catch (Exception e1) {
-                    log.error(e1);
-                }
 
             }
         }
@@ -3294,34 +3262,26 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
             if (v instanceof Double) {
                 return (long) ((Double) v).doubleValue();
             }
+
+            StringBuilder sb = new StringBuilder();
             String s = v.toString();
-            if (X.EMPTY.equals(s)) {
-                return defaultValue;
-            }
-            try {
-                if (s.indexOf(".") > 0) {
-                    return (long) toFloat(s);
+            for (int i = 0; i < s.length(); i++) {
+                char c = s.charAt(i);
+
+                c = X.getNumber(c);
+                if (c >= '0' && c <= '9') {
+                    sb.append(c);
+                } else if (sb.length() > 0) {
+                    break;
                 }
-                return Long.parseLong(s);
+            }
+
+            try {
+                if (!X.isEmpty(sb)) {
+                    return Long.parseLong(sb.toString());
+                }
             } catch (Exception e) {
                 log.error(e);
-
-                StringBuilder sb = new StringBuilder();
-                s = s.trim();
-                for (int i = 0; i < s.length(); i++) {
-                    char c = s.charAt(i);
-                    if (c >= '0' && c <= '9') {
-                        sb.append(c);
-                    } else {
-                        break;
-                    }
-                }
-                try {
-                    return Long.parseLong(sb.toString());
-                } catch (Exception e1) {
-                    log.error(e1);
-                }
-
             }
         }
         return defaultValue;
@@ -3383,52 +3343,42 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
      * @param name
      * @return Object
      */
-    @SuppressWarnings("rawtypes")
     public Object get(Object name) {
         if (extra == null) {
             return null;
         }
 
-        if (extra.containsKey(name)) {
-            return extra.get(name);
+        if (extra.containsKey(name.toString())) {
+            return extra.get(name.toString());
         }
 
-        // name = name.subname[0]
-        String[] ss = name.toString().split("[.]");
-        if (ss.length > 1) {
+        return null;
+    }
 
-            Object o = extra;
-            for (String s : ss) {
-                if (o instanceof Map) {
-                    // .name
-                    Map m = (Map) o;
-                    if (m.containsKey(s)) {
-                        o = m.get(s);
-                        if (o == null) {
-                            return null;
-                        }
-                    } else {
-                        // .name[1]
-                        String[] ss1 = s.split("[\\[\\]]");
-                        if (ss1.length > 1) {
-                            o = m.get(ss1[0]);
-                            if (o != null && o instanceof List) {
-                                List l1 = (List) o;
-                                int i = Bean.toInt(ss1[1]);
-                                if (i >= 0 && i < l1.size()) {
-                                    o = l1.get(i);
-                                }
-                            }
-                        } else {
-                            return null;
-                        }
-                    } // end of "containKey"
-                } else {
-                    return null;
-                } // end of if "map"
+    /**
+     * get the value at index("i")
+     * 
+     * @param name
+     * @param i
+     * @return
+     */
+    public Object get(Object name, int i) {
+        if (extra == null) {
+            return null;
+        }
+
+        if (extra.containsKey(name.toString())) {
+            Object o = extra.get(name.toString());
+            if (o instanceof List) {
+                List l1 = (List) o;
+                if (i >= 0 && i < l1.size()) {
+                    return l1.get(i);
+                }
+            } else if (i == 0) {
+                return o;
             }
-            return o;
         }
+
         return null;
     }
 

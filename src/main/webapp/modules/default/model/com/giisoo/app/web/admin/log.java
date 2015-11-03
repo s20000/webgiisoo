@@ -118,7 +118,7 @@ public class log extends Model {
     public void onGet() {
 
         int s = this.getInt("s");
-        int n = this.getInt("n", 10, "default.list.number");
+        int n = this.getInt("n", 10, "number.per.page");
 
         this.set("currentpage", s);
 

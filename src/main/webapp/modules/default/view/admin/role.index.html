@@ -14,6 +14,7 @@
 #if($edit)
 			<th class='checkbox'><label><input type='checkbox'/>$lang.get('select.all')</label></th>
 #end
+			<th>ID</th>
 			<th>$lang.get('role.name')</th>
 			<th>$lang.get('role.memo')</th>
 		</tr>
@@ -23,8 +24,10 @@
 	<tr>
 	#if($edit)
 		<td class='checkbox'><input type='checkbox' name='id' value='$f.id'/></td>
+		<td>$f.id</td>
 		<td><a href='/admin/role/edit?id=$f.id'>$f.name</a></td>
 	#else
+		<td>$f.id</td>
 		<td>$f.name</td>
 	#end
 		<td>#if($f.memo)$f.memo#end</td>
@@ -45,5 +48,9 @@
 </div>
 
 <script>
+#if($edit)
 $('#user-table').tablesorter({headers:{0:{sorter:false}}});
+#else
+	$('#user-table').tablesorter();
+#end	
 </script>

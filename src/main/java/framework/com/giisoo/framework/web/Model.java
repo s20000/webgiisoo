@@ -750,6 +750,19 @@ public class Model {
     }
 
     /**
+     * get the value from the context
+     * 
+     * @param name
+     * @return
+     */
+    protected Object get(String name) {
+        if (context != null) {
+            return context.get(name);
+        }
+        return null;
+    }
+
+    /**
      * Sets the header.
      * 
      * @param name
@@ -811,7 +824,7 @@ public class Model {
      * @param names
      *            the names
      */
-    final protected void set(JSONObject jo, String... names) {
+    final protected void set(Map<Object, Object> jo, String... names) {
         if (jo == null) {
             return;
         }

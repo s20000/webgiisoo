@@ -69,7 +69,7 @@
 			<th class='system'>$lang.get('log.system')</th>
 			<th class='module'>$lang.get('log.module')</th>
 			<th class='op'>$lang.get('log.op')</th>
-			<th class='breif'>$lang.get('log.message')</th>
+			<th class='breif' style='width: 50%'>$lang.get('log.message')</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -83,8 +83,8 @@
 			<td>#if($f.module)$lang.get("$f.module")#end</td>
 			<td>#if($f.op)$lang.get("$f.op")#end</td>
 			<td #if($f.message) onclick='_showmore(this);' class='more' #end> 
-				<pre>$!f.brief</pre>
-				<div class='more'><pre>$!f.message</pre></div>
+				$!f.brief
+				<div class='more'>$!f.message</div>
 			</td>
 		</tr>
 		#end
@@ -92,23 +92,6 @@
 </table>
 
 #parse('/widget/goto.page.html')
-
-<div class='btns'>
-#if($me.hasAccess('access.log.admin'))
-	<a href='#leanmodal.download' rel="leanModal" class="hint hint--bottom" data-hint="$lang.get('oplog.hint.export')">$lang.get('a.oplog.export')</a>
-#end
-</div>
-
-<div id='leanmodal' class='download'>
-	<div class='leanmodal_header'><label><h3>文件编码</h3>:<i></i></label></div>
-	<div><label><h3>UTF8</h3>:<input type='radio' name='e' value='UTF8'/></label>
-	<label style='margin-left: 20px'><h3>GBK</h3>:<input type='radio' name='e' checked value='GBK'/></label>
-	<label style='margin-left: 20px'><h3>GB2312</h3>:<input type='radio' name='e'  value='gb2312'/></label>
-	</div>
-	<button onclick='_export()'>下载</button>
-</div>
-
-<iframe src="" id="download-iframe" style="display:none;" ></iframe>
 
 <script>
 function _showmore(obj){
@@ -119,42 +102,6 @@ function _showmore(obj){
 	} else {
 		e.show();
 	}
-}
-
-function _clean() {
-	if (confirm("$lang.get('oplog.clear.confirm')")) {
-		$.post('/admin/log/clear', {}, function(d) {
-			if(d.state == 200) {
-				$.message("$lang.get('oplog.clear.alert')");
-			}
-		});
-	}
-}
-
-function _export() {
-	processing.show();
-	var p = {e:$('#leanmodal.download input[name=e]:checked').val()};
-	p.starttime = $('#panel input[name=starttime]').val();
-	p.endtime = $('#panel input[name=endtime]').val();
-	p.uid = $('#panel input[name=uid]').val();
-	p.ip = $('#panel input[name=ip]').val();
-	p._system = $('#panel input[name=_system]').val();
-	p._module = $('#panel input[name=_module]').val();
-	p.type = $('#panel input[name=type]').val();
-	p.op = $('#panel input[name=op]').val();
-	
-	$.post('$query.copy().path("/admin/log/export")', p, function(d) {
-		if (d.state == 200 && d.exporting == 0) {
-			processing.hide();
-
-			$('#download-iframe').attr('src', d.file);
-		} else {
-			setTimeout(_export, 2000);
-		}
-	});
-
-	$('#lean_overlay').click();
-
 }
 
 $(function() {

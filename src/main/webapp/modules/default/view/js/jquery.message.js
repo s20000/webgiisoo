@@ -29,6 +29,7 @@ jQuery.extend({
 					overlay.click();
 				});
 	},
+	
 	hint : function(message, delay) {
 		if(!delay) {
 			delay = 2000;
@@ -48,6 +49,7 @@ jQuery.extend({
 			m.fadeOut();
 		}, delay);
 	},
+	
 	warn : function(message, delay) {
 		if(!delay) {
 			delay = 2000;

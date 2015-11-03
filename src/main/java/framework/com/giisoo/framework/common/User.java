@@ -8,10 +8,7 @@ package com.giisoo.framework.common;
 
 import java.sql.*;
 import java.util.*;
-import java.util.zip.ZipFile;
-import java.util.zip.ZipOutputStream;
 
-import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import com.giisoo.core.bean.*;
@@ -68,7 +65,7 @@ public class User extends Bean {
     public boolean isRole(Role r) {
         getRoles();
 
-        return roles.contains(r.id);
+        return roles.contains(r.getId());
     }
 
     /*
@@ -78,34 +75,6 @@ public class User extends Bean {
      */
     public String toString() {
         return new StringBuilder("User:[").append(getId()).append(",").append(get("name")).append("]").toString();
-    }
-
-    private static long nextId() {
-
-        /**
-         * max long:<br>
-         * 9223372036854775807<br>
-         * 1234567890123456789 <br>
-         * default: <br>
-         * 10000000000000L <br>
-         * 12345678901234<br>
-         * 
-         * max int<br>
-         * 2147483647<br>
-         * 1234567890<br>
-         */
-
-        long id = UID.next("user.id");
-        // /Bean.toInt(Module.home.get("user_prefix"))
-        // +
-        // (int)
-        // UID.next("user.id");
-
-        while (Bean.exists("id=?", new Object[] { id }, User.class)) {
-            id = UID.next("user.id");
-        }
-
-        return id;
     }
 
     /**
@@ -124,7 +93,10 @@ public class User extends Bean {
             }
         }
 
-        long id = nextId();
+        long id = UID.next("user.id");
+        while (Bean.exists("id=?", new Object[] { id }, User.class)) {
+            id = UID.next("user.id");
+        }
 
         if (Bean.insert(v.set("id", id).set("created", System.currentTimeMillis()).set("updated", System.currentTimeMillis()), User.class) > 0) {
 
@@ -205,7 +177,10 @@ public class User extends Bean {
             throw new giException(-1, "the name exists");
         }
 
-        long id = nextId();
+        long id = UID.next("user.id");
+        while (Bean.exists("id=?", new Object[] { id }, User.class)) {
+            id = UID.next("user.id");
+        }
 
         password = encrypt(password);
         V v = V.create("id", id).set("name", name).set("password", password, true).set("created", System.currentTimeMillis()).set("updated", System.currentTimeMillis());
@@ -386,6 +361,10 @@ public class User extends Bean {
      * @return true, if successful
      */
     public boolean hasAccess(String... name) {
+        if(this.getId() == 0) {
+            return true;
+        }
+        
         if (role == null) {
             getRoles();
             role = new Roles(roles);
@@ -625,31 +604,6 @@ public class User extends Bean {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.giisoo.bean.Bean#toJSON(net.sf.json.JSONObject)
-     */
-    @Override
-    public boolean toJSON(JSONObject jo) {
-
-        List<Integer> list = this.getRoles();
-        JSONArray arr = new JSONArray();
-        for (Integer i : list) {
-            Role r = Role.loadById(i);
-            if (r != null) {
-                JSONObject j = new JSONObject();
-                r.toJSON(j);
-                arr.add(j);
-            }
-        }
-        jo.put("roles", arr);
-
-        super.toJSON(jo);
-
-        return true;
-    }
-
     /**
      * Check free.
      * 
@@ -690,91 +644,6 @@ public class User extends Bean {
         }
 
         return 0;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.giisoo.bean.Exportable#output(java.lang.String,
-     * java.lang.Object[], java.util.zip.ZipOutputStream)
-     */
-    public JSONObject output(String where, Object[] args, ZipOutputStream out) {
-        int s = 0;
-        // Beans<User> bs = Bean.load(where, args, null, s, 10, User.class);
-        Beans<User> bs = Bean.load((String) null, (Object[]) null, null, s, 10, User.class);
-
-        JSONObject jo = new JSONObject();
-        JSONArray arr = new JSONArray();
-        int count = 0;
-
-        while (bs != null && bs.getList() != null && bs.getList().size() > 0) {
-            for (User d : bs.getList()) {
-                /**
-                 * avoid sync admin user
-                 */
-                if (d.getId() > 0) {
-                    JSONObject j = new JSONObject();
-                    d.toJSON(j);
-
-                    // log.debug(j);
-
-                    j.convertStringtoBase64();
-                    arr.add(j);
-
-                    count++;
-                    // } else {
-                    // log.debug("id=" + d.id);
-                }
-            }
-            s += bs.getList().size();
-            bs = Bean.load((String) null, (Object[]) null, null, s, 10, User.class);
-
-        }
-
-        jo.put("list", arr);
-        jo.put("total", count);
-
-        return jo;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.giisoo.bean.Exportable#input(net.sf.json.JSONArray,
-     * java.util.zip.ZipFile)
-     */
-    public int input(JSONArray list, ZipFile in) {
-        int count = 0;
-        int len = list.size();
-        for (int i = 0; i < len; i++) {
-            JSONObject jo = list.getJSONObject(i);
-
-            jo.convertBase64toString();
-
-            // log.debug(jo);
-
-            int id = jo.getInt("id");
-            if (id > 0) {
-                count += Bean.insertOrUpdate("tbluser", "id=?", new Object[] { id }, V.create().copy(jo, "name", "nickname", "email", "created", "address", "company", "title", "photo", "description",
-                        "special", "ip", "workspace", "spi", "certid", "lastfailip").copyInt(jo, "rank", "locked", "id", "failtimes", "deleted").copyLong(jo, "total", "free", "lastfailtime",
-                        "lastlogintime", "lockexpired", "updated").set("remote", 1), null);
-            }
-
-            if (jo.has("roles")) {
-                /**
-                 * the the role of the user
-                 */
-                @SuppressWarnings("unchecked")
-                List<JSONObject> roles = jo.getJSONArray("roles");
-                if (roles != null) {
-                    for (JSONObject j : roles) {
-                        int rid = j.getInt("id");
-                        Bean.insertOrUpdate("tbluserrole", "uid=? and rid=?", new Object[] { id, rid }, V.create("uid", id).set("rid", rid), null);
-                    }
-                }
-            }
-        }
-        return count;
     }
 
     /**
@@ -833,33 +702,6 @@ public class User extends Bean {
         return Bean.update("id=?", new Object[] { getId() }, V.create("lastlogintime", System.currentTimeMillis()).set("logintimes", getInt("logintimes")).set("ip", ip).set("failtimes", 0).set(
                 "locked", 0).set("lockexpired", 0).set("sid", sid).set("updated", System.currentTimeMillis()), User.class);
 
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.giisoo.bean.Exportable#load(java.lang.String,
-     * java.lang.Object[], int, int)
-     */
-    @SuppressWarnings("unchecked")
-    public Beans<User> load(String where, Object[] args, int s, int n) {
-        return Bean.load(null, null, "order by id", s, n, User.class);
-    }
-
-    public String getExportableId() {
-        return Long.toString(getId());
-    }
-
-    public String getExportableName() {
-        return get("nickname") + "(" + get("name") + ")";
-    }
-
-    public long getExportableUpdated() {
-        return getLong("updated");
-    }
-
-    public boolean isExportable() {
-        return getId() > 0;
     }
 
     @DBMapping(collection = "gi_userlock")

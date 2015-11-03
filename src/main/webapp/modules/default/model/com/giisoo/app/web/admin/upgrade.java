@@ -173,16 +173,6 @@ public class upgrade extends Model {
 
     }
 
-    /**
-     * History.
-     */
-    @Path(path = "history", login = true, access = "access.config.admin", method = Model.METHOD_GET)
-    public void history() {
-
-        this.show("/admin/upgrade.history.html");
-
-    }
-
     private void zip(ZipOutputStream out, File f, String path) {
         try {
             if (f.isDirectory()) {

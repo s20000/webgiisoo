@@ -58,12 +58,17 @@ import com.mongodb.BasicDBObject;
  */
 public class DefaultListener implements LifeListener {
 
-    private class NtpTask extends WorkerTask {
+    private static class NtpTask extends WorkerTask {
+
+        static NtpTask owner = new NtpTask();
+
+        private NtpTask() {
+        }
 
         @Override
         public void onExecute() {
             String ntp = SystemConfig.s("ntp.server", null);
-            if (!X.isEmpty(ntp)) {
+            if (!X.isEmpty((Object) ntp)) {
 
                 try {
                     String r = Shell.run("ntpdate -u " + ntp);
@@ -72,6 +77,7 @@ public class DefaultListener implements LifeListener {
                     OpLog.error("ntp", X.EMPTY, "时钟同步： " + e.getMessage());
                 }
             }
+
         }
 
         @Override
@@ -99,7 +105,7 @@ public class DefaultListener implements LifeListener {
         }
 
         if ("true".equals(SystemConfig.s(conf.getString("node") + ".upgrade.framework.enabled", "false"))) {
-            new UpgradeTask().schedule(X.AMINUTE + (long) (2 * X.AMINUTE * Math.random()));
+            UpgradeTask.owner.schedule(X.AMINUTE + (long) (2 * X.AMINUTE * Math.random()));
         }
 
         // cleanup
@@ -111,7 +117,7 @@ public class DefaultListener implements LifeListener {
 
         IP.init(conf);
 
-        new NtpTask().schedule(X.AMINUTE);
+        NtpTask.owner.schedule(X.AMINUTE);
 
         setting.register("system", setting.system.class);
 
@@ -121,7 +127,7 @@ public class DefaultListener implements LifeListener {
 
         Cluster.self = Cluster.load(id);
 
-        new HeartbeatTask().schedule(X.AMINUTE);
+        HeartbeatTask.owner.schedule(X.AMINUTE);
 
     }
 
@@ -369,7 +375,14 @@ public class DefaultListener implements LifeListener {
 
     }
 
-    private class HeartbeatTask extends WorkerTask {
+    /**
+     * @deprecated
+     * @author joe
+     *
+     */
+    private static class HeartbeatTask extends WorkerTask {
+
+        private static HeartbeatTask owner = new HeartbeatTask();
 
         @Override
         public void onExecute() {
@@ -392,7 +405,9 @@ public class DefaultListener implements LifeListener {
      * @author joe
      * 
      */
-    public class UpgradeTask extends WorkerTask {
+    public static class UpgradeTask extends WorkerTask {
+
+        private static UpgradeTask owner = new UpgradeTask();
 
         long interval = X.AMINUTE;
 

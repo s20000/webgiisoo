@@ -24,7 +24,7 @@ public class accesslog extends Model {
             this.set("ip", ip);
         }
         int s = this.getInt("s");
-        int n = this.getInt("n", 20, "number.per.page");
+        int n = this.getInt("n", 10, "number.per.page");
 
         Beans<AccessLog> bs = AccessLog.load(q, new BasicDBObject().append("created", -1), s, n);
 

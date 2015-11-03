@@ -9,6 +9,11 @@ import com.mongodb.BasicDBObject;
 
 public class Data extends Bean {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     public String getId() {
         return this.getString(X._ID);
     }

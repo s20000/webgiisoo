@@ -205,6 +205,9 @@ public class Menu extends Bean {
                 String access = jo.getString("access");
                 if (!X.isEmpty(role) && !X.isEmpty(access)) {
                     String memo = jo.getString("memo");
+
+                    log.info("create role: role=" + role + ", memo=" + memo);
+
                     int rid = Role.create(role, memo);
                     if (rid <= 0) {
                         Role r = Role.loadByName(role);

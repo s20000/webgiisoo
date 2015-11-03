@@ -23,7 +23,7 @@ public class setting extends Model {
     }
 
     @Path(path = "get/(.*)", login = true, access = "access.config.admin")
-    final public void get(String name) {
+    final public Object get(String name) {
         Class<? extends setting> c = settings.get(name);
         log.debug("/get/" + c);
         if (c != null) {
@@ -47,6 +47,8 @@ public class setting extends Model {
                 this.show("/admin/setting.html");
             }
         }
+
+        return null;
     }
 
     @Path(path = "set/(.*)", login = true, access = "access.config.admin", log = Model.METHOD_POST)

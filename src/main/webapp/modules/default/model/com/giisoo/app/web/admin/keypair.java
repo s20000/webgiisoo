@@ -44,7 +44,7 @@ public class keypair extends Model {
 		}
 
 		int s = this.getInt("s");
-		int n = this.getInt("n");
+		int n = this.getInt("n", 10, "number.per.page");
 		Beans<Keypair> bs = Keypair.load(s, n);
 		if (bs != null) {
 			this.set("list", bs.getList());

@@ -174,7 +174,7 @@ public class role extends Model {
 	public void onGet() {
 
 		int s = this.getInt("s");
-		int n = this.getInt("n", 10, "default.list.number");
+		int n = this.getInt("n", 10, "number.per.page");
 
 		Beans<Role> bs = Role.load(s, n);
 		this.set(bs, s, n);

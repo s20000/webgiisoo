@@ -54,9 +54,9 @@ public class Role extends Bean {
     }
 
     private static int nextId() {
-        int id = Bean.toInt(Module.home.get("role_prefix")) + (int) UID.next("role.id");
+        int id = Math.abs((int) UID.next("role.id"));
         while (Bean.exists("id=?", new Object[] { id }, Role.class)) {
-            id = Bean.toInt(Module.home.get("role_prefix")) + (int) UID.next("role.id");
+            id = Math.abs((int) UID.next("role.id"));
         }
         return id;
     }

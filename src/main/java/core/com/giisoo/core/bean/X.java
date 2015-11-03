@@ -144,11 +144,62 @@ public class X {
     public static final String RESULT = "result";
 
     public static boolean isEmpty(Object s) {
-        return s == null || X.EMPTY.equals(s);
+        return s == null || X.EMPTY.equals(s) || X.EMPTY.equals(s.toString().trim());
     }
 
-    public static boolean isEmpty(String s) {
-        return s == null || X.EMPTY.equals(s);
+    /**
+     * @deprecated
+     * @param s
+     * @return
+     */
+    // public static boolean isEmpty(String s) {
+    // return s == null || X.EMPTY.equals(s) || X.EMPTY.equals(s.trim());
+    // }
+
+    private static final char[][] DIGS = { "０１２３４５６７８９".toCharArray(), "零一二三四五六七八九".toCharArray(), "零壹贰叁肆伍陆柒捌玖".toCharArray() };
+
+    public static char getNumber(char s) {
+        if (s >= '0' && s <= '9') {
+            return s;
+        }
+
+        for (char[] d : DIGS) {
+            for (int i = 0; i < d.length; i++) {
+                if (s == d[i]) {
+                    return (char) ('0' + i);
+                }
+            }
+        }
+        return s;
+    }
+
+    public static boolean isNumber(Object s) {
+        if (s == null) {
+            return false;
+        }
+        if (s instanceof Number) {
+            return true;
+        }
+
+        String s1 = s.toString();
+        if (s1.length() == 0) {
+            return false;
+        }
+
+        int dot = 0;
+        for (int i = 0; i < s1.length(); i++) {
+            char c = s1.charAt(i);
+            if (c == '.') {
+                dot++;
+                if (dot > 1) {
+                    return false;
+                }
+            } else if (c < '0' || c > '9') {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**

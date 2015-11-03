@@ -56,7 +56,25 @@
 <script>
 function uploaddone(url){
 	$.post('/admin/module/add', {url: url}, function(d){
-		$.message(d.message);
+		if(d.state == 200) {
+			$.message(d.message);
+		} else if(d.state == 201) {
+			$.warn(d.message, 3000);
+			setTimeout(function(){
+				processing && processing.show();
+				setInterval(_load, 5000);
+			}, 3000);
+		} else {
+			$.error(d.message);
+		}
+
 	});
 }
+
+function _load() {
+	$.get('/admin/dashboard', {}, function(d){
+		window.location.href = window.location.href;
+	});
+}
+
 </script>

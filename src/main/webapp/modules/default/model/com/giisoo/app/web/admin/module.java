@@ -94,8 +94,10 @@ public class module extends Model {
                 jo.put("result", "ok");
 
                 if (restart) {
+                    jo.put(X.STATE, 201);
                     jo.put("message", lang.get("auto_restarting"));
                 } else {
+                    jo.put(X.STATE, 200);
                     jo.put("message", lang.get("required_restart"));
                 }
 
@@ -113,7 +115,7 @@ public class module extends Model {
                             System.exit(0);
                         }
 
-                    }.schedule(5000);
+                    }.schedule(2000);
                 }
             } catch (Exception e1) {
                 log.error(e.toString(), e1);
@@ -123,15 +125,18 @@ public class module extends Model {
                  */
                 e.delete();
 
+                jo.put(X.STATE, 202);
                 jo.put("result", "fail");
                 jo.put("message", "invalid module package");
             } finally {
                 e.close();
             }
         } else {
+            jo.put(X.STATE, 202);
             jo.put("result", "fail");
             jo.put("message", "entity not found in repo for [" + url + "]");
         }
+        
         this.response(jo);
 
     }

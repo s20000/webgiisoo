@@ -32,7 +32,7 @@ public class db extends Model implements IBackupCallback {
 	public void onGet() {
 
 		int s = this.getInt("s");
-		int n = this.getInt("n", 10, "default.list.number");
+		int n = this.getInt("n", 10, "number.per.page");
 
 		Beans<Entity> bs = Repo.list("db.backup", s, n);
 		this.set(bs, s, n);

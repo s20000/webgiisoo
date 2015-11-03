@@ -197,7 +197,7 @@ public class app extends Model {
     @Path(login = true, access = "access.admin")
     public void onGet() {
         int s = this.getInt("s");
-        int n = this.getInt("n");
+        int n = this.getInt("n", 10, "number.per.page");
 
         BasicDBObject q = new BasicDBObject();
         BasicDBObject order = new BasicDBObject(X._ID, 1);

@@ -364,7 +364,7 @@ public class user extends Model {
 		W w = getW(jo);
 
 		int s = this.getInt(jo, "s");
-		int n = this.getInt(jo, "n", 10, "default.list.number");
+		int n = this.getInt(jo, "n", 10, "number.per.page");
 		this.set("currentpage", s);
 
 		this.query.clean().path("/admin/user").copy(jo);

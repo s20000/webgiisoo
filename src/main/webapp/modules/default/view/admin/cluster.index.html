@@ -60,8 +60,10 @@ $(function(){
 })
 
 function _delete(id) {
+	processing && processing.show();
 	$.post("/admin/cluster/delete", {id:id}, function(d){
-		//reload();
+		processing && processing.hide();
+		reload();
 	})
 }
 </script>

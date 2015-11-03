@@ -27,7 +27,7 @@ public class cluster extends Model {
         BasicDBObject q = new BasicDBObject();
 
         int s = this.getInt("s");
-        int n = this.getInt("n", 20, "number.per.page");
+        int n = this.getInt("n", 10, "number.per.page");
 
         Beans<Cluster> bs = Cluster.load(q, new BasicDBObject().append("node", 1), s, n);
 
