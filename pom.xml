@@ -4,7 +4,7 @@
 	<groupId>com.giisoo</groupId>
 	<artifactId>webgiisoo</artifactId>
 	<packaging>war</packaging>
-	<version>3.1</version>
+	<version>3.2</version>
 	<name>webgiisoo Maven Webapp</name>
 	<url>http://maven.apache.org</url>
 	<properties>
@@ -282,7 +282,11 @@
 			<artifactId>mongo-java-driver</artifactId>
 			<version>2.5</version>
 		</dependency>
-
+		<dependency>
+			<groupId>com.github.stuxuhai</groupId>
+			<artifactId>jpinyin</artifactId>
+			<version>1.0</version>
+		</dependency>
 	</dependencies>
 
 	<build>
