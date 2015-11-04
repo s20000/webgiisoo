@@ -1851,7 +1851,6 @@ public class Model {
     /**
      * On mdc.
      */
-    @Path(login = false, method = Model.METHOD_MDC)
     public void onMDC() {
         if (module != null) {
             Module t = module.floor();
@@ -1870,7 +1869,6 @@ public class Model {
     /**
      * On get.
      */
-    @Path(login = false, method = Model.METHOD_GET)
     public void onGet() {
         onPost();
     }
@@ -1878,7 +1876,6 @@ public class Model {
     /**
      * On post.
      */
-    @Path(login = false, method = Model.METHOD_POST)
     public void onPost() {
         if (module != null) {
             Module t = module.floor();
