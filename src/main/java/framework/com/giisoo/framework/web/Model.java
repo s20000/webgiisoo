@@ -115,7 +115,7 @@ public class Model {
 
     private static final ThreadLocal<Module> _currentmodule = new ThreadLocal<Module>();
 
-    protected boolean expired() {
+    final protected boolean expired() {
         long expired = Module.home.getInt("request.expired");
         if (expired > 0) {
             return System.currentTimeMillis() - created > expired * 1000;
@@ -570,7 +570,7 @@ public class Model {
     /**
      * Goto login.
      */
-    protected void gotoLogin() {
+    final protected void gotoLogin() {
         if (this.uri != null && !(this.uri.indexOf("/usr/") > 0)) {
             Session.load(sid()).set("uri", this.uri).store();
         }
@@ -594,7 +594,7 @@ public class Model {
      * 
      * @return the string
      */
-    public String sid() {
+    final public String sid() {
         return sid(true);
     }
 
@@ -605,7 +605,7 @@ public class Model {
      *            the new session
      * @return the string
      */
-    public String sid(boolean newSession) {
+    final public String sid(boolean newSession) {
         if (sid == null) {
             sid = this.getString("sid");
             if (sid == null) {
@@ -641,7 +641,7 @@ public class Model {
      * @param e
      *            the e
      */
-    protected void onError(Throwable e) {
+    final protected void onError(Throwable e) {
         log.error(e.getMessage(), e);
 
         if (method.isMdc()) {
@@ -755,11 +755,11 @@ public class Model {
      * @param name
      * @return
      */
-    protected Object get(String name) {
+    final protected Object get(String name, Object defaultValue) {
         if (context != null) {
             return context.get(name);
         }
-        return null;
+        return defaultValue;
     }
 
     /**
@@ -1624,7 +1624,7 @@ public class Model {
      * 
      * @param contentType
      */
-    protected void setContentType(String contentType) {
+    final protected void setContentType(String contentType) {
         this.contentType = contentType;
         resp.setContentType(contentType);
     }
@@ -1634,7 +1634,7 @@ public class Model {
      * 
      * @return String
      */
-    protected String getContentType() {
+    final protected String getContentType() {
         if (contentType == null) {
             return MIME_HTML;
         } else {
@@ -1851,7 +1851,7 @@ public class Model {
     /**
      * On mdc.
      */
-    @Require(login = false)
+    @Path(login = false, method = Model.METHOD_MDC)
     public void onMDC() {
         if (module != null) {
             Module t = module.floor();
@@ -1870,7 +1870,7 @@ public class Model {
     /**
      * On get.
      */
-    @Require(login = false)
+    @Path(login = false, method = Model.METHOD_GET)
     public void onGet() {
         onPost();
     }
@@ -1878,7 +1878,7 @@ public class Model {
     /**
      * On post.
      */
-    @Require(login = false)
+    @Path(login = false, method = Model.METHOD_POST)
     public void onPost() {
         if (module != null) {
             Module t = module.floor();
@@ -2047,7 +2047,7 @@ public class Model {
      * @throws IOException
      *             Signals that an I/O exception has occurred.
      */
-    final public static int copy(InputStream in, OutputStream out) throws IOException {
+    public static int copy(InputStream in, OutputStream out) throws IOException {
         return copy(in, out, true);
     }
 
@@ -2068,7 +2068,7 @@ public class Model {
      * @throws IOException
      *             Signals that an I/O exception has occurred.
      */
-    final public static int copy(InputStream in, OutputStream out, long start, long end, boolean closeAfterDone) throws IOException {
+    public static int copy(InputStream in, OutputStream out, long start, long end, boolean closeAfterDone) throws IOException {
         try {
             if (in == null || out == null)
                 return 0;
@@ -2111,7 +2111,7 @@ public class Model {
      * @throws IOException
      *             Signals that an I/O exception has occurred.
      */
-    final public static int copy(InputStream in, OutputStream out, boolean closeAfterDone) throws IOException {
+    public static int copy(InputStream in, OutputStream out, boolean closeAfterDone) throws IOException {
         try {
             if (in == null || out == null)
                 return 0;
@@ -2144,7 +2144,7 @@ public class Model {
      * @param m
      *            the m
      */
-    public void copy(Model m) {
+    final public void copy(Model m) {
         this.req = m.req;
         this.resp = m.resp;
         this.contentType = m.contentType;
@@ -2432,7 +2432,7 @@ public class Model {
      *            the list
      * @return the list
      */
-    final public static <T> List<T> random(List<T> list) {
+    public static <T> List<T> random(List<T> list) {
         if (list == null || list.size() == 0)
             return list;
 
@@ -2475,12 +2475,12 @@ public class Model {
         return true;
     }
 
-    private void notsupport() {
+    final public void notsupport() {
         this.show("/notsupport.html");
     }
 
     @SuppressWarnings("unchecked")
-    public NameValue[] getQueries() {
+    final public NameValue[] getQueries() {
         Enumeration<String> e = req.getParameterNames();
         if (e != null) {
             List<NameValue> list = new ArrayList<NameValue>();
@@ -2504,7 +2504,7 @@ public class Model {
     }
 
     @SuppressWarnings("unchecked")
-    public NameValue[] getHeaders() {
+    final public NameValue[] getHeaders() {
         Enumeration<String> e = req.getHeaderNames();
         if (e != null) {
             List<NameValue> list = new ArrayList<NameValue>();

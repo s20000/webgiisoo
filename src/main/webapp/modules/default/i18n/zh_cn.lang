@@ -473,7 +473,7 @@ s=秒
 save_fail=保存失败
 save_success=保存成功
 site.logo=<a href='/'><img src='/images/giisoo.png'/></a>
-site.title=Webgiisoo
+site.title=
 stopped=停止
 thanks.leave.message=已经收到您的反馈，我们会马上处理，谢谢您...
 title.add.module=添加模块
