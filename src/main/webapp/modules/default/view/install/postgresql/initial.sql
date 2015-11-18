@@ -262,3 +262,14 @@ create index tblmenu_index_seq on tblmenu(seq);
 alter table tblmenu add style varchar(255);
 alter table tblmenu add load varchar(255);
 
+create table tblload
+(
+	name varchar(255),
+	node varchar(255),
+	count int default 0,
+	updated bigint default 0
+)engine=myisam default charset=utf8;
+create unique index tblload_index_name_node on tblload(name, node);
+create index tblload_index_name on tblload(name);
+create index tblload_index_count on tblload(count);
+create index tblload_index_updated on tblload(updated);

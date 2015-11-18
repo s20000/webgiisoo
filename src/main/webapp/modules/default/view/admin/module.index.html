@@ -1,10 +1,15 @@
 <div class='head'>$lang.get('module.title')</div>
 
-#parse('/widget/file.uploader.html')
+<div class='tabs'>
+	<a href='/admin/module' class='selected'>$lang.get('a.module')</a>
+	<a href='/admin/module/create'>$lang.get('a.module.create')</a>
+</div>
 
 <div class='notes'>
 	$lang.get('notes.upload.module')
 </div>
+
+#parse('/widget/file.uploader.html')
 
 #parse('/widget/widget.message.html')
 

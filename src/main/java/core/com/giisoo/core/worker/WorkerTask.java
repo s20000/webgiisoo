@@ -303,6 +303,45 @@ public abstract class WorkerTask implements Runnable {
     }
 
     /**
+     * schedule the task by absolute time <br>
+     * the time can be: <br>
+     * 1, hh:mm<br>
+     * 2, *:00 each hour <br>
+     * 
+     * @param time
+     *            , hh:mm
+     * @return
+     */
+    public WorkerTask schedule(String time) {
+        if (time.startsWith("*")) {
+            String[] ss = time.split(":");
+            Calendar c = Calendar.getInstance();
+            c.setTimeInMillis(System.currentTimeMillis());
+
+            c.set(Calendar.MINUTE, Bean.toInt(ss[1]));
+            if (c.getTimeInMillis() <= System.currentTimeMillis()) {
+                // next hour
+                c.add(Calendar.HOUR_OF_DAY, 1);
+            }
+            return this.schedule(c.getTimeInMillis() - System.currentTimeMillis());
+        } else {
+            String[] ss = time.split(":");
+
+            Calendar c = Calendar.getInstance();
+            c.setTimeInMillis(System.currentTimeMillis());
+            c.set(Calendar.HOUR_OF_DAY, Bean.toInt(ss[0]));
+            c.set(Calendar.MINUTE, Bean.toInt(ss[1]));
+
+            if (c.getTimeInMillis() <= System.currentTimeMillis()) {
+                // next hour
+                c.add(Calendar.DAY_OF_MONTH, 1);
+            }
+            return this.schedule(c.getTimeInMillis() - System.currentTimeMillis());
+        }
+
+    }
+
+    /**
      * Schedule the worker task
      * 
      * @param msec

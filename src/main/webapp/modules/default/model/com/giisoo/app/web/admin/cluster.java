@@ -5,10 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import ch.ethz.ssh2.Connection;
-import ch.ethz.ssh2.Session;
-import ch.ethz.ssh2.StreamGobbler;
-
 import com.giisoo.core.bean.Beans;
 import com.giisoo.core.bean.X;
 import com.giisoo.core.bean.Bean.V;
@@ -79,11 +75,11 @@ public class cluster extends Model {
 
         try {
 
-            Connection conn = new Connection(host, port);
+            // Connection conn = new Connection(host, port);
 
             /* Now connect */
 
-            conn.connect();
+            // conn.connect();
 
             /*
              * Authenticate. If you get an IOException saying something like
@@ -91,16 +87,17 @@ public class cluster extends Model {
              * then please check the FAQ.
              */
 
-            boolean isAuthenticated = conn.authenticateWithPassword(user, password);
+            // boolean isAuthenticated = conn.authenticateWithPassword(user,
+            // password);
 
-            if (isAuthenticated == false)
-                throw new IOException("Authentication failed.");
+            // if (isAuthenticated == false)
+            // throw new IOException("Authentication failed.");
 
             /* Create a session */
 
-            Session sess = conn.openSession();
+            // Session sess = conn.openSession();
 
-            sess.execCommand("uname -a && date && uptime && who");
+            // sess.execCommand("uname -a && date && uptime && who");
 
             System.out.println("Here is some information about the remote host:");
 
@@ -109,28 +106,29 @@ public class cluster extends Model {
              * dangerous (please read the FAQ).
              */
 
-            InputStream stdout = new StreamGobbler(sess.getStdout());
+            // InputStream stdout = new StreamGobbler(sess.getStdout());
 
-            BufferedReader br = new BufferedReader(new InputStreamReader(stdout));
+            // BufferedReader br = new BufferedReader(new
+            // InputStreamReader(stdout));
 
-            StringBuilder sb = new StringBuilder();
-            while (true) {
-                String line = br.readLine();
-                if (line == null) {
-                    br.close();
-                    break;
-                }
-                sb.append(line);
-            }
+            // StringBuilder sb = new StringBuilder();
+            // while (true) {
+            // String line = br.readLine();
+            // if (line == null) {
+            // br.close();
+            // break;
+            // }
+            // sb.append(line);
+            // }
 
             /* Show exit status, if available (otherwise "null") */
 
-            System.out.println("ExitCode: " + sess.getExitStatus());
+            // System.out.println("ExitCode: " + sess.getExitStatus());
 
             String id = Cluster.add(Model.HOME, V.create().set("status", "installing").set("updated", System.currentTimeMillis()).set("ip", host).set("port", port).set("user", user).set("password",
                     password));
 
-            this.set(X.MESSAGE, sb.toString());
+            // this.set(X.MESSAGE, sb.toString());
             return true;
         } catch (Exception e) {
             log.error(e.getMessage(), e);

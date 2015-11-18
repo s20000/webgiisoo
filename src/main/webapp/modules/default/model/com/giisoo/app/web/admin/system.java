@@ -5,11 +5,17 @@
  */
 package com.giisoo.app.web.admin;
 
-import java.sql.Connection;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 import net.sf.json.JSONObject;
 
@@ -17,7 +23,12 @@ import com.giisoo.core.bean.Bean;
 import com.giisoo.core.bean.X;
 import com.giisoo.core.worker.WorkerTask;
 import com.giisoo.framework.common.User;
+import com.giisoo.framework.utils.Shell;
 import com.giisoo.framework.web.*;
+import com.jcraft.jsch.ChannelExec;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.Session;
+import com.jcraft.jsch.UserInfo;
 import com.mongodb.DB;
 
 public class system extends Model {
@@ -45,7 +56,7 @@ public class system extends Model {
                 public void onExecute() {
 
                     // drop all tables
-                    Connection c = null;
+                    java.sql.Connection c = null;
                     Statement stat = null;
                     ResultSet r = null;
 
@@ -141,33 +152,263 @@ public class system extends Model {
      */
     @Path(path = "clone", login = true, access = "access.config.admin", log = Model.METHOD_POST)
     public void clone0() {
-        JSONObject jo = this.getJSON();
+        if (method.isPost()) {
+            String host = this.getString("host");
+            int port = this.getInt("port");
+            String user = this.getString("user");
+            String passwd = this.getString("password");
 
-        String step = this.getString("step");
-        step = check(step, jo);
+            JSONObject jo = new JSONObject();
 
-        
-        this.set(jo);
-        this.set("step", step);
+            if (task == null) {
+                task = new CloneTask(host, port, user, passwd);
+                task.schedule(0);
+            }
 
-        this.show("/admin/system.clone" + step + ".html");
+            List<String> list = task.get();
+            if (list != null) {
+                StringBuilder sb = new StringBuilder();
+                for (String s : list) {
+                    sb.append("<p>").append(s).append("</p>");
+                }
+                jo.put(X.MESSAGE, sb.toString());
+            }
 
+            if (task.done) {
+                jo.put("done", 1);
+                task = null;
+            }
+            jo.put(X.STATE, 200);
+            this.response(jo);
+        } else {
+            this.show("/admin/system.clone.html");
+        }
     }
 
-    /**
-     * 
-     * check and return next step
-     * 
-     * @param jo
-     * @return String of nextstep
-     */
-    private String check(String step, JSONObject jo) {
-        if (X.isEmpty(step)) {
-            return "0";
+    static CloneTask task = null;
+
+    public static class CloneTask extends WorkerTask implements Shell.IPrint {
+
+        String host;
+        int port;
+        String user;
+        String passwd;
+        boolean done = false;
+        String os = "centos";
+
+        Session session = null;
+
+        List<String> lines = new ArrayList<String>();
+
+        public synchronized List<String> get() {
+            if (lines.size() == 0 && !done) {
+                try {
+                    this.wait(10000);
+                } catch (InterruptedException e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+
+            if (lines.size() > 0) {
+                List<String> l1 = lines;
+                lines = new ArrayList<String>();
+                return l1;
+            }
+            return null;
         }
 
-        this.set(X.MESSAGE, "ok");
-        return step;
+        public CloneTask(String host, int port, String user, String passwd) {
+            this.host = host;
+            this.port = port;
+            this.user = user;
+            this.passwd = passwd;
+        }
+
+        public synchronized void print(String line) {
+            lines.add(line);
+            this.notifyAll();
+        }
+
+        @Override
+        public void onExecute() {
+
+            try {
+
+                JSch jsch = new JSch();
+
+                session = jsch.getSession(user, host, port);
+                session.setPassword(passwd);
+
+                UserInfo ui = new UserInfo() {
+                    public void showMessage(String message) {
+                        print(message);
+                    }
+
+                    public boolean promptYesNo(String message) {
+                        print(message + ", Yes/No?");
+                        return true;
+                    }
+
+                    @Override
+                    public String getPassphrase() {
+                        return null;
+                    }
+
+                    @Override
+                    public String getPassword() {
+                        return null;
+                    }
+
+                    @Override
+                    public boolean promptPassphrase(String arg0) {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean promptPassword(String arg0) {
+                        return false;
+                    }
+
+                };
+
+                session.setUserInfo(ui);
+                session.connect(30000); // making a connection with timeout.
+
+                String line = run("uname -a");
+
+                if (line == null) {
+                    throw new Exception("unknown OS");
+                }
+
+                if (line.indexOf("Ubuntu") > 0) {
+                    os = "ubuntu";
+                }
+
+                /**
+                 * starting
+                 */
+                File f = Module.home.getFile("/admin/clone/cmd." + os);
+                if (f == null) {
+                    throw new Exception("can not find the file [cmd." + os + "] in /admin/clone/");
+                }
+
+                /**
+                 * copy the file to /tmp, and replace the $marco
+                 */
+                copy();
+                
+                BufferedReader cmd = new BufferedReader(new InputStreamReader(new FileInputStream(f)));
+
+                try {
+                    String c = cmd.readLine();
+
+                    while (c != null) {
+                        c = c.trim();
+                        print("<label><g>" + c + "</g></label>");
+                        if (!c.startsWith("#") && !X.isEmpty(c)) {
+                            run(c);
+                        }
+                        c = cmd.readLine();
+                    }
+                } finally {
+                    if (cmd != null) {
+                        cmd.close();
+                    }
+                }
+
+                /**
+                 * tar jdk and scp to remote
+                 */
+                line = Shell.run("rm -rf /tmp/jdk.tar.gz");
+
+                String jdk = Shell.run("echo $JAVA_HOME").trim();
+                print(jdk);
+                print("preparing the jdk ...");
+
+                String c1 = "cd " + jdk + "/.. && tar czf /tmp/jdk.tar.gz " + jdk.substring(jdk.lastIndexOf("/") + 1);
+                print(c1);
+                line = Shell.run(c1);
+                print(line);
+
+                print("scp the jdk to remote ...");
+                print("id");
+                line = Shell.run("id", null, this);
+
+                // c1 =
+                // "scp -oUserKnownHostsFile=/dev/null -oStrictHostKeyChecking=no -P "
+                // + port + " /tmp/jdk.tar.gz " + user + "@" + host + ":/tmp/";
+                c1 = "scp -i /root/.ssh/id_rsa -oStrictHostKeyChecking=no -P " + port + " /tmp/jdk.tar.gz " + user + "@" + host + ":/tmp/";
+                print(c1);
+
+                line = Shell.run(c1, passwd, this);
+                print(line);
+
+                /**
+                 * tar tomcat and scp to remote
+                 */
+
+                /**
+                 * tar webgiisoo and scp to remote
+                 */
+
+                /**
+                 * scp appdog
+                 */
+
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                print("<r>" + e.getMessage() + "</r>");
+            } finally {
+                if (session != null) {
+                    session.disconnect();
+                }
+            }
+        }
+
+        private String run(String cmd) throws Exception {
+            OutputStream stdin = null;
+            BufferedReader stdout = null;
+            BufferedReader stderr = null;
+            ChannelExec channel = (ChannelExec) session.openChannel("exec");
+            try {
+                stdin = channel.getOutputStream();
+
+                channel.setCommand("sudo -S " + cmd);
+                channel.connect(3000);
+                stdin.write((passwd + "\n").getBytes());
+                stdin.flush();
+
+                stdout = new BufferedReader(new InputStreamReader(channel.getInputStream()));
+                String line = stdout.readLine();
+                String last = null;
+                while (line != null) {
+                    print(line);
+                    last = line;
+                    line = stdout.readLine();
+                }
+
+                return last;
+            } finally {
+                if (stdin != null) {
+                    stdin.close();
+                }
+                if (stdout != null) {
+                    stdout.close();
+                }
+                if (stderr != null) {
+                    stderr.close();
+                }
+                if (channel != null) {
+                    channel.disconnect();
+                }
+            }
+        }
+
+        @Override
+        public void onFinish() {
+            done = true;
+        }
+
     }
 
 }

@@ -918,7 +918,7 @@ table {
 	text-indent: 2.2em
 }
 
-#panel form div {
+#panel .form div {
 	line-height: 46px;
 }
 
@@ -1966,10 +1966,6 @@ table th.checkbox {
 	width: 100%;
 }
 
-#panel form div {
-	position: relative;
-}
-
 #panel div.userdashboard {
 	display: block;
 	line-height: 36px;
@@ -2772,10 +2768,6 @@ table th.checkbox {
 
 #panel textarea {
 	width: 100%;
-}
-
-#panel form div {
-	position: relative;
 }
 
 #panel div.userdashboard {
@@ -3653,9 +3645,6 @@ table th.checkbox {
 	width: 100%;
 }
 
-#panel form div {
-	position: relative;
-}
 
 #panel div.userdashboard {
 	display: block;

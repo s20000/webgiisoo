@@ -5,7 +5,7 @@
 	<artifactId>webgiisoo</artifactId>
 	<packaging>war</packaging>
 	<version>3.2</version>
-	<name>webgiisoo Maven Webapp</name>
+	<name>Webgiisoo Maven Webapp</name>
 	<url>http://maven.apache.org</url>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -29,9 +29,9 @@
 			<version>5.10.0</version>
 		</dependency>
 		<dependency>
-			<groupId>ch.ethz.ganymed</groupId>
-			<artifactId>ganymed-ssh2</artifactId>
-			<version>2.6.3</version>
+			<groupId>com.jcraft</groupId>
+			<artifactId>jsch</artifactId>
+			<version>0.1.53</version>
 		</dependency>
 		<dependency>
 			<groupId>org.fusesource.mqtt-client</groupId>
@@ -194,12 +194,6 @@
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
 			<version>1.5.8</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpmime</artifactId>
-			<version>4.1</version>
 		</dependency>
 
 		<dependency>

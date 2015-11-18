@@ -14,6 +14,7 @@ import net.sf.json.JSONObject;
 import org.apache.commons.fileupload.FileItem;
 
 import com.giisoo.core.bean.Bean;
+import com.giisoo.core.bean.UID;
 import com.giisoo.core.bean.X;
 import com.giisoo.core.worker.WorkerTask;
 import com.giisoo.framework.common.*;
@@ -23,6 +24,284 @@ import com.giisoo.framework.web.*;
 public class module extends Model {
 
     private static String ROOT = "/tmp/modules/";
+
+    /**
+     * create a new module
+     */
+    @Path(path = "create", login = true, access = "access.config.admin", log = Model.METHOD_POST | Model.METHOD_GET)
+    public void create() {
+        if (method.isPost()) {
+            /**
+             * create
+             */
+            JSONObject jo = new JSONObject();
+
+            try {
+                String file = createmodule();
+                jo.put(X.STATE, 200);
+                jo.put("file", file);
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                jo.put(X.MESSAGE, e.getMessage());
+                jo.put(X.STATE, 201);
+            }
+            this.response(jo);
+        } else {
+            this.show("/admin/module.create.html");
+        }
+    }
+
+    private String createmodule() throws Exception {
+        int id = this.getInt("id");
+        String name = this.getString("name");
+        String package1 = this.getString("package");
+        String lifelistener = this.getString("lifelistener");
+        String setting = this.getString("setting");
+        String readme = this.getString("readme");
+
+        String fid = UID.id(login.getId(), System.currentTimeMillis());
+
+        File f = Temp.get(fid, name + ".zip");
+        if (f.exists()) {
+            f.delete();
+        } else {
+            f.getParentFile().mkdirs();
+        }
+
+        ZipOutputStream out = null;
+
+        try {
+            out = new ZipOutputStream(new FileOutputStream(f));
+            create(out, name + "/").closeEntry();
+            create(out, name + "/.project");
+
+            File f1 = module.getFile("/demo/.project");
+            if (f1.exists()) {
+                // copy to out
+                copy(out, f1, new String[] { "webdemo", name });
+            }
+
+            create(out, name + "/depends/").closeEntry();
+            f1 = new File(Model.HOME + "/WEB-INF/lib/");
+            List<String> list = new ArrayList<String>();
+            for (File f2 : f1.listFiles()) {
+                list.add(f2.getName());
+                create(out, name + "/depends/" + f2.getName());
+                copy(out, f2);
+                out.closeEntry();
+            }
+
+            create(out, name + "/.classpath");
+            f1 = module.getFile("/demo/.classpath");
+            copy(out, f1, list);
+            out.closeEntry();
+
+            create(out, name + "/build.xml");
+            f1 = module.getFile("/demo/build.xml");
+            if (f1 != null) {
+                copy(out, f1, new String[] { "WEBDEMO", name.toUpperCase() });
+            }
+            out.closeEntry();
+
+            create(out, name + "/src/").closeEntry();
+            create(out, name + "/src/module.ini");
+            println(out, "id=" + id, "enabled=true", "default.language=zh_cn", "name=" + name, "package=" + package1, "lifelistener=" + lifelistener, "screenshot=/images/" + name + "-screenshot.png",
+                    "readme=" + readme, "version=1.0", "build=0");
+            out.closeEntry();
+
+            create(out, name + "/src/WEB-INF/").closeEntry();
+            create(out, name + "/src/WEB-INF/lib/").closeEntry();
+            create(out, name + "/src/i18n/").closeEntry();
+            create(out, name + "/src/i18n/zh_cn.lang").closeEntry();
+            create(out, name + "/src/view/").closeEntry();
+
+            f1 = module.getFile("/demo/src/view/");
+            if (f1.exists()) {
+                for (File f2 : f1.listFiles()) {
+                    if (f2.isFile()) {
+                        create(out, name + "/src/view/" + f2.getName());
+                        copy(out, f2);
+                        out.closeEntry();
+                    }
+                }
+            }
+            create(out, name + "/src/view/js/").closeEntry();
+            f1 = module.getFile("/demo/src/view/js");
+            if (f1 != null) {
+                for (File f2 : f1.listFiles()) {
+                    if (f2.isFile()) {
+                        create(out, name + "/src/view/js/" + f2.getName());
+                        copy(out, f2);
+                        out.closeEntry();
+                    }
+                }
+            }
+            create(out, name + "/src/view/css/").closeEntry();
+            f1 = module.getFile("/demo/src/view/css");
+            if (f1 != null) {
+                for (File f2 : f1.listFiles()) {
+                    if (f2.isFile()) {
+                        create(out, name + "/src/view/css/" + f2.getName());
+                        copy(out, f2);
+                        out.closeEntry();
+                    }
+                }
+            }
+            create(out, name + "/src/view/images/").closeEntry();
+            f1 = module.getFile("/demo/src/view/images");
+            if (f1 != null) {
+                for (File f2 : f1.listFiles()) {
+                    if (f2.isFile()) {
+                        create(out, name + "/src/view/images/" + f2.getName());
+                        copy(out, f2);
+                        out.closeEntry();
+                    }
+                }
+            }
+            create(out, name + "/src/view/admin/").closeEntry();
+            f1 = module.getFile("/demo/src/view/admin");
+            if (f1 != null) {
+                for (File f2 : f1.listFiles()) {
+                    if (f2.isFile()) {
+                        create(out, name + "/src/view/admin/" + f2.getName());
+                        copy(out, f2);
+                        out.closeEntry();
+                    }
+                }
+            }
+            f1 = module.getFile("/demo/src/view/install");
+            if (f1 != null) {
+                create(out, name + "/src/view/install/").closeEntry();
+                for (File f2 : f1.listFiles()) {
+                    if (f2.isFile()) {
+                        create(out, name + "/src/view/install/" + f2.getName());
+                        copy(out, f2);
+                        out.closeEntry();
+                    }
+                }
+            }
+
+            create(out, name + "/src/model/").closeEntry();
+            create(out, name + "/src/model/java/").closeEntry();
+            String[] ss = package1.split("\\.");
+            String s1 = null;
+            for (String s : ss) {
+                if (s1 == null) {
+                    s1 = s;
+                } else {
+                    s1 = s1 + "/" + s;
+                }
+                create(out, name + "/src/model/java/" + s1 + "/").closeEntry();
+            }
+
+            String p1 = package1.replaceAll("\\.", "/");
+            create(out, name + "/src/model/java/" + p1.substring(0, p1.lastIndexOf("/")) + "/bean/").closeEntry();
+            create(out, name + "/src/model/java/" + p1 + "/admin/").closeEntry();
+            create(out, name + "/src/model/java/" + lifelistener.replaceAll("\\.", "/") + ".java");
+            f1 = module.getFile("/demo/src/model/DemoListener.java");
+            if (f1 != null) {
+                copy(out, f1, new String[] { "com.giisoo.demo.web", lifelistener.substring(0, lifelistener.lastIndexOf(".")) }, new String[] { "demosetting",
+                        setting.substring(setting.lastIndexOf(".") + 1) }, new String[] { "DemoListener", lifelistener.substring(lifelistener.lastIndexOf(".") + 1) }, new String[] { "WEBDEMO", name });
+            }
+            out.closeEntry();
+
+            create(out, name + "/src/model/java/" + setting.replaceAll("\\.", "/") + ".java");
+            f1 = module.getFile("/demo/src/model/demosetting.java");
+            if (f1 != null) {
+                copy(out, f1, new String[] { "com.giisoo.demo.web.admin", setting.substring(0, setting.lastIndexOf(".")) }, new String[] { "demosetting",
+                        setting.substring(setting.lastIndexOf(".") + 1) });
+            }
+            out.closeEntry();
+
+        } finally {
+            if (out != null) {
+                out.close();
+            }
+        }
+
+        return "/temp/" + fid + "/" + name + ".zip";
+    }
+
+    private ZipOutputStream copy(ZipOutputStream out, File f) throws Exception {
+        InputStream in = null;
+        try {
+            in = new FileInputStream(f);
+            Model.copy(in, out, false);
+        } finally {
+            if (in != null) {
+                in.close();
+            }
+        }
+
+        return out;
+    }
+
+    private ZipOutputStream println(ZipOutputStream out, String... ss) throws Exception {
+        PrintStream o = new PrintStream(out);
+        for (String s : ss) {
+            o.println(s);
+        }
+
+        return out;
+    }
+
+    private ZipOutputStream copy(ZipOutputStream out, File f, String[]... replacement) throws Exception {
+        BufferedReader in = null;
+        try {
+            PrintStream o = new PrintStream(out);
+            in = new BufferedReader(new InputStreamReader(new FileInputStream(f)));
+            String line = in.readLine();
+            while (line != null) {
+                if (replacement != null && replacement.length > 0) {
+                    for (String[] ss : replacement) {
+                        if (ss.length == 2) {
+                            line = line.replaceAll(ss[0], ss[1]);
+                        }
+                    }
+                }
+                o.println(line);
+                line = in.readLine();
+            }
+        } finally {
+            if (in != null) {
+                in.close();
+            }
+        }
+
+        return out;
+    }
+
+    private ZipOutputStream copy(ZipOutputStream out, File f, List<String> classpath) throws Exception {
+        BufferedReader in = null;
+        try {
+            PrintStream o = new PrintStream(out);
+            in = new BufferedReader(new InputStreamReader(new FileInputStream(f)));
+            String line = in.readLine();
+            while (line != null) {
+                if (line.indexOf("webdemo.jar") > 0) {
+                    for (String s : classpath) {
+                        String s1 = line.replaceAll("webdemo.jar", s);
+                        o.println(s1);
+                    }
+                } else {
+                    o.println(line);
+                }
+                line = in.readLine();
+            }
+        } finally {
+            if (in != null) {
+                in.close();
+            }
+        }
+
+        return out;
+    }
+
+    private ZipOutputStream create(ZipOutputStream out, String filename) throws IOException {
+        ZipEntry e = new ZipEntry(filename);
+        out.putNextEntry(e);
+        return out;
+    }
 
     /**
      * Adds the.
@@ -136,7 +415,7 @@ public class module extends Model {
             jo.put("result", "fail");
             jo.put("message", "entity not found in repo for [" + url + "]");
         }
-        
+
         this.response(jo);
 
     }
