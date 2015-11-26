@@ -821,7 +821,7 @@ public class DB {
         }
 
         Connection c = (external == null ? ds.getConnection() : external.getConnection());
-        c.setAutoCommit(true);
+        // c.setAutoCommit(true);
         return c;
     }
 

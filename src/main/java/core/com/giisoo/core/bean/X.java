@@ -143,6 +143,19 @@ public class X {
     public static final String SEQ = "seq";
     public static final String RESULT = "result";
 
+    public static boolean isSame(Object s1, Object s2) {
+        if (s1 == s2)
+            return true;
+        if (X.isEmpty(s1) && X.isEmpty(s2))
+            return true;
+
+        if (s1 != null) {
+            return s1.equals(s2);
+        }
+
+        return false;
+    }
+
     public static boolean isEmpty(Object s) {
         return s == null || X.EMPTY.equals(s) || X.EMPTY.equals(s.toString().trim());
     }

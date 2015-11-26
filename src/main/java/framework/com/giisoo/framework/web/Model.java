@@ -31,8 +31,6 @@ import com.giisoo.core.bean.TimeStamp;
 import com.giisoo.core.bean.Bean.V;
 import com.giisoo.core.bean.X;
 import com.giisoo.core.conf.SystemConfig;
-import com.giisoo.core.index.SearchResults;
-import com.giisoo.core.index.Searchable;
 import com.giisoo.framework.mdc.command.*;
 import com.giisoo.utils.base.Html;
 
@@ -808,13 +806,14 @@ public class Model {
      * @param n
      *            the n
      */
-    final protected void set(SearchResults<? extends Searchable> bs, int s, int n) {
-        if (bs != null) {
-            this.set("list", bs.getList());
-            this.set("total", bs.total());
-            this.set("pages", Paging.create(bs.total(), s, n));
-        }
-    }
+    // final protected void set(SearchResults<? extends Searchable> bs, int s,
+    // int n) {
+    // if (bs != null) {
+    // this.set("list", bs.getList());
+    // this.set("total", bs.total());
+    // this.set("pages", Paging.create(bs.total(), s, n));
+    // }
+    // }
 
     /**
      * Sets the.

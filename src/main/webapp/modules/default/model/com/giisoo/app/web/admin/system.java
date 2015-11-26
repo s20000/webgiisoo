@@ -8,8 +8,12 @@ package com.giisoo.app.web.admin;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.PrintStream;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -284,19 +288,56 @@ public class system extends Model {
                     os = "ubuntu";
                 }
 
-                /**
-                 * starting
-                 */
-                File f = Module.home.getFile("/admin/clone/cmd." + os);
-                if (f == null) {
-                    throw new Exception("can not find the file [cmd." + os + "] in /admin/clone/");
-                }
+                delete(new File("/opt/tmp/webgiisoo/"));
 
                 /**
                  * copy the file to /tmp, and replace the $marco
                  */
-                copy();
-                
+                print("Preparing jdk ...");
+                String jdk = Shell.run("echo $JAVA_HOME").trim();
+                if (X.isEmpty(jdk)) {
+                    throw new Exception("no set JAVA_HOME, please set it in /etc/profile");
+                }
+                copy(new File(jdk), "/opt/tmp/webgiisoo/", false);
+
+                /**
+                 * copy tomcat
+                 */
+                print("Preparing tomcat ...");
+                String tomcat = Shell.run("echo $TOMCAT_HOME").trim();
+                if (X.isEmpty(tomcat)) {
+                    throw new Exception("no set TOMCAT_HOME, please set it in /etc/profile");
+                }
+                copy(new File(tomcat), "/opt/tmp/webgiisoo/", false, new String[] { "temp", "logs", "work" });
+
+                /**
+                 * copy webgiisoo
+                 */
+                print("Preparing webgiisoo ...");
+                copy(new File(Model.HOME), "/opt/tmp/webgiisoo/", false);
+
+                /**
+                 * copy dbinit.sql
+                 */
+                File s1 = Module.home.getFile("/admin/clone/dbinit.sql");
+                copy(s1, "/opt/tmp/webgiisoo/dbinit.sql");
+
+                /**
+                 * copy scp.sh
+                 */
+                s1 = Module.home.getFile("/admin/clone/scp.shell");
+                copy(s1, "/opt/tmp/webgiisoo/scp.sh", new String[] { "\\$HOST", host }, new String[] { "\\$PORT", Integer.toString(port) }, new String[] { "\\$USER", user });
+
+                Shell.run("chmod ugo+x /opt/tmp/webgiisoo/scp.sh");
+                Shell.run("/opt/tmp/webgiisoo/scp.sh", null, this);
+
+                /**
+                 * run install shell on remote
+                 */
+                File f = Module.home.getFile("/admin/clone/install." + os);
+                if (f == null) {
+                    throw new Exception("can not find the file [install." + os + "] in /admin/clone/");
+                }
                 BufferedReader cmd = new BufferedReader(new InputStreamReader(new FileInputStream(f)));
 
                 try {
@@ -304,65 +345,136 @@ public class system extends Model {
 
                     while (c != null) {
                         c = c.trim();
-                        print("<label><g>" + c + "</g></label>");
-                        if (!c.startsWith("#") && !X.isEmpty(c)) {
+                        if (c.startsWith("#")) {
+                            print("<label><g>" + c + "</g></label>");
+                        } else if (!X.isEmpty(c)) {
                             run(c);
                         }
                         c = cmd.readLine();
                     }
+
                 } finally {
+
                     if (cmd != null) {
                         cmd.close();
                     }
+
                 }
 
-                /**
-                 * tar jdk and scp to remote
-                 */
-                line = Shell.run("rm -rf /tmp/jdk.tar.gz");
-
-                String jdk = Shell.run("echo $JAVA_HOME").trim();
-                print(jdk);
-                print("preparing the jdk ...");
-
-                String c1 = "cd " + jdk + "/.. && tar czf /tmp/jdk.tar.gz " + jdk.substring(jdk.lastIndexOf("/") + 1);
-                print(c1);
-                line = Shell.run(c1);
-                print(line);
-
-                print("scp the jdk to remote ...");
-                print("id");
-                line = Shell.run("id", null, this);
-
-                // c1 =
-                // "scp -oUserKnownHostsFile=/dev/null -oStrictHostKeyChecking=no -P "
-                // + port + " /tmp/jdk.tar.gz " + user + "@" + host + ":/tmp/";
-                c1 = "scp -i /root/.ssh/id_rsa -oStrictHostKeyChecking=no -P " + port + " /tmp/jdk.tar.gz " + user + "@" + host + ":/tmp/";
-                print(c1);
-
-                line = Shell.run(c1, passwd, this);
-                print(line);
-
-                /**
-                 * tar tomcat and scp to remote
-                 */
-
-                /**
-                 * tar webgiisoo and scp to remote
-                 */
-
-                /**
-                 * scp appdog
-                 */
-
             } catch (Exception e) {
+
                 log.error(e.getMessage(), e);
                 print("<r>" + e.getMessage() + "</r>");
+
             } finally {
+
                 if (session != null) {
                     session.disconnect();
                 }
+
             }
+        }
+
+        private void copy(File f, String target, String[]... replacements) {
+            BufferedReader in = null;
+            PrintStream out = null;
+
+            try {
+                new File(target).getParentFile().mkdirs();
+                out = new PrintStream(new FileOutputStream(target));
+                in = new BufferedReader(new InputStreamReader(new FileInputStream(f)));
+
+                String line = in.readLine();
+                while (line != null) {
+                    if (replacements != null) {
+                        for (String[] ss : replacements) {
+                            if (ss.length == 2) {
+                                line = line.replaceAll(ss[0], ss[1]);
+                            }
+                        }
+                    }
+                    out.println(line);
+                    line = in.readLine();
+                }
+
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+            } finally {
+                if (in != null) {
+                    try {
+                        in.close();
+                    } catch (IOException e) {
+                    }
+                }
+
+                if (out != null) {
+                    out.close();
+                }
+            }
+
+        }
+
+        private void copy(File f, String target, boolean debug) {
+            copy(f, target, debug, null);
+        }
+
+        private void copy(File f, String target, boolean debug, String[] excepts) {
+
+            if (target.endsWith("/")) {
+                target += f.getName();
+            } else {
+                target += "/" + f.getName();
+            }
+
+            if (f.isDirectory()) {
+                File t = new File(target);
+                if (t.exists()) {
+                    delete(t);
+                }
+                t.mkdirs();
+
+                if (excepts != null) {
+                    for (String s : excepts) {
+                        if (s.equals(f.getName())) {
+                            return;
+                        }
+                    }
+                }
+
+                File[] list = f.listFiles();
+                if (list != null && list.length > 0) {
+                    for (File f1 : list) {
+                        copy(f1, target, debug, excepts);
+                    }
+                }
+            } else {
+                // copy
+                File t = new File(target);
+                t.getParentFile().mkdirs();
+
+                if (debug) {
+                    log.debug("copying " + f.getName());
+                }
+
+                try {
+                    OutputStream out = new FileOutputStream(t);
+                    InputStream in = new FileInputStream(f);
+
+                    Model.copy(in, out, true);
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+
+        }
+
+        private void delete(File f) {
+            if (f.isDirectory()) {
+                for (File f1 : f.listFiles()) {
+                    delete(f1);
+                }
+            }
+            f.delete();
         }
 
         private String run(String cmd) throws Exception {
@@ -373,7 +485,11 @@ public class system extends Model {
             try {
                 stdin = channel.getOutputStream();
 
-                channel.setCommand("sudo -S " + cmd);
+                if (cmd.startsWith("sudo ")) {
+                    channel.setCommand(cmd);
+                } else {
+                    channel.setCommand("sudo -S " + cmd);
+                }
                 channel.connect(3000);
                 stdin.write((passwd + "\n").getBytes());
                 stdin.flush();

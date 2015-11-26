@@ -1,9 +1,7 @@
 	<div><label><h3>$lang.get('system.time')</h3>:<input type='text' name='time' value='$time' readonly=readonly/><a href='#leanmodal' rel='leanModal'>设置</a></label></div>
 	<div><label><h3>$lang.get('label.ntp')</h3>:<input type='text' name='ntp' value=#if($ntp)'$ntp' #else '' #end/></label></div>
 
-	<div><label><h3>$lang.get('label.deploycode')</h3>:<i>$!system_code</i></label></div>
-	<div><label><h3>$lang.get('label.systemcode')</h3>:<i>$lang.get("node.type_$module.node_type")</i></label></div>
-	<div><label><h3>$lang.get('label.nodename')</h3>:<input type='text' name='nodename' value="$!nodename"/></label></div>
+	<div><label><h3>$lang.get('label.deploycode')</h3>:<i>$!system_code</i><g>松散分布式系统中的节点编码 ( system.code in giisoo.properties )</g></label></div>
 
 	<div><label class='full'><h3>$lang.get('label.pubkey')</h3>:<textarea name='pubkey'>$!pubkey</textarea></label></div>
 

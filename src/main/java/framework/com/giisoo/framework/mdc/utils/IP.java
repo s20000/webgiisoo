@@ -18,9 +18,9 @@ import org.apache.commons.logging.LogFactory;
 
 import com.giisoo.core.bean.X;
 import com.giisoo.core.conf.SystemConfig;
-import com.giisoo.utils.url.Url;
 import com.giisoo.utils.http.GHttpClient;
 import com.giisoo.utils.http.IPage;
+import com.giisoo.utils.url.Url;
 
 public class IP {
 
