@@ -259,8 +259,9 @@
 		<dependency>
 			<groupId>org.mongodb</groupId>
 			<artifactId>mongo-java-driver</artifactId>
-			<version>2.5</version>
+			<version>3.0.0</version>
 		</dependency>
+
 		<dependency>
 			<groupId>com.github.stuxuhai</groupId>
 			<artifactId>jpinyin</artifactId>

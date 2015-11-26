@@ -582,7 +582,7 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
                 if (!X.EMPTY.equals(dbname)) {
                     MongoOptions mo = new MongoOptions();
                     mo.connectionsPerHost = conf.getInt("mongo[" + database + "].conns", 50);
-                    mo.autoConnectRetry = true;
+                    // mo.autoConnectRetry = true;
                     Mongo mongodb = new Mongo(list, mo);
                     g = mongodb.getDB(dbname);
 
@@ -662,7 +662,7 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
                     if (!X.EMPTY.equals(dbname)) {
                         MongoOptions mo = new MongoOptions();
                         mo.connectionsPerHost = conf.getInt("mongo[" + database + "].conns", 50);
-                        mo.autoConnectRetry = true;
+                        // mo.autoConnectRetry = true;
                         Mongo mongodb = new Mongo(list, mo);
                         g = mongodb.getDB(dbname);
 
@@ -993,7 +993,7 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
                     break;
                 }
             }
-            
+
             try {
                 return Double.parseDouble(s);
             } catch (Exception e) {
@@ -1548,13 +1548,13 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
                 Set<String> set = query.keySet();
                 for (String name : set) {
                     if (!name.startsWith("$")) {
-                        db.ensureIndex(name);
+                        db.createIndex(name);
                     }
                 }
             }
 
             if (orderBy != null && orderBy.keySet().size() > 0) {
-                db.ensureIndex(orderBy);
+                db.createIndex(orderBy);
             }
 
         } finally {
