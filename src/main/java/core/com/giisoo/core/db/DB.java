@@ -806,13 +806,13 @@ public class DB {
                 }
 
                 external.setMaxActive(10);
-                external.setDefaultAutoCommit(true);
+                // external.setDefaultAutoCommit(true);
                 external.setMaxIdle(10);
 
                 external.setMaxWait(MAX_WAIT_TIME);
-                external.setDefaultAutoCommit(true);
-                external.setDefaultReadOnly(false);
-                external.setDefaultTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+                // external.setDefaultAutoCommit(true);
+                // external.setDefaultReadOnly(false);
+                // external.setDefaultTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
                 external.setValidationQuery(null);// VALIDATION_SQL);
                 external.setPoolPreparedStatements(true);
 

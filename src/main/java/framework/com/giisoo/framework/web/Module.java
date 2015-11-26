@@ -1487,11 +1487,13 @@ public class Module {
                 File[] list = m.listFiles();
                 if (list != null) {
                     for (File f2 : list) {
-                        FileUtil.R r = f1.compareTo(f2);
-                        if (r != FileUtil.R.DIFF) {
-                            log.warn("same jar file, but different varsion, remove [" + f2.getAbsolutePath() + "]");
-                            f2.delete();
-                            r1 = true;
+                        if (f2.getName().endsWith(".jar")) {
+                            FileUtil.R r = f1.compareTo(f2);
+                            if (r != FileUtil.R.DIFF) {
+                                log.warn("same jar file, but different varsion, remove [" + f2.getAbsolutePath() + "]");
+                                f2.delete();
+                                r1 = true;
+                            }
                         }
                     }
                 } else {

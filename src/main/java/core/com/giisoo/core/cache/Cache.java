@@ -20,8 +20,6 @@ public class Cache {
     /** The _conf. */
     private static Configuration _conf;
 
-    private static boolean enabled = false;
-
     /**
      * Inits the.
      * 
@@ -33,10 +31,6 @@ public class Cache {
             return;
 
         _conf = conf;
-
-        if ("yes".equals(conf.getString("cache.enabled"))) {
-            enabled = true;
-        }
 
         if (conf.containsKey("memcached.host")) {
             String[] servers = conf.getStringArray("memcached.host");
@@ -66,9 +60,6 @@ public class Cache {
      * @return the cachable
      */
     public static Cachable get(String id) {
-        if (!enabled) {
-            return null;
-        }
 
         try {
 
@@ -139,9 +130,6 @@ public class Cache {
      * @return true, if successful
      */
     public static boolean set(String id, Cachable data) {
-        if (!enabled) {
-            return false;
-        }
 
         if (memCachedClient != null) {
             if (data == null) {
