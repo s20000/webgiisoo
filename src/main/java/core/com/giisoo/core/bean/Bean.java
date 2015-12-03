@@ -889,7 +889,7 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
                     break;
                 }
             }
-
+            s = sb.toString();
             try {
                 return Integer.parseInt(s);
             } catch (Exception e) {
@@ -948,6 +948,7 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
                     break;
                 }
             }
+            s = sb.toString();
 
             try {
                 return Float.parseFloat(s);
@@ -993,6 +994,7 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
                     break;
                 }
             }
+            s = sb.toString();
 
             try {
                 return Double.parseDouble(s);
@@ -1548,7 +1550,8 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
                 Set<String> set = query.keySet();
                 for (String name : set) {
                     if (!name.startsWith("$")) {
-                        db.createIndex(name);
+                        // db.createIndex(name);
+                        db.ensureIndex(name);
                     }
                 }
             }
@@ -3275,11 +3278,10 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
                     break;
                 }
             }
+            s = sb.toString();
 
             try {
-                if (!X.isEmpty(sb)) {
-                    return Long.parseLong(sb.toString());
-                }
+                return Long.parseLong(s);
             } catch (Exception e) {
                 log.error(e);
             }

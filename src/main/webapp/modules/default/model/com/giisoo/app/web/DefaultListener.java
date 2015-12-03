@@ -104,6 +104,8 @@ public class DefaultListener implements LifeListener {
             return;
         }
 
+        log.debug("upgrade.enabled=" + SystemConfig.s(conf.getString("node") + ".upgrade.framework.enabled", "false"));
+
         if ("true".equals(SystemConfig.s(conf.getString("node") + ".upgrade.framework.enabled", "false"))) {
             UpgradeTask.owner.schedule(X.AMINUTE + (long) (2 * X.AMINUTE * Math.random()));
         }
@@ -437,9 +439,14 @@ public class DefaultListener implements LifeListener {
             }
 
             try {
+                if (url.endsWith("/")) {
+                    url = url.substring(0, url.length() - 1);
+                }
+
                 DefaultHttpClient client = new DefaultHttpClient();
                 HttpGet get = new HttpGet(url + "/admin/upgrade/ver?modules=" + getModules());
-
+                get.addHeader("User-Agent", USER_AGENT);
+                
                 HttpResponse resp = client.execute(get);
                 HttpEntity e = resp.getEntity();
                 if (e == null) {
@@ -476,6 +483,7 @@ public class DefaultListener implements LifeListener {
                          */
 
                         get = new HttpGet(url + "/admin/upgrade/get?modules=" + getModules());
+                        get.addHeader("User-Agent", USER_AGENT);
 
                         resp = client.execute(get);
                         e = resp.getEntity();
@@ -613,4 +621,7 @@ public class DefaultListener implements LifeListener {
         }
 
     }
+    
+    public static final String USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.130 Safari/537.36";
+
 }

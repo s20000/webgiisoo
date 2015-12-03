@@ -109,18 +109,18 @@ public class Model {
 
     protected User login = null;
 
-    protected long created = System.currentTimeMillis();
+    // protected long created = System.currentTimeMillis();
 
     private static final ThreadLocal<Module> _currentmodule = new ThreadLocal<Module>();
 
-    final protected boolean expired() {
-        long expired = Module.home.getInt("request.expired");
-        if (expired > 0) {
-            return System.currentTimeMillis() - created > expired * 1000;
-        }
-
-        return false;
-    }
+    // final protected boolean expired() {
+    // long expired = Module.home.getInt("request.expired");
+    // if (expired > 0) {
+    // return System.currentTimeMillis() - created > expired * 1000;
+    // }
+    //
+    // return false;
+    // }
 
     /**
      * Clean.
@@ -205,7 +205,7 @@ public class Model {
      */
     final protected void dispatch(String uri, HttpServletRequest req, HttpServletResponse resp, HTTPMethod method) {
 
-        created = System.currentTimeMillis();
+        // created = System.currentTimeMillis();
 
         // construct var
         // init
@@ -570,7 +570,7 @@ public class Model {
      */
     final protected void gotoLogin() {
         if (this.uri != null && !(this.uri.indexOf("/usr/") > 0)) {
-            Session.load(sid()).set("uri", this.uri).store();
+            Session.load(sid()).set("uri", this.query.path(this.uri).toString()).store();
         }
 
         String request = this.getHeader("X-Requested-With");
@@ -1759,10 +1759,10 @@ public class Model {
      *            the allow override
      */
     final protected boolean show(String viewname, boolean allowOverride) {
-        if (expired()) {
-            log.warn("the request was expired");
-            return false;
-        }
+        // if (expired()) {
+        // log.warn("the request was expired");
+        // return false;
+        // }
 
         Writer writer = null;
         try {

@@ -79,6 +79,10 @@ img {
 	border: 0;
 }
 
+.logo img {
+	height: 50px;
+}
+
 #wrapper {
 	background: #fff;
 	box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
@@ -702,7 +706,7 @@ a.disabled {
 	overflow: hidden;
 	margin-top: -12px;
 	position: fixed;
-	top: 200px;
+	top: 50%;
 	left: 220px;
 	z-index: 101;
 }

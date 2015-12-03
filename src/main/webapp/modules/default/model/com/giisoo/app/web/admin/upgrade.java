@@ -16,9 +16,7 @@ import org.apache.commons.configuration.Configuration;
 
 import net.sf.json.JSONObject;
 
-import com.giisoo.core.bean.Beans;
 import com.giisoo.core.bean.UID;
-import com.giisoo.core.bean.Bean.V;
 import com.giisoo.core.bean.X;
 import com.giisoo.core.conf.Config;
 import com.giisoo.core.conf.SystemConfig;
@@ -27,7 +25,6 @@ import com.giisoo.framework.common.Temp;
 import com.giisoo.framework.mdc.utils.IP;
 import com.giisoo.framework.web.Model;
 import com.giisoo.framework.web.Module;
-import com.giisoo.framework.web.Paging;
 import com.giisoo.framework.web.Path;
 
 public class upgrade extends Model {
