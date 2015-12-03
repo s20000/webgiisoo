@@ -570,7 +570,7 @@ public class Model {
      */
     final protected void gotoLogin() {
         if (this.uri != null && !(this.uri.indexOf("/usr/") > 0)) {
-            Session.load(sid()).set("uri", this.query.path(this.uri).toString()).store();
+            Session.load(sid()).set("uri", this.query == null ? this.uri : this.query.path(this.uri).toString()).store();
         }
 
         String request = this.getHeader("X-Requested-With");
