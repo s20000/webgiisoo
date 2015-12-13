@@ -1,4 +1,4 @@
-html,body {
+html, body {
 	width: 100%;
 	font: 16px 微软雅黑, 宋体, Arial, sans-serif;
 	background: url(/docs/images/bg.jpg);
@@ -18,18 +18,19 @@ html,body {
 
 h1 {
 	color: #3254a0;
-	font-size: 2em;
+	font-size: 32px;
+	line-height: 32px;
 }
 
-menu,ol,ul {
+menu, ol, ul {
 	padding: 0 0 0 2em;
 }
 
-dl,menu,ol,ul,li {
+dl, menu, ol, ul, li {
 	margin: 1em 0;
 }
 
-b,strong {
+b, strong {
 	font-weight: bold;
 }
 
@@ -43,33 +44,61 @@ a:hover {
 	text-decoration: underline;
 }
 
-#head {
-	height: 85px;
-	border-bottom: #dfdfdf 1px solid;
-	border-top: 6px solid #074F97;
-}
-
 #head .center {
-	border-bottom: #dfdfdf 1px solid;
 	height: 100%;
 	display: inline-block;
+	width: 960px;
+}
+
+#head ul.navigation a {
+	color: #f1f1f1;
+	text-decoration: none;
+	padding: 18px 20px;
+}
+
+#head  ul.navigation a:hover {
+	color: #fff;
+	background: #21863E;
+}
+
+#content {
+	text-align: center;
+	margin: 120px 0 60px 0;
+	position: relative;
+	width: auto;
+	border: 0;
+	overflow: hidden;
+}
+
+#foot .center {
+	border-top: 0;
+	overflow: visible;
+}
+
+#content .center {
+	width: 960px;
+	line-height: 32px;
 }
 
 ul.navigation {
 	float: right;
-	margin: 4px 10px 0 0;
-	padding: 25px 0 0 0;
+	bottom: 0;
+	position: relative;
+	padding: 0;
+	background: #2767AB;
+	height: 50px;
+	margin: 30px 0 0;
 }
 
 ul.navigation li {
 	list-style-type: none;
 	float: left;
-	padding: 0 0 0 27px;
+	margin: 0;
+	line-height: 50px;
 }
 
 ul.navigation a {
-	font-size: 1.1em;
-	font-weight: bold;
+	font-size: 18px;
 }
 
 #foot {
@@ -78,10 +107,10 @@ ul.navigation a {
 	height: 50px;
 	margin: 60px 0 0 0;
 	padding: 10px 0 0 0;
+	position: fixed;
 }
 
 #logo {
-	background: url(/images/giisoo.png) no-repeat;
 	width: 239px;
 	height: 85px;
 	float: left;
@@ -96,4 +125,8 @@ ul.navigation a {
 	right: -70px;
 	top: -42px;
 	display: inline-block;
+}
+
+#logo img:hover {
+	zoom: 1.01;
 }

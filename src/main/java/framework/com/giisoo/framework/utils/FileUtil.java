@@ -56,7 +56,7 @@ public class FileUtil {
             try {
                 for (int i = 0; i < ss.length; i++) {
                     int i1 = Bean.toInt(ss[i]);
-                    int i2 = Bean.toInt(v1.ss[i]);
+                    int i2 = v1.ss.length>i ? Bean.toInt(v1.ss[i]):0;
 
                     if (i1 > i2) {
                         return R.HIGH;

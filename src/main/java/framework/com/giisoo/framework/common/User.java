@@ -361,10 +361,10 @@ public class User extends Bean {
      * @return true, if successful
      */
     public boolean hasAccess(String... name) {
-        if(this.getId() == 0) {
+        if (this.getId() == 0) {
             return true;
         }
-        
+
         if (role == null) {
             getRoles();
             role = new Roles(roles);
@@ -586,6 +586,24 @@ public class User extends Bean {
         return Bean.update("id=?", new Object[] { getId() }, v.set("updated", System.currentTimeMillis()), User.class);
     }
 
+    public static int update(long id, V v) {
+        int len = v.size();
+        for (int i = 0; i < len; i++) {
+            String name = v.name(i);
+            if ("password".equals(name)) {
+                String passwd = (String) v.value(i);
+                if (!"".equals(passwd)) {
+                    passwd = encrypt(passwd);
+                    v.set("password", passwd, true);
+                } else {
+                    v.remove(i);
+                }
+                break;
+            }
+        }
+        return Bean.update("id=?", new Object[] { id }, v.set("updated", System.currentTimeMillis()), User.class);
+    }
+
     public void setRoles(String[] roles) {
         /**
          * remove all
@@ -794,7 +812,7 @@ public class User extends Bean {
      *            the id
      * @return the int
      */
-    public static int delete(int id) {
+    public static int delete(long id) {
         return Bean.delete("id=?", new Object[] { id }, User.class);
     }
 

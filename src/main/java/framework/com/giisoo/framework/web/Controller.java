@@ -237,6 +237,8 @@ public class Controller implements IStub {
 
         TimeStamp t = TimeStamp.create();
 
+        uri = uri.replaceAll("//", "/");
+
         /**
          * test and load from cache first
          */

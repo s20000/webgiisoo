@@ -250,14 +250,16 @@ input:focus, select:focus, textarea:focus {
 }
 
 #head .title {
-	position: absolute;
-	left: 220px;
-	font-size: 20pt;
-	width: 420px;
-	text-align: left;
-	top: 20px;
-	color: #F1EDD1;
-}
+    position: absolute;
+    left: 220px;
+    font-size: 20pt;
+    width: 420px;
+    text-align: left;
+    top: 0;
+    color: #EEE;
+    font-weight: bold;
+    letter-spacing: 3px;
+    line-height: 80px;}
 
 #head .title g {
 	font-size: 16px;

@@ -2527,6 +2527,24 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
             return this;
         }
 
+        public V copy(JSONObject jo) {
+            if (jo == null)
+                return this;
+
+            for (Object s : jo.keySet()) {
+                if (jo.containsKey(s)) {
+                    Object o = jo.get(s);
+                    if (X.isEmpty(o)) {
+                        set(s.toString(), X.EMPTY);
+                    } else {
+                        set(s.toString(), o);
+                    }
+                }
+            }
+
+            return this;
+        }
+
         /**
          * 
          * @param jo
@@ -2543,6 +2561,34 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
                         set(s, X.EMPTY);
                     } else {
                         set(s, o);
+                    }
+                }
+            }
+
+            return this;
+        }
+
+        public V copy(V v, String... names) {
+            if (v == null)
+                return this;
+
+            if (names != null) {
+                for (String s : names) {
+                    Object o = v.value(s);
+                    if (X.isEmpty(o)) {
+                        set(s, X.EMPTY);
+                    } else {
+                        set(s, o);
+                    }
+                }
+            } else {
+                for (int i = 0; i < v.size(); i++) {
+                    String name = v.name(i);
+                    Object o = v.value(i);
+                    if (X.isEmpty(o)) {
+                        set(name, X.EMPTY);
+                    } else {
+                        set(name, o);
                     }
                 }
             }
