@@ -24,6 +24,7 @@ import com.giisoo.framework.web.Require;
  * @author yjiang
  * 
  */
+@SuppressWarnings("deprecation")
 public abstract class Command implements Serializable {
 
 	/**
@@ -75,7 +76,8 @@ public abstract class Command implements Serializable {
 	 *            the d
 	 * @return true, if successful
 	 */
-	public static boolean process(byte[] b, TConn d) {
+	@SuppressWarnings("deprecation")
+    public static boolean process(byte[] b, TConn d) {
 		// System.out.println(b.length);
 
 		// log.debug("process: " + d);

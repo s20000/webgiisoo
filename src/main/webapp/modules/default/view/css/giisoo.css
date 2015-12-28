@@ -46,20 +46,21 @@ button {
 	transition: .5s ease;
 	font-family: inherit;
 	box-sizing: border-box;
-	font-size: 1rem;
+	font-size: 16px;
 	text-align: center;
-	border: none;
 	text-shadow: none;
-	-webkit-border-radius: .4rem;
-	-moz-border-radius: .4rem;
-	border-radius: .4rem;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
 	vertical-align: middle;
 	cursor: pointer;
 	background-color: #009df5;
 	color: #fff;
 	line-height: 20px;
 	margin: 10px 0;
-	padding: 8px 10px;
+	padding: 6px 20px;
+	border: 1px solid transparent;
+	box-shadow: 0 0 1px #009DF5;
 }
 
 .btns button {
@@ -244,22 +245,22 @@ input:focus, select:focus, textarea:focus {
 }
 
 #head .logo {
-	position: absolute;
-	left: 8px;
-	top: 11px;
+	position: relative;
+	float: left;
+	margin: 14px 10px;
 }
 
 #head .title {
-    position: absolute;
-    left: 220px;
-    font-size: 20pt;
-    width: 420px;
-    text-align: left;
-    top: 0;
-    color: #EEE;
-    font-weight: bold;
-    letter-spacing: 3px;
-    line-height: 80px;}
+	position: relative;
+	font-size: 20pt;
+	width: 420px;
+	text-align: left;
+	color: #EEE;
+	font-weight: bold;
+	letter-spacing: 3px;
+	line-height: 80px;
+	float: left;
+}
 
 #head .title g {
 	font-size: 16px;
@@ -822,6 +823,10 @@ span.folder.open {
 	line-height: 46px;
 }
 
+#panel .form div.sync_notes {
+	margin-left: 80px;
+}
+
 #panel form div.accesses div {
 	line-height: 30px;
 	margin: 0 10px;
@@ -961,7 +966,7 @@ a.page_1, a.page_2 {
 	-moz-user-select: none;
 	-ms-user-select: none;
 	background: #009df5;
-	box-shadow: 0 0 1px #666;
+	box-shadow: 0 0 1px #009DF5;
 	text-align: center;
 	overflow: initial;
 	padding: 4px 15px;
@@ -1043,7 +1048,6 @@ div.tabs a.selected {
 a.btn {
 	display: inline-block;
 	margin-bottom: 0;
-	font-weight: 400;
 	text-align: center;
 	vertical-align: middle;
 	cursor: pointer;
@@ -1051,7 +1055,6 @@ a.btn {
 	border: 1px solid transparent;
 	white-space: nowrap;
 	font-size: 14px;
-	line-height: 1.42857143;
 	border-radius: 4px;
 	-webkit-user-select: none;
 	overflow: hidden;
@@ -1060,7 +1063,7 @@ a.btn {
 	background-color: #5cb85c;
 	text-decoration: none;
 	border-color: #4cae4c;
-	padding: 6px 12px;
+	padding: 0 12px;
 }
 
 .btn-upload input {
@@ -1843,19 +1846,25 @@ label r {
 #error.leanmodal {
 	background: #6B1F1F;
 	color: #FCF5F5;
-	box-shadow: 0 0 6px #F6A9A9;
+	box-shadow: 0 0 6px #EEE;
 }
 
 #message.leanmodal {
 	background: #145711;
 	color: #FCF5F5;
-	box-shadow: 0 0 6px #90F588;
+	box-shadow: 0 0 6px #EEE;
+}
+
+#hint.leanmodal {
+	background: #0AAF64;
+	color: #FCF5F5;
+	box-shadow: 0 0 6px #0AAF64;
 }
 
 #warn.leanmodal {
 	background: #C35A22;
 	color: #FCF5F5;
-	box-shadow: 0 0 6px #FBA97E;
+	box-shadow: 0 0 6px #C35A22;
 }
 
 label g {
@@ -2334,12 +2343,6 @@ table.tablesorter tbody tr.state_0 td {
 	width: 25%;
 }
 
-#hint .leanmodal-content {
-	background: #0AAF64;
-	border-radius: 10px;
-	padding: 20px;
-}
-
 #menu .item {
 	cursor: pointer;
 	line-height: 40px;
@@ -2716,6 +2719,7 @@ table.tablesorter tbody tr.state_0 td {
 
 button:hover, .fileupload .fileupload-cancel:hover {
 	background-color: #1B65A2;
+	box-shadow: 0 0 4px #009DF5;
 }
 
 button:active, .fileupload .fileupload-cancel:active {
@@ -2925,10 +2929,6 @@ a.btn:hover, #panel a.btn:hover {
 #panel table .state_0 .state, #panel table .state_0 .state, #panel table .state_0 .state1,
 	#panel table .network-state_0 {
 	color: #a33;
-}
-
-#panel a.btn, .fileupload a.btn {
-	padding: 3px 12px;
 }
 
 #dict-picker .jspVerticalBar, #menu .jspVerticalBar, #dict-picker .jspHorizontalBar,

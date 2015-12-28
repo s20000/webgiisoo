@@ -193,13 +193,13 @@ public abstract class MDCServer extends IoHandlerAdapter {
             while (in.length() > 5) {
                 in.mark();
                 /**
-                 * Byte 1: head of the package<br/>
-                 * bit 7-6: "01", indicator of MDC<br/>
-                 * bit 5: encrypt indicator, "0": no; "1": encrypted<br/>
-                 * bit 4: zip indicator, "0": no, "1": ziped<br/>
-                 * bit 0-3: reserved<br/>
-                 * Byte 2-5: length of data<br/>
-                 * Byte[…]: data array<br/>
+                 * Byte 1: head of the package<br>
+                 * bit 7-6: "01", indicator of MDC<br>
+                 * bit 5: encrypt indicator, "0": no; "1": encrypted<br>
+                 * bit 4: zip indicator, "0": no, "1": ziped<br>
+                 * bit 0-3: reserved<br>
+                 * Byte 2-5: length of data<br>
+                 * Byte[…]: data array<br>
                  * 
                  */
 

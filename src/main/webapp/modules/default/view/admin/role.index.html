@@ -6,7 +6,7 @@
 	<a href='/admin/role' class='selected'>$lang.get('a.role')</a>
 </div>
 
-#set($edit = $me.hasAccess('access.user.admin') && $module.role_edit == 'true')
+#set($edit = $me.hasAccess('access.user.admin'))
 
 <table id='role-table' class='tablesorter nospace' border="0" cellpadding="0" cellspacing="1">
 	<thead>
@@ -44,7 +44,6 @@
 	<a href='javascript:;' onclick='_post("/admin/role/edit", "#role-table", 1);'>$lang.get('a.edit')</a>
 	<a href='javascript:;' onclick='_post("/admin/role/delete", "#role-table", -1);'>$lang.get('a.delete')</a>
 #end
-	<a href='javascript:;' onclick='back()'>$lang.get('a.back')</a>
 </div>
 
 <script>

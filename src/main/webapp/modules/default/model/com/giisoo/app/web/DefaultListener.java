@@ -32,6 +32,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import com.giisoo.app.web.admin.setting;
+import com.giisoo.app.web.admin.sync;
 import com.giisoo.core.bean.Bean;
 import com.giisoo.core.bean.Bean.V;
 import com.giisoo.core.bean.X;
@@ -122,6 +123,7 @@ public class DefaultListener implements LifeListener {
         NtpTask.owner.schedule(X.AMINUTE);
 
         setting.register("system", setting.system.class);
+        setting.register("sync", sync.class);
 
         V v = V.create().set("status", "running").set("updated", System.currentTimeMillis()).set("ip", IP.myip().toString()).set("started", System.currentTimeMillis()).set("master",
                 conf.containsKey("master") && "yes".equals(conf.getString("master")) ? 1 : 0);
@@ -257,19 +259,6 @@ public class DefaultListener implements LifeListener {
                 }
             }
 
-            /**
-             * recover all tables from db.zip
-             */
-            f = module.loadResource("/install/db.zip", false);
-            if (f != null && f.exists()) {
-                int b = SystemConfig.i("db.zip", 0);
-                if (b == 0) {
-                    DB.recover(new FileInputStream(f), (String) null);
-                    SystemConfig.setConfig("db.zip", 1);
-
-                    System.exit(0);
-                }
-            }
         } catch (Exception e) {
             log.error("database is not configured!", e);
             return;

@@ -177,84 +177,6 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
     }
 
     /**
-     * Update.
-     * 
-     * @param table
-     *            the table
-     * @param v
-     *            the v
-     * @param where
-     *            the where
-     * @param whereArgs
-     *            the where args
-     * @return the int
-     * @deprecated
-     */
-    static protected int update(String table, Values v, String where, Object[] whereArgs, String db) {
-
-        /**
-         * create the sql statement
-         */
-        StringBuilder sql = new StringBuilder();
-        sql.append("update ").append(table).append(" set ");
-        ArrayList<String> key = v.keySet();
-        for (int i = 0; i < key.size() - 1; i++) {
-            sql.append(key.get(i)).append("=?,");
-        }
-        sql.append(key.get(key.size() - 1)).append("=? ");
-
-        if (where != null) {
-            sql.append(" where ").append(where);
-        }
-
-        /**
-         * update it in database
-         */
-        Connection c = null;
-        PreparedStatement p = null;
-        ResultSet r = null;
-
-        try {
-            if (X.isEmpty(db)) {
-                c = getConnection();
-            } else {
-                c = getConnection(db);
-            }
-            if (c == null)
-                return -1;
-
-            p = c.prepareStatement(sql.toString());
-
-            ArrayList<Object> values = v.values();
-            int order = 1;
-            for (int i = 0; i < values.size(); i++) {
-                Object o = values.get(i);
-
-                setParameter(p, order++, o);
-
-            }
-
-            if (whereArgs != null) {
-                for (int i = 0; i < whereArgs.length; i++) {
-                    Object o = whereArgs[i];
-
-                    setParameter(p, order++, o);
-
-                }
-            }
-
-            return p.executeUpdate();
-
-        } catch (Exception e) {
-            log.error(sql.toString() + toString(whereArgs), e);
-        } finally {
-            close(c, p, r);
-        }
-
-        return 0;
-    }
-
-    /**
      * convert a millis time to date with offset.
      * 
      * @deprecated
@@ -343,74 +265,6 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
         // int d = cal.get(Calendar.DAY_OF_YEAR);
         //
         // return y * 1000 + d;
-    }
-
-    /**
-     * Insert.
-     * 
-     * @param table
-     *            the table
-     * @param v
-     *            the v
-     * @return true, if successful
-     * @deprecated
-     */
-    protected static boolean insert(String table, Values v, String db) {
-        /**
-         * create the sql statement
-         */
-        StringBuilder sql = new StringBuilder();
-        sql.append("insert into ").append(table).append(" (");
-        ArrayList<String> key = v.keySet();
-        for (int i = 0; i < key.size(); i++) {
-            sql.append(key.get(i)).append(",");
-        }
-
-        sql.append(" create_date) values( ");
-        for (int i = 0; i < key.size(); i++) {
-            sql.append("?, ");
-        }
-        sql.append("?)");
-
-        /**
-         * insert it in database
-         */
-        Connection c = null;
-        PreparedStatement p = null;
-        ResultSet r = null;
-
-        try {
-            if (X.isEmpty(db)) {
-                c = getConnection();
-            } else {
-                c = getConnection(db);
-            }
-            if (c == null)
-                return false;
-
-            p = c.prepareStatement(sql.toString());
-
-            ArrayList<Object> values = v.values();
-            int order = 1;
-            for (int i = 0; i < values.size(); i++) {
-                Object o = values.get(i);
-
-                setParameter(p, order++, o);
-
-            }
-
-            p.setLong(order++, System.currentTimeMillis());
-
-            p.executeUpdate();
-
-            return true;
-        } catch (Exception e) {
-
-            log.error(sql.toString() + v.toString(), e);
-        } finally {
-            close(c, p, r);
-        }
-        return false;
     }
 
     /**
@@ -614,7 +468,7 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
     /**
      * get Mongo DB connection
      * 
-     * @return
+     * @return DB
      */
     public static DB getDB() {
         return getDB("prod");
@@ -624,7 +478,7 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
      * get Mongo DB connection
      * 
      * @param database
-     * @return
+     * @return DB
      */
     public static DB getDB(String database) {
         DB g = null;
@@ -1454,6 +1308,8 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
         DBCollection db = Bean.getCollection(collection);
         DBCursor cur = null;
         try {
+            KeyField.create(collection, query, order);
+
             cur = db.find(query);
             if (order != null) {
                 cur.sort(order);
@@ -1510,13 +1366,16 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
      * @param offset
      * @param limit
      * @param clazz
-     * @return
+     * @return Beans
      */
     protected static <T extends Bean> Beans<T> load(String collection, DBObject query, DBObject orderBy, int offset, int limit, Class<T> clazz) {
         TimeStamp t = TimeStamp.create();
         DBCollection db = Bean.getCollection(collection);
         DBCursor cur = db.find(query);
         try {
+
+            KeyField.create(collection, query, orderBy);
+
             if (orderBy != null) {
                 cur.sort(orderBy);
             }
@@ -1609,6 +1468,7 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
          */
         DBCollection c = Bean.getCollection(collection);
         if (c != null) {
+            KeyField.create(collection, query, null);
             DBObject d = c.findOne(query);
             return d;
         }
@@ -1970,7 +1830,7 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
      * @param limit
      * @param clazz
      * @param c
-     * @return
+     * @return Beans
      */
     protected static <T extends Bean> Beans<T> load(String table, String where, Object[] args, String orderby, int offset, int limit, Class<T> clazz, Connection c) {
         /**
@@ -2216,6 +2076,7 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
      * 
      * @param collection
      * @param v
+     * @param db
      * @return int
      */
     final protected static int insertCollection(String collection, V v, String db) {
@@ -2270,6 +2131,8 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
         }
 
         WriteResult r = Bean.getCollection(collection).update(q, new BasicDBObject().append("$set", d), adding, true);
+
+        log.debug("updated collection=" + collection + ", q=" + q + ", d=" + d + ",result=" + r);
 
         // r.getN();
         // r.getField("nModified");
@@ -3030,12 +2893,14 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
     }
 
     /**
-     * 
      * @param table
      * @param col
      * @param where
      * @param args
-     * @return T primary type
+     * @param orderby
+     * @param position
+     * @param db
+     * @return T
      */
     @SuppressWarnings("unchecked")
     public static <T> T getOne(String table, String col, String where, Object[] args, String orderby, int position, String db) {
@@ -3110,7 +2975,8 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
      * @param orderby
      * @param s
      * @param n
-     * @return List<T>
+     * @param db
+     * @return List
      */
     @SuppressWarnings("unchecked")
     public static <T> List<T> getList(String table, String col, String where, Object[] args, String orderby, int s, int n, String db) {
@@ -3396,11 +3262,30 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
             return null;
         }
 
-        if (extra.containsKey(name.toString())) {
-            return extra.get(name.toString());
+        String s = name.toString();
+        if (extra.containsKey(s)) {
+            return extra.get(s);
         }
 
-        return null;
+        String[] ss = s.split("\\.");
+        Map<String, Object> m = extra;
+        Object o = null;
+        for (String s1 : ss) {
+            if (m == null) {
+                return null;
+            }
+
+            o = m.get(s1);
+            if (o == null)
+                return null;
+            if (o instanceof Map) {
+                m = (Map<String, Object>) o;
+            } else {
+                m = null;
+            }
+        }
+
+        return o;
     }
 
     /**
@@ -3408,7 +3293,7 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
      * 
      * @param name
      * @param i
-     * @return
+     * @return Object
      */
     public Object get(Object name, int i) {
         if (extra == null) {
@@ -3480,7 +3365,16 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
 
     @Override
     public Set<String> keySet() {
-        return extra == null ? null : extra.keySet();
+        Set<String> names = new HashSet<String>();
+        if (extra != null) {
+            names.addAll(extra.keySet());
+            for (String s : extra.keySet()) {
+                if (s.endsWith("_obj")) {
+                    names.remove(s);
+                }
+            }
+        }
+        return names;
     }
 
     @Override
@@ -3490,7 +3384,15 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
 
     @Override
     public Set<Entry<String, Object>> entrySet() {
-        return extra == null ? null : extra.entrySet();
+        Set<Entry<String, Object>> ss = new HashSet<Entry<String, Object>>();
+        if (extra != null) {
+            for (Entry<String, Object> e : extra.entrySet()) {
+                if (!e.getKey().endsWith("_obj") && e.getValue() != null) {
+                    ss.add(e);
+                }
+            }
+        }
+        return ss;
     }
 
     /**
@@ -3553,7 +3455,7 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
     /**
      * get all extra value
      * 
-     * @return Map<String, Object>
+     * @return Map
      */
     public Map<String, Object> getAll() {
         return extra;
@@ -4110,7 +4012,12 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
     public static boolean exists(DBObject query, Class<? extends Bean> t) {
         String collection = getCollection(t);
         if (collection != null) {
-            return Bean.load(collection, query) != null;
+            TimeStamp t1 = TimeStamp.create();
+            try {
+                return Bean.load(collection, query) != null;
+            } finally {
+                log.debug("exists cost=" + t1.past() + "ms,  collection=" + collection + ", query=" + query);
+            }
         }
         return false;
     }

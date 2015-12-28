@@ -219,6 +219,19 @@ public class Controller implements IStub {
         dispatch(uri, req, resp, method);
     }
 
+    static private String getRemoteHost(HttpServletRequest req) {
+        String remote = req.getHeader("X-Forwarded-For");
+        if (remote == null) {
+            remote = req.getHeader("X-Real-IP");
+
+            if (remote == null) {
+                remote = req.getRemoteAddr();
+            }
+        }
+
+        return remote;
+    }
+
     /**
      * Dispatch.
      * 
@@ -265,7 +278,7 @@ public class Controller implements IStub {
         if (transparenturls == null) {
             String s = Module.home.getTransparent();
 
-            // log.debug("transparenturls:" + s);
+            log.debug("transparenturls:" + s);
 
             if (X.isEmpty(s)) {
                 transparenturls = Pattern.compile("^/(css|js|images)/.*$", Pattern.CASE_INSENSITIVE);
@@ -302,24 +315,29 @@ public class Controller implements IStub {
                 }
 
                 if (f != null) {
-                    Language lang = Language.getLanguage();
-                    String range = req.getHeader("RANGE");
-
-                    String date2 = lang.format(f.lastModified(), "yyyy-MM-dd HH:mm:ss z");
-
-                    if (X.isEmpty(range)) {
-                        String date = req.getHeader("If-Modified-Since");
-                        if (date != null && date.equals(date2)) {
-                            resp.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
-                            return;
-                        }
-                    }
-
-                    resp.addHeader("Last-Modified", date2);
-
                     InputStream in = null;
                     OutputStream out = null;
                     try {
+                        // log.debug("file=" + f.getCanonicalPath());
+
+                        Language lang = Language.getLanguage();
+                        String range = req.getHeader("RANGE");
+
+                        String date2 = lang.format(f.lastModified(), "yyyy-MM-dd HH:mm:ss z");
+
+                        if (X.isEmpty(range)) {
+                            String date = req.getHeader("If-Modified-Since");
+                            if (date != null && date.equals(date2)) {
+                                resp.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+
+                                log.info(method + " " + uri + " - " + t.past() + "ms " + getRemoteHost(req));
+
+                                return;
+                            }
+                        }
+
+//                        resp.addHeader("Last-Modified", date2);
+
                         in = new FileInputStream(f);
                         out = resp.getOutputStream();
 
@@ -360,8 +378,11 @@ public class Controller implements IStub {
                             }
                         }
                     }
+                } else {
+                    log.warn("not found the file = " + uri);
                 }
                 // TODO
+                log.info(method + " " + uri + " - " + t.past() + "ms " + getRemoteHost(req));
 
                 return;
             } // end of matches

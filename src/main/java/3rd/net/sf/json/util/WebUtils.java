@@ -26,7 +26,7 @@ import net.sf.json.JSONObject;
 /**
  * Provides useful methods for working with JSON and web.
  *
- * @author Andres Almiray <aalmiray@users.sourceforge.net>
+ * @author Andres Almiray 
  */
 public class WebUtils {
    private static final WebHijackPreventionStrategy DEFAULT_WEB_HIJACK_PREVENTION_STRATEGY = WebHijackPreventionStrategy.INFINITE_LOOP;
@@ -77,7 +77,7 @@ public class WebUtils {
     * Returns a string represenation of a JSON value.<br>
     * When an object property name does not contain a space (' ') or a colon
     * (':'), the quotes are omitted. This is done to reduce the amount of bytes
-    * sent to a web browser.<br/>USE WITH CAUTION.
+    * sent to a web browser.<br>USE WITH CAUTION.
     */
    public static String toString( JSON json ) {
       if( json instanceof JSONObject ){

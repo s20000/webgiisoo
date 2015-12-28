@@ -17,7 +17,7 @@
 package net.sf.json.xml;
 
 /**
- * @author Andres Almiray <aalmiray@users.sourceforge.net>
+ * @author Andres Almiray 
  */
 public interface JSONTypes {
    String ARRAY = "array";

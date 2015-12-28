@@ -34,7 +34,7 @@ import com.giisoo.core.worker.WorkerTask;
 
 /**
  * the distribute message system, <br>
- * the performance: sending > 1w/300ms <br>
+ * the performance: sending 1w/300ms <br>
  * recving 1w/1500ms<br>
  * 
  * @author joe
@@ -98,7 +98,7 @@ public final class MQ {
      * initialize the MQ
      * 
      * @param conf
-     * @return
+     * @return boolean
      */
     public static boolean init(Configuration conf) {
         if (session != null)
@@ -289,7 +289,6 @@ public final class MQ {
      * @param from
      * @param header
      * @return 1: success<br>
-     *         <=0: failed
      */
     public static int broadcast(long seq, String dest, String to, JSONObject message, byte[] bb, String src, String from, JSONObject header) {
         if (message == null)
@@ -370,7 +369,6 @@ public final class MQ {
      * @param handler
      * @param timeout
      * @return 1: success<br>
-     *         <=0: failed
      */
     public static int call(String dest, String to, JSONObject message, byte[] bb, String src, String from, JSONObject header, IStub handler, long timeout) {
         if (message == null)
@@ -465,8 +463,7 @@ public final class MQ {
      * @param src
      * @param from
      * @param header
-     * @return<br> 1: success <br>
-     *             <=0: failed
+     * @return int 1: success
      */
     public static int send(long seq, String dest, String to, JSONObject message, byte[] bb, String src, String from, JSONObject header) {
         if (message == null)
@@ -549,7 +546,6 @@ public final class MQ {
      * @param header
      * @return <br>
      *         1: success,<br>
-     *         <=0: failed
      */
     public static int response(long originalseq, String dest, String to, JSONObject message, byte[] bb, String src, String from, JSONObject header) {
         if (message == null)

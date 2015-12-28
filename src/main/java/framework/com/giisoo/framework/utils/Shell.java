@@ -57,8 +57,6 @@ public class Shell {
             Process p = Runtime.getRuntime().exec(new String[] { "/bin/bash", "-c", command });
 
             err = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-            ErrReader e = new ErrReader(err, print);
-            e.schedule(0);
 
             input = new BufferedReader(new InputStreamReader(p.getInputStream()));
 
@@ -75,7 +73,18 @@ public class Shell {
                 line = input.readLine();
             }
 
-            sb.append(e.sb);
+            line = err.readLine();
+            while (line != null) {
+                if (line.toLowerCase().indexOf("password") > 0 && !X.isEmpty(passwd)) {
+                    p.getOutputStream().write((passwd + "\n").getBytes());
+                }
+                if (print != null) {
+                    print.print(line);
+                } else {
+                    sb.append(line).append("\r\n");
+                }
+                line = err.readLine();
+            }
 
             if (sb.length() > 0)
                 return sb.toString();
@@ -94,35 +103,6 @@ public class Shell {
                 err.close();
             }
         }
-    }
-
-    private static class ErrReader extends WorkerTask {
-        BufferedReader in;
-        IPrint printer;
-        StringBuilder sb = new StringBuilder();
-
-        ErrReader(BufferedReader in, IPrint printer) {
-            this.in = in;
-            this.printer = printer;
-        }
-
-        @Override
-        public void onExecute() {
-            try {
-                String line = in.readLine();
-                while (line != null) {
-                    if (printer != null) {
-                        printer.print("<r>" + line + "</r>");
-                    } else {
-                        sb.append(line).append("\r\n");
-                    }
-                    line = in.readLine();
-                }
-            } catch (Exception e) {
-                //
-            }
-        }
-
     }
 
     // 192.168.1.1#系统名称#2014-10-31#ERROR#日志消息#程序名称

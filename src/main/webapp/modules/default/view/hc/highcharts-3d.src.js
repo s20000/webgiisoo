@@ -1286,7 +1286,7 @@ Highcharts.wrap(Highcharts.seriesTypes.scatter.prototype, 'init', function (proc
 		this.pointArrayMap = ['x', 'y', 'z'];
 
 		// Set a new default tooltip formatter
-		var default3dScatterTooltip = 'x: <b>{point.x}</b><br/>y: <b>{point.y}</b><br/>z: <b>{point.z}</b><br/>';
+		var default3dScatterTooltip = 'x: <b>{point.x}</b><br>y: <b>{point.y}</b><br>z: <b>{point.z}</b><br>';
 		if (this.userOptions.tooltip) {
 			this.tooltipOptions.pointFormat = this.userOptions.tooltip.pointFormat || default3dScatterTooltip;
 		} else {

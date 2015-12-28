@@ -23,24 +23,42 @@ public class Data extends Bean {
     }
 
     public static Data load(String collection, String id) {
-        return Bean.load(collection, new BasicDBObject().append(X._ID, id), Data.class);
+        Data d = Bean.load(collection, new BasicDBObject(), Data.class);
+        if (d != null) {
+            Object _id = id;
+            Object o = d.get(X._ID);
+            if (o instanceof Long) {
+                _id = Bean.toLong(id);
+            }
+            return Bean.load(collection, new BasicDBObject().append(X._ID, _id), Data.class);
+        }
+        return null;
     }
 
-    public static void update(String collection, JSONObject jo) {
+    public static int update(String collection, JSONObject jo) {
         V v = V.create();
 
-        String id = jo.getString(X._ID);
+        Object id = jo.get(X._ID);
         jo.remove(X._ID);
 
         for (Object name : jo.keySet()) {
             v.set(name.toString(), jo.get(name));
         }
 
-        if (Bean.load(collection, new BasicDBObject(X._ID, id)) == null) {
-            // new , insert
-            Bean.insertCollection(collection, v.set(X._ID, id), null);
+        Data d = Bean.load(collection, new BasicDBObject(), Data.class);
+
+        if (d != null) {
+
+            if (Bean.load(collection, new BasicDBObject(X._ID, id)) == null) {
+                // new , insert
+                log.debug("inserted: " + v);
+                return Bean.insertCollection(collection, v.set(X._ID, id), null);
+            } else {
+                return Bean.updateCollection(collection, id, v);
+            }
         } else {
-            Bean.updateCollection(collection, id, v);
+            log.debug("inserted: " + v);
+            return Bean.insertCollection(collection, v.set(X._ID, id), null);
         }
     }
 

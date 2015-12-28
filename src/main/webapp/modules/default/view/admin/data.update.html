@@ -3,7 +3,7 @@
 #parse('/widget/widget.message.html')
 
 <div class='tabs'>
-	<a href='/admin/data'>数据集查询</a>
+	<a href='/admin/data?collection=$!collection'>数据集查询</a>
 	<a href='/admin/data/update?collection=$!collection&id=$!id' class='selected'>修改数据</a>
 	#if($id)
 	<a href='/admin/data/detail?collection=$!collection&id=$!id'>数据详情</a>

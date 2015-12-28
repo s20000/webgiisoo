@@ -61,7 +61,7 @@
 				s += '"></i>';
 				s += '<img class="icon" src="/images/loading.gif"/>';
 				if (e.url) {
-					s += '<span><a href="' + e.url + '">' + e.text
+					s += '<span><a href="' + e.url + '" target="_blank">' + e.text
 							+ '</a></span>';
 				} else {
 					s += '<span>' + e.text + '</span>';

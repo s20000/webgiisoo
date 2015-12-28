@@ -24,7 +24,7 @@ import java.util.Set;
  * <li>DEFAULT - matches the target class with equals().</li>
  * </ul>
  *
- * @author Andres Almiray <aalmiray@users.sourceforge.net>
+ * @author Andres Almiray 
  */
 public abstract class JsonBeanProcessorMatcher {
    /** Matches the target with equals() */

@@ -9,22 +9,22 @@
 <script type="text/javascript" src="/js/jquery.dictpicker.min.js"></script>
 
 <div class='search'>
-	<form action='/admin/log' method='get' #if($currentpage>
-		0) style='display:none' #end > <span><label><h3>$lang.get('log.starttime'):</h3>
+	<form action='/admin/log' method='get' #if($currentpage>0) style='display:none' #end > 
+		<span><label><h3>$lang.get('log.starttime'):</h3>
 				<input type='text' data-beatpicker="true" name='starttime'
 				value=#if($starttime) '$starttime' #else '' #end /></label></span> <span><label><h3>$lang.get('log.endtime'):</h3>
 				<input type='text' data-beatpicker="true" name='endtime'
 				value=#if($endtime) '$endtime' #else '' #end /></label></span> 
 #if($me.hasAccess('access.log.admin'))
 				<span><label><h3>$lang.get('log.user'):</h3>
-				<input type='text' name='uid' dict-picker='true' value=#if($uid)
+				<input type='text' name='uid' value=#if($uid)
 				'$uid' #else '' #end /></label></span> 
 #end				
 				<span><label><h3>$lang.get('log.ip'):</h3>
 				<input type='text' name='ip' value=#if($ip) '$ip' #else '' #end /></label></span> <span><label><h3>$lang.get('log.system'):</h3>
-				<input type='text' name='_system' dict-picker='true'
+				<input type='text' name='_system' 
 				value=#if($_system) '$_system' #else '' #end /></label></span> <span><label><h3>$lang.get('log.module'):</h3>
-				<input type='text' name='_module' dict-picker='true'
+				<input type='text' name='_module' 
 				value=#if($_module) '$_module' #else '' #end /></label></span> 
 				<span><label><h3>$lang.get('log.type'):</h3>
 				<select name='type'>
@@ -34,9 +34,6 @@
 					<option value='2' #if($type == 2) selected #end>$lang.get('log.type_2')</option>
 				</select>
 			</label></span>
-				<span><label><h3>$lang.get('log.op'):</h3>
-				<input type='text' name='op' dict-picker='true' value=#if($op)
-				'$op' #else '' #end /></label></span>
 
 		<span class='line'></span>
 		<span><label><h3>$lang.get('sort.by'):</h3>

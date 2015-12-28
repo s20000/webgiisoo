@@ -88,8 +88,11 @@ public class upload extends Model {
             long position = 0;
             long total = 0;
             String lastModified = this.getHeader("lastModified");
-            if (lastModified == null) {
+            if (X.isEmpty(lastModified)) {
                 lastModified = this.getString("lastModified");
+            }
+            if (X.isEmpty(lastModified)) {
+                lastModified = this.getString("lastModifiedDate");
             }
 
             if (range != null) {
@@ -109,6 +112,8 @@ public class upload extends Model {
             }
 
             String id = UID.id(me, tag, file.getName(), total, lastModified);
+
+            log.debug("storing, id=" + id + ", name=" + file.getName() + ", tag=" + tag + ", total=" + total + ", last=" + lastModified);
 
             String share = this.getString("share");
             String folder = this.getString("folder");

@@ -19,7 +19,7 @@ package net.sf.json.regexp;
 /**
  * Abstraction for regexp handling.
  * 
- * @author Andres Almiray <aalmiray@users.sourceforge.net>
+ * @author Andres Almiray 
  */
 public interface RegexpMatcher {
    /**

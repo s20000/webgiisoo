@@ -180,15 +180,12 @@ public class App extends Bean {
     // }
 
     /**
-     * Load.
      * 
-     * @param w
-     *            the w
+     * @param q
+     * @param order
      * @param s
-     *            the s
      * @param n
-     *            the n
-     * @return the beans
+     * @return Beans
      */
     public static Beans<App> load(BasicDBObject q, BasicDBObject order, int s, int n) {
         return Bean.load(q, order, s, n, App.class);

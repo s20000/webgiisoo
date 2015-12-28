@@ -22,6 +22,35 @@ public class setting extends Model {
         settings.put(name, m);
     }
 
+    @Path(path = "reset/(.*)", login = true, access = "access.config.admin")
+    final public Object reset(String name) {
+        Class<? extends setting> c = settings.get(name);
+        log.debug("/reset/" + c);
+        if (c != null) {
+            try {
+                setting s = c.newInstance();
+                s.req = this.req;
+                s.resp = this.resp;
+                s.login = this.login;
+                s.lang = this.lang;
+                s.module = this.module;
+                s.reset();
+
+                s.set("lang", lang);
+                s.set("module", module);
+                s.set("name", name);
+                s.set("settings", settings.keySet());
+                s.show("/admin/setting.html");
+
+            } catch (Exception e) {
+                log.error(name, e);
+                this.show("/admin/setting.html");
+            }
+        }
+
+        return null;
+    }
+
     @Path(path = "get/(.*)", login = true, access = "access.config.admin")
     final public Object get(String name) {
         Class<? extends setting> c = settings.get(name);
@@ -86,6 +115,13 @@ public class setting extends Model {
     }
 
     /**
+     * invoked when reset called
+     */
+    public void reset() {
+        get();
+    }
+
+    /**
      * invoked when get the setting form
      * 
      */
@@ -112,6 +148,16 @@ public class setting extends Model {
         @Override
         public void set() {
             SystemConfig.setConfig("node.name", this.getString("nodename"));
+            SystemConfig.setConfig("mdc.tcp.enabled", "on".equals(this.getString("mdc_tcp")) ? "true" : "false");
+            SystemConfig.setConfig("mdc.tcp.host", this.getString("mdc_tcp_host"));
+            SystemConfig.setConfig(Model.node() + ".mdc.tcp.domain", this.getString("mdc_tcp_domain"));
+            SystemConfig.setConfig("mdc.tcp.port", this.getString("mdc_tcp_port"));
+            SystemConfig.setConfig("mdc.udp.enabled", "on".equals(this.getString("mdc_udp")) ? "true" : "false");
+            SystemConfig.setConfig("mdc.udp.host", this.getString("mdc_udp_host"));
+            SystemConfig.setConfig("mdc.udp.port", this.getString("mdc_udp_port"));
+            SystemConfig.setConfig("mdc.allow.ip", this.getString("mdc_allow_ip"));
+            SystemConfig.setConfig("mdc.allow.uid", this.getString("mdc_allow_uid"));
+            SystemConfig.setConfig("mdc.allow.user", this.getString("mdc_allow_user"));
 
             // if (!X.isEmpty(this.getString("prikey"))) {
             // SystemConfig.setConfig("pri_key", this.getString("prikey")
@@ -144,6 +190,16 @@ public class setting extends Model {
 
             this.set("nodename", SystemConfig.s("node.name", null));
             this.set("system_code", SystemConfig.l("system.code", 1));
+            this.set("mdc_tcp", SystemConfig.s("mdc.tcp.enabled", null));
+            this.set("mdc_tcp_host", SystemConfig.s("mdc.tcp.host", null));
+            this.set("mdc_tcp_domain", SystemConfig.s(Model.node() + ".mdc.tcp.domain", null));
+            this.set("mdc_tcp_port", SystemConfig.s("mdc.tcp.port", null));
+            this.set("mdc_udp", SystemConfig.s("mdc.udp.enabled", null));
+            this.set("mdc_udp_host", SystemConfig.s("mdc.udp.host", null));
+            this.set("mdc_udp_port", SystemConfig.s("mdc.udp.port", null));
+            this.set("mdc_allow_ip", SystemConfig.s("mdc.allow.ip", null));
+            this.set("mdc_allow_uid", SystemConfig.s("mdc.allow.uid", null));
+            this.set("mdc_allow_user", SystemConfig.s("mdc.allow.user", null));
 
             // this.set("prikey", SystemConfig.s("pri_key", null));
             this.set("pubkey", SystemConfig.s("pub_key", null));

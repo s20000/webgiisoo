@@ -178,7 +178,7 @@ public final class JSONArray extends AbstractJSON implements JSON, List, Compara
 
    /**
     * Get the collection type from a getter or setter, or null if no type was
-    * found.<br/>
+    * found.<br>
     * Contributed by [Matt Small @ WaveMaker].
     */
    public static Class[] getCollectionType( PropertyDescriptor pd, boolean useGetter )
@@ -372,14 +372,14 @@ public final class JSONArray extends AbstractJSON implements JSON, List, Compara
    }
 
    /**
-    * Returns a List or a Set taking generics into account.<br/>
+    * Returns a List or a Set taking generics into account.<br>
     */
    public static Collection toCollection( JSONArray jsonArray ) {
       return toCollection( jsonArray, new JsonConfig() );
    }
 
    /**
-    * Returns a List or a Set taking generics into account.<br/>
+    * Returns a List or a Set taking generics into account.<br>
     */
    public static Collection toCollection( JSONArray jsonArray, Class objectClass ) {
       JsonConfig jsonConfig = new JsonConfig();
@@ -388,7 +388,7 @@ public final class JSONArray extends AbstractJSON implements JSON, List, Compara
    }
 
    /**
-    * Returns a List or a Set taking generics into account.<br/>
+    * Returns a List or a Set taking generics into account.<br>
     * Contributed by [Matt Small @ WaveMaker].
     */
    public static Collection toCollection( JSONArray jsonArray, JsonConfig jsonConfig ) {

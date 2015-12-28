@@ -12,7 +12,7 @@ import com.giisoo.framework.mdc.TConnCenter;
 import com.giisoo.framework.web.*;
 
 /**
- * Web 接口: /bye <br/>
+ * Web 接口: /bye <br>
  * MDC 客户端断开链接时候，调用改接口
  * 
  * @author joe
@@ -20,19 +20,20 @@ import com.giisoo.framework.web.*;
  */
 public class bye extends Model {
 
-	/* (non-Javadoc)
-	 * @see com.giisoo.framework.web.Model#onMDC()
-	 */
-	@Override
-	@Path(path = X.NONE, method = Model.METHOD_MDC)
-	public void onMDC() {
-		User u = this.getUser();
-		if (u != null) {
-			TConnCenter.remove(u.getId());
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.giisoo.framework.web.Model#onMDC()
+     */
+    @Override
+    @Path(path = X.NONE, method = Model.METHOD_MDC)
+    public void onMDC() {
+        User u = this.getUser();
+        if (u != null) {
+            TConnCenter.remove(u.getId());
 
-			OpLog.log("mdc", "bye", "disconnected", u.getId(),
-					this.getRemoteHost());
-		}
-	}
+            OpLog.log("mdc", "bye", "disconnected", u.getId(), this.getRemoteHost());
+        }
+    }
 
 }

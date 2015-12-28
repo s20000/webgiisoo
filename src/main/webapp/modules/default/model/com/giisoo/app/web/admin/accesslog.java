@@ -32,4 +32,10 @@ public class accesslog extends Model {
 
         this.show("/admin/accesslog.index.html");
     }
+
+    @Path(path = "deleteall", login = true, access = "acess.config.admin")
+    public void deleteall() {
+        AccessLog.deleteAll();
+    }
+
 }

@@ -6,7 +6,7 @@
 
 	<tstamp>
 		<format property="TODAY" pattern="yyMMdd" locale="zh,CN" />
-		<format property="BUILDNO" pattern="yyMMddhhmm" locale="zh,CN" />
+		<format property="BUILDNO" pattern="yyMMddHHmm" locale="zh,CN" />
 	</tstamp>
 
 	<target name="patch" description="build sever all">
@@ -30,8 +30,8 @@
 
 		<zip destfile="target/webgiisoo_${version}_${BUILDNO}.zip">
 			<fileset dir="target/webgiisoo/modules/default">
-				<exclude name="**/classes/**" />
-				<exclude name="**/com/**" />
+				<exclude name="**/WEB-INF/classes/**" />
+				<exclude name="**/model/com/**" />
 			</fileset>
 		</zip>
 		

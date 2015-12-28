@@ -50,8 +50,8 @@ public class App extends Command {
             byte[] bb = in.readBytes(len);
 
             /**
-             * send the request to web by MQ <br/>
-             * if fail, invoke the web component directly <br/>
+             * send the request to web by MQ <br>
+             * if fail, invoke the web component directly <br>
              * create mock http request and mock httpresponse, dispatch the
              * request to http controller
              */

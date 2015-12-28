@@ -50,4 +50,8 @@ public class AccessLog extends Bean {
         Bean.delete(new BasicDBObject().append("created", new BasicDBObject().append("$lt", System.currentTimeMillis() - X.AMONTH)), AccessLog.class);
     }
 
+    public static void deleteAll() {
+        Bean.delete(new BasicDBObject(), AccessLog.class);
+    }
+
 }

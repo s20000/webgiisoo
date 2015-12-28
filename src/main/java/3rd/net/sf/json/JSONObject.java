@@ -21,7 +21,6 @@ import java.io.Writer;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.lang.reflect.AnnotatedElement;
@@ -58,7 +57,6 @@ import net.sf.json.util.PropertySetStrategy;
 import org.apache.commons.beanutils.DynaBean;
 import org.apache.commons.beanutils.DynaProperty;
 import org.apache.commons.beanutils.PropertyUtils;
-import org.apache.commons.collections.map.ListOrderedMap;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -119,7 +117,13 @@ import org.apache.commons.logging.LogFactory;
  * 
  * @author JSON.org
  */
+@SuppressWarnings("rawtypes")
 public final class JSONObject extends AbstractJSON implements JSON, Map, Comparable {
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
 
     private static final Log log = LogFactory.getLog(JSONObject.class);
 
@@ -345,6 +349,7 @@ public final class JSONObject extends AbstractJSON implements JSON, Map, Compara
     /**
      * Creates a bean from a JSONObject, with the specific configuration.
      */
+    @SuppressWarnings("unused")
     public static Object toBean(JSONObject jsonObject, JsonConfig jsonConfig) {
         if (jsonObject == null || jsonObject.isNullObject()) {
             return null;
@@ -1236,6 +1241,7 @@ public final class JSONObject extends AbstractJSON implements JSON, Map, Compara
         return array;
     }
 
+    @SuppressWarnings("unused")
     private static List convertPropertyValueToList(String key, Object value, JsonConfig jsonConfig, String name, Map classMap) {
         Class targetClass = findTargetClass(key, classMap);
         targetClass = targetClass == null ? findTargetClass(name, classMap) : targetClass;
@@ -1333,6 +1339,7 @@ public final class JSONObject extends AbstractJSON implements JSON, Map, Compara
         return false;
     }
 
+    @SuppressWarnings("unchecked")
     private static boolean isTransient(AnnotatedElement element, JsonConfig jsonConfig) {
         for (Iterator annotations = jsonConfig.getIgnoreFieldAnnotations().iterator(); annotations.hasNext();) {
             try {

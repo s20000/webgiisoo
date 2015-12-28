@@ -9,7 +9,6 @@
 <table id='cluster-table' class='tablesorter nospace' border="0" cellpadding="0" cellspacing="1">
 	<thead>
 		<tr>
-			<th>$lang.get('cluster.nodeid')</th>
 			<th>$lang.get('cluster.node')</th>
 			<th>$lang.get('cluster.ip')</th>
 			<th>$lang.get('cluster.status')</th>
@@ -23,7 +22,6 @@
 	<tbody>
 #foreach($f in $list)
 	<tr class='cluster-status-$f.status'>
-		<td>$f.id</td>
 		<td>$!f.node</td>
 		<td>$!f.ip</td>
 		<td>$!f.status</td>

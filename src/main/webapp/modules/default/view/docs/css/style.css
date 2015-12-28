@@ -19,7 +19,7 @@ html, body {
 h1 {
 	color: #3254a0;
 	font-size: 32px;
-	line-height: 32px;
+	line-height: 40px;
 }
 
 menu, ol, ul {
@@ -129,4 +129,8 @@ ul.navigation a {
 
 #logo img:hover {
 	zoom: 1.01;
+}
+
+.icon-file-pdf2:before {
+	color: #f33;
 }

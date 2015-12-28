@@ -75,7 +75,7 @@ public class module extends Model {
             create(out, name + "/").closeEntry();
             create(out, name + "/.project");
 
-            File f1 = module.getFile("/demo/.project");
+            File f1 = module.getFile("/admin/demo/.project");
             if (f1.exists()) {
                 // copy to out
                 copy(out, f1, new String[] { "webdemo", name });
@@ -92,12 +92,12 @@ public class module extends Model {
             }
 
             create(out, name + "/.classpath");
-            f1 = module.getFile("/demo/.classpath");
+            f1 = module.getFile("/admin/demo/.classpath");
             copy(out, f1, list);
             out.closeEntry();
 
             create(out, name + "/build.xml");
-            f1 = module.getFile("/demo/build.xml");
+            f1 = module.getFile("/admin/demo/build.xml");
             if (f1 != null) {
                 copy(out, f1, new String[] { "WEBDEMO", name.toUpperCase() });
             }
@@ -115,7 +115,7 @@ public class module extends Model {
             create(out, name + "/src/i18n/zh_cn.lang").closeEntry();
             create(out, name + "/src/view/").closeEntry();
 
-            f1 = module.getFile("/demo/src/view/");
+            f1 = module.getFile("/admin/demo/src/view/");
             if (f1.exists()) {
                 for (File f2 : f1.listFiles()) {
                     if (f2.isFile()) {
@@ -126,7 +126,7 @@ public class module extends Model {
                 }
             }
             create(out, name + "/src/view/js/").closeEntry();
-            f1 = module.getFile("/demo/src/view/js");
+            f1 = module.getFile("/admin/demo/src/view/js");
             if (f1 != null) {
                 for (File f2 : f1.listFiles()) {
                     if (f2.isFile()) {
@@ -137,7 +137,7 @@ public class module extends Model {
                 }
             }
             create(out, name + "/src/view/css/").closeEntry();
-            f1 = module.getFile("/demo/src/view/css");
+            f1 = module.getFile("/admin/demo/src/view/css");
             if (f1 != null) {
                 for (File f2 : f1.listFiles()) {
                     if (f2.isFile()) {
@@ -148,7 +148,7 @@ public class module extends Model {
                 }
             }
             create(out, name + "/src/view/images/").closeEntry();
-            f1 = module.getFile("/demo/src/view/images");
+            f1 = module.getFile("/admin/demo/src/view/images");
             if (f1 != null) {
                 for (File f2 : f1.listFiles()) {
                     if (f2.isFile()) {
@@ -159,7 +159,7 @@ public class module extends Model {
                 }
             }
             create(out, name + "/src/view/admin/").closeEntry();
-            f1 = module.getFile("/demo/src/view/admin");
+            f1 = module.getFile("/admin/demo/src/view/admin");
             if (f1 != null) {
                 for (File f2 : f1.listFiles()) {
                     if (f2.isFile()) {
@@ -169,7 +169,7 @@ public class module extends Model {
                     }
                 }
             }
-            f1 = module.getFile("/demo/src/view/install");
+            f1 = module.getFile("/admin/demo/src/view/install");
             if (f1 != null) {
                 create(out, name + "/src/view/install/").closeEntry();
                 for (File f2 : f1.listFiles()) {
@@ -198,7 +198,7 @@ public class module extends Model {
             create(out, name + "/src/model/java/" + p1.substring(0, p1.lastIndexOf("/")) + "/bean/").closeEntry();
             create(out, name + "/src/model/java/" + p1 + "/admin/").closeEntry();
             create(out, name + "/src/model/java/" + lifelistener.replaceAll("\\.", "/") + ".java");
-            f1 = module.getFile("/demo/src/model/DemoListener.java");
+            f1 = module.getFile("/admin/demo/src/model/DemoListener.java");
             if (f1 != null) {
                 copy(out, f1, new String[] { "com.giisoo.demo.web", lifelistener.substring(0, lifelistener.lastIndexOf(".")) }, new String[] { "demosetting",
                         setting.substring(setting.lastIndexOf(".") + 1) }, new String[] { "DemoListener", lifelistener.substring(lifelistener.lastIndexOf(".") + 1) }, new String[] { "WEBDEMO", name });
@@ -206,7 +206,7 @@ public class module extends Model {
             out.closeEntry();
 
             create(out, name + "/src/model/java/" + setting.replaceAll("\\.", "/") + ".java");
-            f1 = module.getFile("/demo/src/model/demosetting.java");
+            f1 = module.getFile("/admin/demo/src/model/demosetting.java");
             if (f1 != null) {
                 copy(out, f1, new String[] { "com.giisoo.demo.web.admin", setting.substring(0, setting.lastIndexOf(".")) }, new String[] { "demosetting",
                         setting.substring(setting.lastIndexOf(".") + 1) });
@@ -357,6 +357,18 @@ public class module extends Model {
                     delete(dest);
                 }
 
+                Module m1 = Module.load(m.getName());
+                if (m1 != null) {
+                    String repo = m1.getRepo();
+                    if (!X.isEmpty(repo)) {
+                        log.debug("old.repo=" + repo + ", new.repo=" + url);
+                        Entity e1 = Repo.loadByUri(repo);
+                        if (e1 != null) {
+                            e1.delete();
+                        }
+                    }
+                }
+
                 /**
                  * merge WEB-INF and depends lib
                  * 
@@ -369,6 +381,8 @@ public class module extends Model {
                 f.renameTo(dest);
 
                 Module.init(m);
+                m.set(m.getName() + "_repo", url);
+                m.store();
 
                 jo.put("result", "ok");
 
@@ -383,7 +397,7 @@ public class module extends Model {
                 /**
                  * delete the old file in repo
                  */
-                e.delete();
+                // e.delete();
 
                 if (restart) {
                     new WorkerTask() {
@@ -500,7 +514,13 @@ public class module extends Model {
     public void delete() {
         String name = this.getString("name");
         Module m = Module.load(name);
-
+        String url = m.get("repo");
+        if (!X.isEmpty(url)) {
+            Entity e = Repo.loadByUri(url);
+            if (e != null) {
+                e.delete();
+            }
+        }
         m.delete();
 
         index();

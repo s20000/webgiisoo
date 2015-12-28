@@ -358,8 +358,7 @@ public class TConn extends Bean {
     /**
      * Send.
      * 
-     * @param b
-     *            the b
+     * @param bb
      * @param requireEncode
      *            the require encode
      */
@@ -628,7 +627,7 @@ public class TConn extends Bean {
      * @param host
      * @param port
      * @param resp
-     * @return
+     * @return TConn
      */
     public static TConn connectByTcp(String host, int port, IResponse resp) {
         return connectByTcp(host, port, resp, X.AMINUTE);

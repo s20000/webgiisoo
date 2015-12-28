@@ -27,7 +27,7 @@ import net.sf.json.JSONString;
 /**
  * Verifies if a value is a valid JSON value.
  *
- * @author Andres Almiray <aalmiray@users.sourceforge.net>
+ * @author Andres Almiray 
  */
 public final class JsonVerifier {
 

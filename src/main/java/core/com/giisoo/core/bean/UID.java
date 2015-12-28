@@ -7,9 +7,8 @@ import java.util.UUID;
 import com.giisoo.core.conf.SystemConfig;
 import com.giisoo.utils.base.*;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class UID.
+ * The Class UID that used to create unique id, or sequence no
  */
 public class UID extends Bean {
 
@@ -200,7 +199,7 @@ public class UID extends Bean {
     /**
      * global id
      * 
-     * @return
+     * @return String
      */
     public static String uuid() {
         return UUID.randomUUID().toString();

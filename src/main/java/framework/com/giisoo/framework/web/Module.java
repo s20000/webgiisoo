@@ -92,11 +92,6 @@ public class Module {
      */
     String readme;
 
-    /**
-     * @deprecated
-     */
-    String setting;
-
     /*
      * (non-Javadoc)
      * 
@@ -143,8 +138,7 @@ public class Module {
     private static TreeMap<Integer, Module> modules = new TreeMap<Integer, Module>();
 
     /**
-     * cache the model in the module, the modelMap structure: {"uri",
-     * "class<Model>"}
+     * cache the model in the module, the modelMap structure: {"uri", "class"}
      */
     protected Map<String, Class<Model>> modelMap = new HashMap<String, Class<Model>>();
 
@@ -201,7 +195,6 @@ public class Module {
             p.setProperty("lifelistener", lifelistener);
             p.setProperty("id", id);
             p.setProperty("enabled", enabled);
-            p.setProperty("setting", setting);
 
             p.setProperty("version", version);
             p.setProperty("build", build);
@@ -229,6 +222,10 @@ public class Module {
      */
     public String get(String name) {
         return get(name, null);
+    }
+
+    public String getRepo() {
+        return get(this.name + "_repo");
     }
 
     /**
@@ -620,7 +617,6 @@ public class Module {
                 t.version = p.getString("version", null);
                 t.build = p.getString("build", null);
                 t.transparent = p.getString("transparent.url", null);
-                t.setting = p.getString("setting", "/admin/setting/" + name);
 
                 // Iterator<String> it = p.getKeys("setting.");
                 //
@@ -908,6 +904,7 @@ public class Module {
             File f = new File(path + "/view" + uri);
             // log.debug("testing: " + f.getAbsolutePath() + ", exists?" +
             // f.exists());
+
             if (f.exists() && f.getCanonicalPath().startsWith(path + "/view"))
                 return f;
 
@@ -1212,14 +1209,6 @@ public class Module {
         }
 
         return null;
-    }
-
-    /**
-     * @deprecated
-     * @return String
-     */
-    public String getSetting() {
-        return setting;
     }
 
     /**

@@ -24,18 +24,15 @@ html, body {
 #head .center {
 	width: 900px;
 	text-align: center;
+	display: inline-block;
 }
 
 #content {
 	overflow: hidden;
 	background: none;
-	margin: 0;
 	z-index: 1000;
-}
-
-#head .title {
-	font-size: 15pt;
-	top: 13px;
+	text-align: center;
+	margin: 0;
 }
 
 #head .title g {
@@ -45,15 +42,13 @@ html, body {
 
 #content.login {
 	display: inline-block;
+	width: 100%;
 }
 
 #content .center {
 	width: 850px;
 	overflow: hidden;
-}
-
-#content.login .center {
-	background: url(/images/login_img.jpg) no-repeat;
+	display: inline-block;
 }
 
 #foot {
@@ -65,7 +60,6 @@ html, body {
 }
 
 #content .form {
-	padding: 20px 50px 50px 50px;
 	width: 500px;
 	display: inline-block;
 	text-align: left;
@@ -74,21 +68,23 @@ html, body {
 	position: relative;
 	box-shadow: 1px 1px 3px #456;
 	line-height: 40px;
-	margin: 40px 0;
 	border-radius: 10px;
+	margin: 40px 0;
+	padding: 20px 50px 50px;
 }
 
 #content.login form {
-	background-color: #b7c7e1;
 	width: 380px;
 	border-radius: 10px;
-	padding: 20px 30px 40px 30px;
-	margin: 40px 40px 40px 400px;
 	color: #222;
 	box-shadow: 1px 1px 3px #456;
 	line-height: 40px;
 	display: inline-block;
 	text-align: left;
+	border: 4px solid #fff;
+	background-color: #4A89F0;
+	margin: 0 40px;
+	padding: 20px 30px 40px;
 }
 
 #content .register {
@@ -97,11 +93,11 @@ html, body {
 	display: inline-block;
 	background-color: #b7c7e1;
 	border-radius: 10px;
-	padding: 40px 30px;
-	margin: 20px 0;
 	color: #222;
 	box-shadow: 1px 1px 3px #456;
 	line-height: 40px;
+	margin: 20px 0;
+	padding: 40px 30px;
 }
 
 #content .register .note {
@@ -118,6 +114,7 @@ html, body {
 .inner .title {
 	font-size: 16pt;
 	border-bottom: 1px solid #f1f1f1;
+	color: #fefefe;
 }
 
 .inner .left {
@@ -161,15 +158,16 @@ label {
 
 .login label {
 	width: 80px;
+	color: #fefefe;
 }
 
 button {
 	margin-top: 20px;
-	padding: 6px 14px;
 	line-height: 20px;
 	margin-left: 90px;
 	width: 200px;
 	background-color: #314BA2;
+	padding: 6px 14px;
 }
 
 button:hover {
@@ -177,7 +175,7 @@ button:hover {
 }
 
 button:active {
-	background-color: #142661
+	background-color: #142661;
 }
 
 .inner .right a {
@@ -198,33 +196,18 @@ div.message {
 	color: #fff;
 }
 
-#content.login .center {
-	background: none;
-}
-
 #head .logo {
 	position: relative;
+	float: none;
 }
 
 #head .title {
+	font-size: 15pt;
 	position: relative;
 	text-align: center;
 	width: initial;
 	left: 0;
 	top: 24px;
 	color: #fff;
-}
-
-#content.login form {
-	margin: 40px;
-	border: 4px solid #fff;
-	background-color: #4A89F0;
-}
-
-.inner .title {
-	color: #fefefe;
-}
-
-.login label {
-	color: #fefefe;
+	display: inline-block;
 }

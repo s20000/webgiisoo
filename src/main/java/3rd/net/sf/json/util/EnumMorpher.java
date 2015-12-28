@@ -19,7 +19,7 @@ package net.sf.json.util;
 import net.sf.ezmorph.ObjectMorpher;
 
 /**
- * @author Andres Almiray <aalmiray@users.sourceforge.net>
+ * @author Andres Almiray 
  */
 public class EnumMorpher implements ObjectMorpher
 {

@@ -49,7 +49,7 @@ import org.apache.commons.lang.StringUtils;
 /**
  * Utility class that helps configuring the serialization process.
  * 
- * @author Andres Almiray <aalmiray@users.sourceforge.net>
+ * @author Andres Almiray 
  */
 public class JsonConfig {
    public static final DefaultValueProcessorMatcher DEFAULT_DEFAULT_VALUE_PROCESSOR_MATCHER = DefaultValueProcessorMatcher.DEFAULT;

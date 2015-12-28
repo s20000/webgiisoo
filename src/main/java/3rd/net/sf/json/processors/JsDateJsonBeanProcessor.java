@@ -38,7 +38,7 @@ import net.sf.json.JsonConfig;
  }
  </pre>
  *
- * @author Andres Almiray <aalmiray@users.sourceforge.net>
+ * @author Andres Almiray 
  */
 public class JsDateJsonBeanProcessor implements JsonBeanProcessor {
 

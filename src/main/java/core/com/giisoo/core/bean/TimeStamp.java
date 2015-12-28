@@ -1,8 +1,7 @@
 package com.giisoo.core.bean;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class TimeStamp.
+ * The Class TimeStamp that timer utility class.
  */
 public class TimeStamp {
 

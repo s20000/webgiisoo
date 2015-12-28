@@ -455,10 +455,10 @@ function load1(uri) {
 
 function resize() {
 	var menu = $('#menu');
-	if(menu.length > 0) {
+	if (menu.length > 0) {
 		var h = $(window).height();
 		menu.css('height', (h - 120) + 'px');
-	
+
 		if (!menuapi) {
 			menuapi = menu.jScrollPane().data('jsp');
 		} else {

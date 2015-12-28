@@ -28,8 +28,8 @@ import org.apache.commons.beanutils.PropertyUtils;
  * Defines a custom setter to be used when setting object values.<br>
  * Specify with JsonConfig.setJsonPropertySetter().
  *
- * @author Gino Miceli <ginomiceli@users.sourceforge.net>
- * @author Andres Almiray <aalmiray@users.sourceforge.net>
+ * @author Gino Miceli 
+ * @author Andres Almiray 
  */
 public abstract class PropertySetStrategy {
    public static final PropertySetStrategy DEFAULT = new DefaultPropertySetStrategy();

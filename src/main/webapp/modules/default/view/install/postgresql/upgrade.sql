@@ -1,7 +1,6 @@
 alter table tbluser add department varchar(100);
-alter table tblconn drop uid;
 alter table tblconn add password varchar(128);
-alter table tblconn add uid int default 0;
+alter table tblconn alter uid type bigint;
 alter table tbluser add remote int default 0;
 alter table tbluser add logintimes int default 0;
 alter table tbluser add certid varchar(20);

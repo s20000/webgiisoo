@@ -411,7 +411,7 @@ public class Model {
                                         e.printStackTrace(out);
                                         sb.append(sw.toString());
 
-                                        OpLog.error(this.getClass().getName(), path == null ? uri : uri + "/" + path, lang.get("oplog.exception"), sb.toString().replaceAll("\r\n", "<br/>"),
+                                        OpLog.error(this.getClass().getName(), path == null ? uri : uri + "/" + path, lang.get("oplog.exception"), sb.toString().replaceAll("\r\n", "<br>"),
                                                 getUser() == null ? -1 : getUser().getId(), this.getRemoteHost());
                                     }
 
@@ -755,7 +755,7 @@ public class Model {
      * get the value from the context
      * 
      * @param name
-     * @return
+     * @return Object
      */
     final protected Object get(String name, Object defaultValue) {
         if (context != null) {
@@ -799,25 +799,6 @@ public class Model {
             this.set("pages", Paging.create(bs.getTotal(), s, n));
         }
     }
-
-    /**
-     * Sets the.
-     * 
-     * @param bs
-     *            the bs
-     * @param s
-     *            the s
-     * @param n
-     *            the n
-     */
-    // final protected void set(SearchResults<? extends Searchable> bs, int s,
-    // int n) {
-    // if (bs != null) {
-    // this.set("list", bs.getList());
-    // this.set("total", bs.total());
-    // this.set("pages", Paging.create(bs.total(), s, n));
-    // }
-    // }
 
     /**
      * Sets the.
@@ -1189,7 +1170,7 @@ public class Model {
     /**
      * get all param names
      * 
-     * @return Enumeration<String>
+     * @return Enumeration
      */
     @SuppressWarnings("unchecked")
     final protected Enumeration<String> getParameterNames() {
@@ -1433,7 +1414,7 @@ public class Model {
     /**
      * get the parameters names
      * 
-     * @return List<String>
+     * @return List
      */
     final protected List<String> getNames() {
         if (this._multipart) {
@@ -1649,10 +1630,8 @@ public class Model {
      * Gets the template.
      * 
      * @param viewname
-     *            the viewname
-     * @param allowOverride
-     *            the allow override
-     * @return the template
+     * @param allowEmpty
+     * @return Template
      */
     final protected Template getTemplate(String viewname, boolean allowEmpty) {
         Template template = cache.get(viewname);
@@ -1670,7 +1649,7 @@ public class Model {
     }
 
     /**
-     * Show.
+     * render and output the html page
      * 
      * @param viewname
      *            the viewname
@@ -1683,7 +1662,7 @@ public class Model {
     }
 
     /**
-     * Response.
+     * output the json as "application/json"
      * 
      * @param jo
      *            the jo
@@ -1713,6 +1692,7 @@ public class Model {
     /**
      * Response json.
      * 
+     * @deprecated
      * @param jsonstr
      *            the jsonstr
      */
@@ -1890,6 +1870,7 @@ public class Model {
                 }
             }
         }
+        log.warn("nosupport the POST" + this.path);
         show("/nosupport.html");
     }
 
@@ -1981,6 +1962,7 @@ public class Model {
      *            the error
      */
     final protected void deny(String error) {
+        log.warn("deny ... " + error);
         String request = this.getHeader("X-Requested-With");
         if ("XMLHttpRequest".equals(request)) {
             JSONObject jo = new JSONObject();
@@ -1994,6 +1976,7 @@ public class Model {
             this.set(X.ERROR, error);
             this.show("/deny.html", true);
         }
+
     }
 
     /**
@@ -2476,6 +2459,8 @@ public class Model {
     }
 
     final public void notsupport() {
+        log.warn("nosupport, support.ua=" + module.get("browser.support") + ", actual.ua=" + this.browser() + ", params=" + this.getJSON());
+
         this.show("/notsupport.html");
     }
 

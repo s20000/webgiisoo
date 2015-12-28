@@ -26,7 +26,7 @@ import net.sf.json.util.JSONUtils;
  * be DynaBeans and Lists, because the JSON notation does not carry any
  * information on java classes.<br>
  *
- * @author Andres Almiray <aalmiray@users.sourceforge.net>
+ * @author Andres Almiray 
  */
 public class JSONSerializer {
    /**

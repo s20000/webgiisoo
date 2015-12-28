@@ -592,7 +592,7 @@ defaultOptions.plotOptions.heatmap = merge(defaultOptions.plotOptions.scatter, {
 	},
 	marker: null,
 	tooltip: {
-		pointFormat: '{point.x}, {point.y}: {point.value}<br/>'
+		pointFormat: '{point.x}, {point.y}: {point.value}<br>'
 	},
 	states: {
 		normal: {

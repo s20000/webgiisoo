@@ -109,8 +109,9 @@ public class User extends Bean {
     /**
      * create a user from the jo
      * 
+     * @deprecated
      * @param jo
-     * @return
+     * @return int
      */
     public static int copy(JSONObject jo) {
 
@@ -279,17 +280,27 @@ public class User extends Bean {
     public static User loadById(long id) {
         String uid = "user://id/" + id;
         User u = (User) Cache.get(uid);
-        if (u != null) {
+        if (u != null && !u.expired()) {
             return u;
         }
 
-        u = Bean.load("tbluser", "id=?", new Object[] { id }, User.class);
+        u = Bean.load("id=?", new Object[] { id }, User.class);
         if (u != null) {
             u.setExpired(60);
+            u.recache();
         }
-        Cache.set(uid, u);
 
         return u;
+    }
+
+    private void recache() {
+        String uid = "user://id/" + getId();
+        Cache.set(uid, this);
+    }
+
+    private void cleanup() {
+        String uid = "user://id/" + getId();
+        Cache.remove(uid);
     }
 
     /**
@@ -583,7 +594,11 @@ public class User extends Bean {
                 break;
             }
         }
-        return Bean.update("id=?", new Object[] { getId() }, v.set("updated", System.currentTimeMillis()), User.class);
+        int i = Bean.update("id=?", new Object[] { getId() }, v.set("updated", System.currentTimeMillis()), User.class);
+        if (i > 0) {
+            cleanup();
+        }
+        return i;
     }
 
     public static int update(long id, V v) {

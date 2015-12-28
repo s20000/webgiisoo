@@ -91,8 +91,6 @@ public class Role extends Bean {
     /**
      * Gets the access.
      * 
-     * @param rid
-     *            the rid
      * @return the access
      */
     public List<String> getAccesses() {

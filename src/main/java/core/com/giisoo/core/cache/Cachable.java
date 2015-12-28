@@ -53,7 +53,7 @@ public interface Cachable extends Serializable {
 	public Object attachment(String key);
 
 	/**
-	 * set the expired time by second, <=0 never expired
+	 * set the expired time by second, -1 never expired
 	 * 
 	 * @param t
 	 */

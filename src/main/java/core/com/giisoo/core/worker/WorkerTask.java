@@ -310,7 +310,7 @@ public abstract class WorkerTask implements Runnable {
      * 
      * @param time
      *            , hh:mm
-     * @return
+     * @return WorkerTask
      */
     public WorkerTask schedule(String time) {
         if (time.startsWith("*")) {

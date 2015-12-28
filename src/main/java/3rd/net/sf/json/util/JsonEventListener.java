@@ -21,7 +21,7 @@ import net.sf.json.JSONException;
 /**
  * Defines the contract to handle JsonEvents when building an object or array.
  *
- * @author Andres Almiray <aalmiray@users.sourceforge.net>
+ * @author Andres Almiray 
  */
 public interface JsonEventListener {
 

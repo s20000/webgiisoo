@@ -52,15 +52,12 @@ public class OpLog extends Bean {
     }
 
     /**
-     * Load.
      * 
-     * @param w
-     *            the w
+     * @param query
+     * @param order
      * @param offset
-     *            the offset
      * @param limit
-     *            the limit
-     * @return the beans
+     * @return Beans
      */
     public static Beans<OpLog> load(BasicDBObject query, BasicDBObject order, int offset, int limit) {
         return Bean.load(query, order, offset, limit, OpLog.class);
@@ -125,7 +122,7 @@ public class OpLog extends Bean {
      * @deprecated
      * @param op
      * @param message
-     * @return
+     * @return int
      */
     public static int log(String op, String message) {
         return info("default", op, message, -1, null);

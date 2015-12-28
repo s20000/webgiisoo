@@ -155,29 +155,30 @@ public class user extends Model {
 
     }
 
-//    /**
-//     * Message_unread.
-//     */
-//    @Path(path = "message/unread", login = true, method = Model.METHOD_GET | Model.METHOD_POST)
-//    public void message_unread() {
-//        String ids = this.getString("id");
-//        int updated = 0;
-//        if (ids != null) {
-//            String[] ss = ids.split(",");
-//            V v = V.create("flag", Message.FLAG_NEW);
-//            for (String s : ss) {
-//                updated += Message.update(login.getId(), s, v);
-//            }
-//        }
-//
-//        if (updated > 0) {
-//            this.set(X.MESSAGE, lang.get("set_success"));
-//        } else {
-//            this.set(X.MESSAGE, lang.get("select.required"));
-//        }
-//
-//        message();
-//    }
+    // /**
+    // * Message_unread.
+    // */
+    // @Path(path = "message/unread", login = true, method = Model.METHOD_GET |
+    // Model.METHOD_POST)
+    // public void message_unread() {
+    // String ids = this.getString("id");
+    // int updated = 0;
+    // if (ids != null) {
+    // String[] ss = ids.split(",");
+    // V v = V.create("flag", Message.FLAG_NEW);
+    // for (String s : ss) {
+    // updated += Message.update(login.getId(), s, v);
+    // }
+    // }
+    //
+    // if (updated > 0) {
+    // this.set(X.MESSAGE, lang.get("set_success"));
+    // } else {
+    // this.set(X.MESSAGE, lang.get("select.required"));
+    // }
+    //
+    // message();
+    // }
 
     /**
      * Go.
@@ -639,151 +640,152 @@ public class user extends Model {
 
     }
 
-//    /**
-//     * Message_count.
-//     */
-//    @Path(path = "message/count", login = true)
-//    public void message_count() {
-//        JSONObject jo = new JSONObject();
-//        Beans<Message> bs = Message.load(login.getId(), W.create("flag", Message.FLAG_NEW), 0, 1);
-//        if (bs != null && bs.getTotal() > 0) {
-//            jo.put("count", bs.getTotal());
-//        } else {
-//            jo.put("count", 0);
-//        }
-//        jo.put(X.STATE, 200);
-//        this.response(jo);
-//    }
+    // /**
+    // * Message_count.
+    // */
+    // @Path(path = "message/count", login = true)
+    // public void message_count() {
+    // JSONObject jo = new JSONObject();
+    // Beans<Message> bs = Message.load(login.getId(), W.create("flag",
+    // Message.FLAG_NEW), 0, 1);
+    // if (bs != null && bs.getTotal() > 0) {
+    // jo.put("count", bs.getTotal());
+    // } else {
+    // jo.put("count", 0);
+    // }
+    // jo.put(X.STATE, 200);
+    // this.response(jo);
+    // }
 
-//    /**
-//     * Message_delete.
-//     */
-//    @Path(path = "message/delete", login = true)
-//    public void message_delete() {
-//        String ids = this.getString("id");
-//        int updated = 0;
-//        if (ids != null) {
-//            String[] ss = ids.split(",");
-//            for (String s : ss) {
-//                updated += Message.delete(login.getId(), s);
-//            }
-//        }
-//
-//        if (updated > 0) {
-//            this.set(X.MESSAGE, lang.get("delete_success"));
-//        } else {
-//            this.set(X.MESSAGE, lang.get("select.required"));
-//        }
-//
-//        message();
-//    }
+    // /**
+    // * Message_delete.
+    // */
+    // @Path(path = "message/delete", login = true)
+    // public void message_delete() {
+    // String ids = this.getString("id");
+    // int updated = 0;
+    // if (ids != null) {
+    // String[] ss = ids.split(",");
+    // for (String s : ss) {
+    // updated += Message.delete(login.getId(), s);
+    // }
+    // }
+    //
+    // if (updated > 0) {
+    // this.set(X.MESSAGE, lang.get("delete_success"));
+    // } else {
+    // this.set(X.MESSAGE, lang.get("select.required"));
+    // }
+    //
+    // message();
+    // }
 
-//    /**
-//     * Message_detail.
-//     */
-//    @Path(path = "message/detail", login = true)
-//    public void message_detail() {
-//        String id = this.getString("id");
-//        if (id == null) {
-//            message();
-//            return;
-//        }
-//
-//        Message m = Message.load(login.getId(), id);
-//        if (m == null) {
-//            message();
-//            return;
-//        }
-//
-//        this.set("m", m);
-//
-//        this.show("/user/message.detail.html");
-//    }
+    // /**
+    // * Message_detail.
+    // */
+    // @Path(path = "message/detail", login = true)
+    // public void message_detail() {
+    // String id = this.getString("id");
+    // if (id == null) {
+    // message();
+    // return;
+    // }
+    //
+    // Message m = Message.load(login.getId(), id);
+    // if (m == null) {
+    // message();
+    // return;
+    // }
+    //
+    // this.set("m", m);
+    //
+    // this.show("/user/message.detail.html");
+    // }
 
-//    /**
-//     * Message_mark.
-//     */
-//    @Path(path = "message/mark", login = true)
-//    public void message_mark() {
-//        String ids = this.getString("id");
-//        int updated = 0;
-//        if (ids != null) {
-//            String[] ss = ids.split(",");
-//            V v = V.create("flag", Message.FLAG_MARK);
-//            for (String s : ss) {
-//                updated += Message.update(login.getId(), s, v);
-//            }
-//        }
-//
-//        if (updated > 0) {
-//            this.set(X.MESSAGE, lang.get("save.success"));
-//        } else {
-//            this.set(X.MESSAGE, lang.get("select.required"));
-//        }
-//
-//        message();
-//    }
+    // /**
+    // * Message_mark.
+    // */
+    // @Path(path = "message/mark", login = true)
+    // public void message_mark() {
+    // String ids = this.getString("id");
+    // int updated = 0;
+    // if (ids != null) {
+    // String[] ss = ids.split(",");
+    // V v = V.create("flag", Message.FLAG_MARK);
+    // for (String s : ss) {
+    // updated += Message.update(login.getId(), s, v);
+    // }
+    // }
+    //
+    // if (updated > 0) {
+    // this.set(X.MESSAGE, lang.get("save.success"));
+    // } else {
+    // this.set(X.MESSAGE, lang.get("select.required"));
+    // }
+    //
+    // message();
+    // }
 
-//    /**
-//     * Message_done.
-//     */
-//    @Path(path = "message/done", login = true)
-//    public void message_done() {
-//        String ids = this.getString("id");
-//        int updated = 0;
-//        if (ids != null) {
-//            String[] ss = ids.split(",");
-//            V v = V.create("flag", Message.FLAG_DONE);
-//            for (String s : ss) {
-//                updated += Message.update(login.getId(), s, v);
-//            }
-//        }
-//
-//        if (updated > 0) {
-//            this.set(X.MESSAGE, lang.get("save.success"));
-//        } else {
-//            this.set(X.MESSAGE, lang.get("select.required"));
-//        }
-//
-//        message();
-//
-//    }
+    // /**
+    // * Message_done.
+    // */
+    // @Path(path = "message/done", login = true)
+    // public void message_done() {
+    // String ids = this.getString("id");
+    // int updated = 0;
+    // if (ids != null) {
+    // String[] ss = ids.split(",");
+    // V v = V.create("flag", Message.FLAG_DONE);
+    // for (String s : ss) {
+    // updated += Message.update(login.getId(), s, v);
+    // }
+    // }
+    //
+    // if (updated > 0) {
+    // this.set(X.MESSAGE, lang.get("save.success"));
+    // } else {
+    // this.set(X.MESSAGE, lang.get("select.required"));
+    // }
+    //
+    // message();
+    //
+    // }
 
-//    /**
-//     * Message.
-//     */
-//    @Path(path = "message", login = true)
-//    public void message() {
-//
-//        JSONObject jo = this.getJSON();
-//        if (!"message".equals(this.path)) {
-//            Object o = this.getSession().get("query");
-//            if (o != null && o instanceof JSONObject) {
-//                jo.clear();
-//                jo.putAll((JSONObject) o);
-//            }
-//        } else {
-//            this.getSession().set("query", jo).store();
-//        }
-//        W w = W.create();
-//        w.copy(jo, W.OP_LIKE, "subject").copy(jo, W.OP_EQ, "flag");
-//        this.set(jo);
-//
-//        int s = this.getInt(jo, "s");
-//        int n = this.getInt(jo, "n", 10, "default.list.number");
-//
-//        Beans<Message> bs = Message.load(login.getId(), w, s, n);
-//        this.set(bs, s, n);
-//        if (bs != null && bs.getList() != null && bs.getList().size() > 0) {
-//            for (Message m : bs.getList()) {
-//                if (Message.FLAG_NEW.equals(m.getFlag())) {
-//                    m.update(V.create("flag", Message.FLAG_READ));
-//                }
-//            }
-//        }
-//
-//        this.show("/user/user.message.html");
-//    }
+    // /**
+    // * Message.
+    // */
+    // @Path(path = "message", login = true)
+    // public void message() {
+    //
+    // JSONObject jo = this.getJSON();
+    // if (!"message".equals(this.path)) {
+    // Object o = this.getSession().get("query");
+    // if (o != null && o instanceof JSONObject) {
+    // jo.clear();
+    // jo.putAll((JSONObject) o);
+    // }
+    // } else {
+    // this.getSession().set("query", jo).store();
+    // }
+    // W w = W.create();
+    // w.copy(jo, W.OP_LIKE, "subject").copy(jo, W.OP_EQ, "flag");
+    // this.set(jo);
+    //
+    // int s = this.getInt(jo, "s");
+    // int n = this.getInt(jo, "n", 10, "default.list.number");
+    //
+    // Beans<Message> bs = Message.load(login.getId(), w, s, n);
+    // this.set(bs, s, n);
+    // if (bs != null && bs.getList() != null && bs.getList().size() > 0) {
+    // for (Message m : bs.getList()) {
+    // if (Message.FLAG_NEW.equals(m.getFlag())) {
+    // m.update(V.create("flag", Message.FLAG_READ));
+    // }
+    // }
+    // }
+    //
+    // this.show("/user/user.message.html");
+    // }
 
     /**
      * Dashboard.
@@ -819,26 +821,26 @@ public class user extends Model {
             JSONObject j = this.getJSON();
             User u = User.loadById(id);
             if (u != null) {
-                u.update(V.create().copy(j, "nickname", "password", "title", "department", "phone"));
+                u.update(V.create().copy(j, "nickname", "password", "title"));
 
                 this.set("message", lang.get("message.edit.success"));
-
                 this.set(X.MESSAGE, lang.get("save.success"));
+                u = User.loadById(id);
+                this.setUser(u);
 
             } else {
                 this.set(X.ERROR, lang.get("save.failed"));
             }
-
-            dashboard();
+            this.set(j);
         } else {
             User u = User.loadById(login.getId());
             this.set("u", u);
             JSONObject jo = new JSONObject();
             u.toJSON(jo);
             this.set(jo);
-
-            this.show("/user/user.edit.html");
         }
+
+        this.show("/user/user.edit.html");
     }
 
     /**

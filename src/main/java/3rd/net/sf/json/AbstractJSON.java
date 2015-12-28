@@ -30,15 +30,18 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Base class for JSONObject and JSONArray.
  *
- * @author Andres Almiray <aalmiray@users.sourceforge.net>
+ * @author Andres Almiray 
  */
 abstract class AbstractJSON {
-   private static class CycleSet extends ThreadLocal {
-      protected Object initialValue() {
+   @SuppressWarnings("rawtypes")
+private static class CycleSet extends ThreadLocal {
+      @SuppressWarnings("unchecked")
+    protected Object initialValue() {
          return new SoftReference(new HashSet());
       }
 
-      public Set getSet() {
+      @SuppressWarnings("unchecked")
+    public Set getSet() {
          Set set = (Set) ((SoftReference)get()).get();
          if( set == null ) {
              set = new HashSet();
@@ -59,14 +62,16 @@ abstract class AbstractJSON {
     * @return true if the instance has not been added previously, false
     *        otherwise.
     */
-   protected static boolean addInstance( Object instance ) {
+   @SuppressWarnings("unchecked")
+protected static boolean addInstance( Object instance ) {
       return getCycleSet().add( instance );
    }
 
    /**
     * Fires an end of array event.
     */
-   protected static void fireArrayEndEvent( JsonConfig jsonConfig ) {
+   @SuppressWarnings("rawtypes")
+protected static void fireArrayEndEvent( JsonConfig jsonConfig ) {
       if( jsonConfig.isEventTriggeringEnabled() ){
          for( Iterator listeners = jsonConfig.getJsonEventListeners()
                .iterator(); listeners.hasNext(); ){
@@ -83,7 +88,8 @@ abstract class AbstractJSON {
    /**
     * Fires a start of array event.
     */
-   protected static void fireArrayStartEvent( JsonConfig jsonConfig ) {
+   @SuppressWarnings("rawtypes")
+protected static void fireArrayStartEvent( JsonConfig jsonConfig ) {
       if( jsonConfig.isEventTriggeringEnabled() ){
          for( Iterator listeners = jsonConfig.getJsonEventListeners()
                .iterator(); listeners.hasNext(); ){
@@ -103,7 +109,8 @@ abstract class AbstractJSON {
     * @param index the index where the element was added
     * @param element the added element
     */
-   protected static void fireElementAddedEvent( int index, Object element, JsonConfig jsonConfig ) {
+   @SuppressWarnings("rawtypes")
+protected static void fireElementAddedEvent( int index, Object element, JsonConfig jsonConfig ) {
       if( jsonConfig.isEventTriggeringEnabled() ){
          for( Iterator listeners = jsonConfig.getJsonEventListeners()
                .iterator(); listeners.hasNext(); ){
@@ -122,7 +129,8 @@ abstract class AbstractJSON {
     *
     * @param jsone the thrown exception
     */
-   protected static void fireErrorEvent( JSONException jsone, JsonConfig jsonConfig ) {
+   @SuppressWarnings("rawtypes")
+protected static void fireErrorEvent( JSONException jsone, JsonConfig jsonConfig ) {
       if( jsonConfig.isEventTriggeringEnabled() ){
          for( Iterator listeners = jsonConfig.getJsonEventListeners()
                .iterator(); listeners.hasNext(); ){
@@ -139,7 +147,8 @@ abstract class AbstractJSON {
    /**
     * Fires an end of object event.
     */
-   protected static void fireObjectEndEvent( JsonConfig jsonConfig ) {
+   @SuppressWarnings("rawtypes")
+protected static void fireObjectEndEvent( JsonConfig jsonConfig ) {
       if( jsonConfig.isEventTriggeringEnabled() ){
          for( Iterator listeners = jsonConfig.getJsonEventListeners()
                .iterator(); listeners.hasNext(); ){
@@ -156,7 +165,8 @@ abstract class AbstractJSON {
    /**
     * Fires a start of object event.
     */
-   protected static void fireObjectStartEvent( JsonConfig jsonConfig ) {
+   @SuppressWarnings("rawtypes")
+protected static void fireObjectStartEvent( JsonConfig jsonConfig ) {
       if( jsonConfig.isEventTriggeringEnabled() ){
          for( Iterator listeners = jsonConfig.getJsonEventListeners()
                .iterator(); listeners.hasNext(); ){
@@ -177,7 +187,8 @@ abstract class AbstractJSON {
     * @param value the value of the property
     * @param accumulated if the value has been accumulated over 'key'
     */
-   protected static void firePropertySetEvent( String key, Object value, boolean accumulated,
+   @SuppressWarnings("rawtypes")
+protected static void firePropertySetEvent( String key, Object value, boolean accumulated,
          JsonConfig jsonConfig ) {
       if( jsonConfig.isEventTriggeringEnabled() ){
          for( Iterator listeners = jsonConfig.getJsonEventListeners()
@@ -197,7 +208,8 @@ abstract class AbstractJSON {
     *
     * @param warning the warning message
     */
-   protected static void fireWarnEvent( String warning, JsonConfig jsonConfig ) {
+   @SuppressWarnings("rawtypes")
+protected static void fireWarnEvent( String warning, JsonConfig jsonConfig ) {
       if( jsonConfig.isEventTriggeringEnabled() ){
          for( Iterator listeners = jsonConfig.getJsonEventListeners()
                .iterator(); listeners.hasNext(); ){
@@ -214,7 +226,8 @@ abstract class AbstractJSON {
    /**
     * Removes a reference for cycle detection check.
     */
-   protected static void removeInstance( Object instance ) {
+   @SuppressWarnings("rawtypes")
+protected static void removeInstance( Object instance ) {
       Set set = getCycleSet();
       set.remove( instance );
       if(set.size() == 0) {
@@ -222,7 +235,8 @@ abstract class AbstractJSON {
       }
    }
 
-   protected Object _processValue( Object value, JsonConfig jsonConfig ) {
+   @SuppressWarnings("rawtypes")
+protected Object _processValue( Object value, JsonConfig jsonConfig ) {
       if( JSONNull.getInstance().equals( value ) ) {
          return JSONNull.getInstance();
       } else if( Class.class.isAssignableFrom( value.getClass() ) || value instanceof Class ) {
@@ -280,7 +294,8 @@ abstract class AbstractJSON {
       }
    }
    
-   private static Set getCycleSet() {
+   @SuppressWarnings("rawtypes")
+private static Set getCycleSet() {
       return cycleSet.getSet();
    }
 }

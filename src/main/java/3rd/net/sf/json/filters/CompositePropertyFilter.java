@@ -23,7 +23,7 @@ import java.util.List;
 import net.sf.json.util.PropertyFilter;
 
 /**
- * @author Andres Almiray <aalmiray@users.sourceforge.net>
+ * @author Andres Almiray 
  */
 public class CompositePropertyFilter implements PropertyFilter {
    @SuppressWarnings("rawtypes")
