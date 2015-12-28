@@ -20,6 +20,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -37,6 +38,8 @@ import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
+import com.mongodb.MapReduceCommand;
+import com.mongodb.MapReduceOutput;
 import com.mongodb.Mongo;
 import com.mongodb.MongoOptions;
 import com.mongodb.ServerAddress;
@@ -3201,6 +3204,18 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
         return defaultValue;
     }
 
+    /**
+     * load record in database
+     * 
+     * @deprecated
+     * @param table
+     * @param where
+     * @param args
+     * @param orderby
+     * @param clazz
+     * @param db
+     * @return T
+     */
     protected static <T extends Bean> T load(String table, String where, Object[] args, String orderby, Class<T> clazz, String db) {
         try {
             T b = (T) clazz.newInstance();
@@ -3213,25 +3228,6 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
         }
         return null;
     }
-
-    // @Override
-    // public boolean load(String where, Object o) {
-    // /**
-    // * not support
-    // */
-    // return false;
-    // }
-
-    // /**
-    // * @deprecated
-    // */
-    // @Override
-    // public String getDisplay() {
-    // /**
-    // * not support
-    // */
-    // return null;
-    // }
 
     /**
      * set the extra value
@@ -3485,6 +3481,11 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
 
     private Map<String, Object> extra = null;
 
+    /**
+     * create the data as json
+     * 
+     * @return JSONObject
+     */
     public JSONObject getJSON() {
         if (extra == null) {
             return null;
@@ -4009,6 +4010,13 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
         }
     }
 
+    /**
+     * test whether the query is exists in
+     * 
+     * @param query
+     * @param t
+     * @return boolean
+     */
     public static boolean exists(DBObject query, Class<? extends Bean> t) {
         String collection = getCollection(t);
         if (collection != null) {
@@ -4020,6 +4028,88 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
             }
         }
         return false;
+    }
+
+    /**
+     * get the result by mapReduce in mongo
+     * 
+     * @param collection
+     * @param mapjs
+     * @param reducejs
+     * @param finaljs
+     * @param query
+     * @param limit
+     * @return Map
+     */
+    public static Map<String, Object> mapReduce(String collection, String mapjs, String reducejs, String finaljs, DBObject query, int limit) {
+
+        DBCollection dc = getCollection(collection);
+        MapReduceCommand cmd = new MapReduceCommand(dc, mapjs, reducejs, null, MapReduceCommand.OutputType.INLINE, query);
+        // set limit rows;
+        if (limit > 0)
+            cmd.setLimit(limit);
+
+        cmd.setFinalize(finaljs);
+
+        MapReduceOutput out = dc.mapReduce(cmd);
+        LinkedHashMap<String, Object> output = new LinkedHashMap<String, Object>();
+        for (DBObject o : out.results()) {
+            // System.out.println("row result = " + o.toString());
+
+            // get X axis first, put it at first position of map
+            Map<String, Object> x = ((BasicDBObject) o.get(X._ID)).toMap();
+            for (Map.Entry<String, Object> m : x.entrySet()) {
+                String key = m.getKey();
+                // if (key.equalsIgnoreCase("_table_")) {
+                // return tableDataOutput(((BasicDBObject)
+                // o.get("value")).toMap());
+                // }
+
+                Object obj = m.getValue();
+                // String valueString = "";
+                // if (obj instanceof Double) {
+                // valueString = String.format("%#.2f", obj);
+                // } else if (obj instanceof Integer) {
+                // valueString = obj.toString();
+                // } else {
+                // valueString = "'" + obj + "'";
+                // String[] orderedValue = valueString.split("##");
+                // if (orderedValue.length > 1) {
+                // valueString = "'" + orderedValue[1];
+                // }
+                // }
+
+                if (output.containsKey(key)) {
+                    Object outValue = output.get(key);
+                    output.put(key, outValue + "," + obj);
+                } else {
+                    output.put(key, obj);
+                }
+            }
+
+            // get Y axis ;
+            Map<String, Object> y = ((BasicDBObject) o.get("value")).toMap();
+            for (Map.Entry<String, Object> m : y.entrySet()) {
+                String key = m.getKey();
+                Object obj = m.getValue();
+                // String valueString = "";
+                // if (obj instanceof Double) {
+                // valueString = String.format("%#.2f", obj);
+                // } else {
+                // valueString = obj + "";
+                // }
+
+                if (output.containsKey(key)) {
+                    Object outValue = output.get(key);
+                    output.put(key, outValue + "," + obj);
+                } else {
+                    output.put(key, obj);
+                }
+
+            }
+        }
+
+        return output;
     }
 
 }
