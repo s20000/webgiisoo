@@ -4109,6 +4109,8 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
             }
         }
 
+        log.debug("mapreduce: query=" + query + ", mapjs=" + mapjs + ", reducejs=" + reducejs + ", finaljs=" + finaljs + ", output=" + output);
+
         return output;
     }
 
