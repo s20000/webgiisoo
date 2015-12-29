@@ -28,6 +28,10 @@
 			<fileset dir="target/webgiisoo/WEB-INF" />
 		</copy>
 
+		<copy todir="target/webgiisoo/modules/default/view/docs">
+			<fileset file="target/webgiisoo.war" />
+		</copy>
+
 		<zip destfile="target/webgiisoo_${version}_${BUILDNO}.zip">
 			<fileset dir="target/webgiisoo/modules/default">
 				<exclude name="**/WEB-INF/classes/**" />

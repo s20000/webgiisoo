@@ -363,7 +363,8 @@ public class module extends Model {
                     if (!X.isEmpty(repo)) {
                         log.debug("old.repo=" + repo + ", new.repo=" + url);
                         Entity e1 = Repo.loadByUri(repo);
-                        if (e1 != null) {
+                        if (e1 != null && !e1.getId().equals(e.getId())) {
+                            // not the same file
                             e1.delete();
                         }
                     }
