@@ -1,8 +1,0 @@
-
-<input class="fileupload" type="file" name="file" resuming="true"/>
-
-<script>
-$(function(){
-	$('#panel input[resuming=true]').fileuploader({});
-})
-</script>
