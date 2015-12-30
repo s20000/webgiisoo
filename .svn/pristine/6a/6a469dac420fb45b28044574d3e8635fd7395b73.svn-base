@@ -1,0 +1,13 @@
+#check and install nginx
+apt-get -y install nginx
+
+#check and install postgresql
+apt-get -y install postgresql-9.3
+ 
+#check and install mongodb
+apt-get -y install mongodb
+ 
+ #check and install sysv-rc-conf
+ apt-get -y install sysv-rc-conf
+ 
+ 

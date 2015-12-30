@@ -1,0 +1,54 @@
+<div class='head'>访问日志</div>
+
+#parse('/widget/widget.message.html')
+
+<div class='tabs'>
+	<a href='/admin/accesslog' class='selected'>访问日志</a>
+</div>
+
+<form action='/admin/accesslog' method='post' class='form'>
+	<div><label><h3>URI</h3>:<input type='text' name='guri' value="$!guri" /></label></div>
+	<div><label><h3>IP</h3>:<input type='text' name='ip' value="$!ip" /></label></div>
+
+	<div class='submit'>
+		<button type='submit'>$lang.get('btn.ok')</button>
+	</div>
+</form>
+
+<table id='accesslog-table' class='tablesorter nospace' border="0" cellpadding="0" cellspacing="1">
+	<thead>
+		<tr>
+			<th>URL</th>
+			<th>Method</th>
+			<th>Cost(ms)</th>
+			<th>SID</th>
+			<th>UID</th>
+			<th>USERNAME</th>
+			<th>IP</th>
+			<th>Created</th>
+		</tr>
+	</thead>
+	<tbody>
+#foreach($f in $list)
+	<tr>
+		<td>$!f.url</td>
+		<td>$!f.method</td>
+		<td>$!f.cost</td>
+		<td>$!f.sid</td>
+		<td>$!f.uid</td>
+		<td>$!f.username</td>
+		<td>$!f.ip</td>
+		<td>$lang.format($!f.created, 'yyyy-MM-dd HH:mm')</td>
+	</tr>
+#end
+	</tbody>
+</table>
+
+ #parse('/widget/goto.page.html')
+
+<script>
+$(function(){
+	$('#accesslog-table').tablesorter();
+})
+
+</script>

@@ -1,0 +1,70 @@
+<div class='head'>$lang.get('user.history.title')</div>
+
+#parse('/widget/widget.message.html')
+
+<div class='tabs'>
+	<a href='/admin/user'>$lang.get('a.user')</a>
+	<a href='/admin/user/history'  class='selected' >$lang.get('a.history')</a>
+</div>
+
+<div class='search'>
+	<form action='/admin/user/history' method='get' #if($currentpage>0) style='display:none' #end >
+	
+<span><label><h3>$lang.get('log.starttime'):</h3><input type='text' data-beatpicker="true" name='starttime' value=#if($starttime) '$starttime' #else '' #end/></label></span>
+<span><label><h3>$lang.get('log.endtime'):</h3><input type='text' data-beatpicker="true" name='endtime' value=#if($endtime) '$endtime' #else '' #end/></label></span>
+<span><label><h3>$lang.get('log.user'):</h3><input type='text' name='uid'  value=#if($uid) '$uid' #else '' #end/></label></span>
+<span><label><h3>$lang.get('log.ip'):</h3><input type='text' name='ip' value=#if($ip) '$ip' #else '' #end/></label></span>
+<span><label><h3>$lang.get('log.type'):</h3>
+	<select name='type'>
+		<option value=''>$lang.get('log.type_all')</option>
+		<option value='0' #if($type == 0) selected #end>$lang.get('log.type_0')</option>
+		<option value='1' #if($type == 1) selected #end>$lang.get('log.type_1')</option>
+		<option value='2' #if($type == 2) selected #end>$lang.get('log.type_2')</option>
+	</select>
+</label></span>
+<span><label><h3>$lang.get('log.op'):</h3><input type='text' name='op'  value=#if($op) '$op' #else '' #end/></label></span>
+
+
+		<button class='btns1' type='submit'>$lang.get('a.search')</button>
+	</form>
+	
+	<div class='s1tab #if($currentpage>0) down #else up #end'>
+		<div class='arrow'></div>
+	</div>
+</div>
+
+<table id='log-table' class='tablesorter nospace' border="0" cellpadding="0" cellspacing="1">
+	<thead>
+		<tr>
+			<th class='date'>$lang.get('log.created')</th>
+			<th>$lang.get('log.type')</th>
+			<th>$lang.get('log.op')</th>
+			<th style='width: 40%'>$lang.get('log.message')</th>
+			<th>$lang.get('log.system')</th>
+			<th>$lang.get('user.name')</th>
+			<th>$lang.get('log.ip')</th>
+		</tr>
+	</thead>
+	<tbody>
+#foreach($f in $list)
+	<tr class='log_type_$f.type'>
+		<td>$lang.format($f.created, 'yy-MM-dd hh:mm:ss')</td>
+		<td class='type'>#if($f.type)$lang.get("log.type_$f.type")#end</td>
+		<td>#if($f.op)$lang.get("log.opt_$f.op")#end</td>
+		<td>#if($f.message)$f.message#end</td>
+		<td>#if($f.system)$f.system#end</td>
+		<td>#if($f.user)<i class='user'>$f.user.name</i>#end</td>
+		<td>#if($f.ip)$f.ip#end</td>
+	</tr>
+#end
+	</tbody>
+</table>
+
+#parse('/widget/goto.page.html')
+
+<div class='btns'>
+	<a href='javascript:;' onclick='back();'>$lang.get('a.back')</a>
+</div>
+<script>
+$('#log-table').tablesorter();
+</script>

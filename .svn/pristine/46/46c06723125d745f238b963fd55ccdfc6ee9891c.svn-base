@@ -1,0 +1,43 @@
+<div class='notes'>
+	<p>从远端服务器同步数据，或推送（发布）数据到远端服务器。</p>
+	<p>在模块中，调用SyncTask.register(String connection, String order, Type[] types)（参见<a href='/docs/apidocs/index.html' target='_blank'>Javadoc</a>） 来注册一个可同步数据集合。</p>
+</div>
+
+<div>
+	<label><h3>远端服务器接口</h3>:<input type='text' name='sync_url' value='$!sync_url' /><g>http://[host]/data</g></label>
+</div>
+<div>
+	<label><h3>接入号</h3>:<input type='text' name='sync_appid' value='$!sync_appid' /><g>远端服务器获得的接入号appid</g></label>
+</div>
+<div>
+	<label><h3>接入Key</h3>:<input type='text' name='sync_appkey' value='$!sync_appkey' /><g>在远端服务器获得的key</g></label>
+</div>
+
+#foreach($c in $groups)
+<div>
+	<label><h3>$lang.get("sync_$c")</h3>:
+		<select name='sync_$c'>
+			<option value=''></option>
+			#if($t.support($c, 'set'))
+			<option value='set' #if($t.setting($c) == 'set') selected #end>自动推送</option>
+			#end
+			#if($t.support($c, 'mset'))
+			<option value='mget' #if($t.setting($c) == 'mget') selected #end>手动推送</option>
+			#end
+			#if($t.support($c, 'get'))
+			<option value='get' #if($t.setting($c) == 'get') selected #end>自动同步</option>
+			#end
+		</select>
+		#if($t.collections($c).size() == 1)
+			<g>#if($t.lasttime($c1)>0) $lang.format($t.lasttime($c1), 'yyyy-MM-dd HH:mm:ss')</g>
+		#end
+	</label>
+	#if($t.collections($c).size() > 1)
+	<div class='sync_notes'>
+		#foreach($c1 in $t.collections($c))
+		<label><g>$lang.get("sync_$c1"): #if($t.lasttime($c1)>0) $lang.format($t.lasttime($c1), 'yyyy-MM-dd HH:mm:ss'), </g></label>
+		#end
+	</div>
+	#end
+</div>
+#end

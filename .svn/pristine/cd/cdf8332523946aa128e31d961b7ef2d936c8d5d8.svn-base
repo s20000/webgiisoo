@@ -1,0 +1,25 @@
+[{'name':'admin', seq:10, 'childs':[
+	{name:'menu.dashboard', load:'/admin/dashboard', classes:'dashboard', content:'', tip:'dashboard', seq:-1},
+	
+	{name:'menu.system', classes:'icon-settings', seq:10, childs:[
+		{name:'menu.setting',  load:'/admin/setting', classes:'icon-cogs2', seq:10},
+		{name:'menu.upgrade',  load:'/admin/upgrade/edit', classes:'icon-fire3', seq:20},
+		{name:'menu.clone',  load:'/admin/system/clone', classes:'icon-copy', seq:30},
+		{name:'menu.cluster',  load:'/admin/cluster', classes:'icon-spinner15', seq:40},
+		{name:'menu.urlmapping',  load:'load("/admin/url', classes:'icon-link3', seq:-1},
+		{name:'menu.db',  load:'load("/admin/db', classes:'icon-database2', seq:-1},
+		{name:'menu.mdc',  load:'/admin/mdc', classes:'icon-feed9', seq:-1},
+		{name:'menu.app',  load:'/admin/app', seq:-1, classes:'icon-power-cord2'},
+		{name:'menu.module',  load:'/admin/module', seq:1000, classes:'icon-joomla2'},
+		{name:'menu.log',  load:'/admin/log', seq:1010, classes:'icon-note'},
+		{name:'menu.accesslog',  load:'/admin/accesslog', seq:1020, classes:'icon-list3'},
+		{name:'menu.data',  load:'/admin/data', seq:1030, classes:'icon-database2'},
+		{name:'menu.keypair',  load:'/admin/keypair', seq:1040, classes:'icon-key6'},
+	]},
+	{name:'menu.usermgr', classes:'icon-users2', content:'', seq:20, childs:[
+		{name:'menu.user',  load:'/admin/user', seq:10, classes:'icon-user2'},
+		{name:'menu.role',  load:'/admin/role', seq:20, classes:'icon-shield2'},
+	]},
+]},
+{'name':'home', seq:20, childs:[]},
+{'name':'user', seq:30, childs:[]}]

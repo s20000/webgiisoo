@@ -1,0 +1,9 @@
+#parse('/docs/head.html')
+
+<div id="content">
+	<div class='center'>
+		<h1>快速开发</h1>
+	</div>
+</div>
+
+#parse('/docs/foot.html')

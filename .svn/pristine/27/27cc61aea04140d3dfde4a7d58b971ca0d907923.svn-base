@@ -1,0 +1,226 @@
+package com.giisoo.framework.utils;
+
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.xerces.impl.dv.util.Base64;
+
+import com.giisoo.core.bean.Beans;
+import com.giisoo.core.bean.X;
+import com.giisoo.core.conf.SystemConfig;
+import com.giisoo.core.worker.WorkerTask;
+import com.giisoo.framework.common.Data;
+import com.giisoo.framework.common.OpLog;
+import com.giisoo.framework.utils.Http;
+import com.giisoo.framework.utils.Http.Response;
+import com.giisoo.utils.base.DES;
+import com.mongodb.BasicDBObject;
+
+public class SyncTask extends WorkerTask {
+
+    static Log log = LogFactory.getLog(SyncTask.class);
+
+    public static SyncTask instance = new SyncTask();
+
+    public static enum Type {
+        set, get, mset;
+    };
+
+    private static Map<String, Type[]> collections = new LinkedHashMap<String, Type[]>();
+    private static Map<String, String> orders = new LinkedHashMap<String, String>();
+
+    public boolean support(String collection, String t) {
+        Type[] tt = collections.get(collection);
+        if (tt != null) {
+            for (Type t1 : tt) {
+                if (t1.toString().equals(t)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public String setting(String collection) {
+        return SystemConfig.s("sync." + collection, null);
+    }
+
+    public long lasttime(String collection) {
+        return SystemConfig.l("sync." + collection + ".lasttime", 0);
+    }
+
+    public static Map<String, Type[]> getCollections() {
+        return collections;
+    }
+
+    public static void register(String collection, Type... t) {
+        collections.put(collection, t);
+    }
+
+    public static void register(String collection, String order, Type... t) {
+        collections.put(collection, t);
+        orders.put(collection, order);
+    }
+
+    private SyncTask() {
+    }
+
+    private void sync(final String collection, final String url, final String appid, final String appkey) {
+        String type = SystemConfig.s("sync." + collection, X.EMPTY);
+
+        if ("get".equals(type)) {
+            new WorkerTask() {
+
+                @Override
+                public String getName() {
+                    return "synctask." + collection;
+                }
+
+                @Override
+                public void onExecute() {
+                    JSONObject req = new JSONObject();
+                    JSONObject query = new JSONObject();
+                    JSONObject order = new JSONObject();
+
+                    String o = orders.get(collection);
+                    if (X.isEmpty(o)) {
+                        order = JSONObject.fromObject(o);
+                    } else {
+                        order.put("updated", 1);
+                    }
+
+                    long updated = SystemConfig.l("sync." + collection + ".lasttime", 0);
+                    JSONObject q = new JSONObject();
+                    q.put("$gt", updated);
+                    query.put(order.keys().next(), q);
+
+                    req.put("query", query);
+                    req.put("order", order);
+                    req.put("collection", collection);
+
+                    int s = 0;
+                    int n = 100;
+
+                    try {
+                        boolean hasmore = true;
+                        while (hasmore) {
+                            hasmore = false;
+
+                            req.put("s", s);
+                            req.put("n", n);
+                            req.put("_time", System.currentTimeMillis());
+
+                            String data = Base64.encode(DES.encode(req.toString().getBytes(), appkey.getBytes()));
+
+                            Response r = Http.post(url, null, new String[][] { { "User-Agent", Publisher.USER_AGENT }, { "m", "get" } }, new String[][] { { "appid", appid }, { "data", data } });
+
+                            // log.debug("resp=" + r.body);
+                            if (r.status == 200) {
+                                JSONObject jo = JSONObject.fromObject(r.body);
+                                jo.convertBase64toString();
+                                log.debug("resp=" + jo);
+
+                                JSONArray arr = jo.getJSONArray("list");
+
+                                if (arr != null && arr.size() > 0) {
+
+                                    for (int i = 0; i < arr.size(); i++) {
+                                        JSONObject j1 = arr.getJSONObject(i);
+                                        Data.update(collection, j1);
+
+                                        long l1 = j1.getLong(order.keys().next().toString());
+                                        if (l1 > updated) {
+                                            updated = l1;
+                                            SystemConfig.setConfig("sync." + collection + ".lasttime", updated);
+                                        }
+                                    }
+
+                                    s += arr.size();
+                                    hasmore = arr.size() >= n;
+                                }
+                            } // end if "status == 200"
+
+                        }
+                    } catch (Exception e) {
+                        log.error(e.getMessage(), e);
+                        OpLog.warn("sync", e.getMessage(), e.getMessage());
+                    }
+                }
+
+            }.schedule(0);
+        } else if ("set".equals(type)) {
+            new WorkerTask() {
+
+                @Override
+                public String getName() {
+                    return "synctask." + collection;
+                }
+
+                @Override
+                public void onExecute() {
+
+                    // auto push
+                    BasicDBObject query = new BasicDBObject().append("synced", new BasicDBObject().append("$ne", 1));
+                    BasicDBObject order = new BasicDBObject().append(X._ID, 1);
+                    int s = 0;
+
+                    try {
+                        Beans<Data> bs = Data.load(collection, query, order, s, 100);
+                        JSONObject jo = new JSONObject();
+                        jo.put("synced", 1);
+                        while (bs != null && bs.getList() != null && bs.getList().size() > 0) {
+                            for (Data p : bs.getList()) {
+                                if (Publisher.publish(p) > 0) {
+                                    jo.put(X._ID, p.get(X._ID));
+                                    Data.update(collection, jo);
+                                }
+                            }
+
+                            // s += bs.getList().size();
+                            bs = Data.load(collection, query, order, s, 100);
+                        }
+                    } catch (Exception e) {
+                        log.error(e.getMessage(), e);
+                    }
+
+                }
+
+            }.schedule(0);
+        }
+    }
+
+    @Override
+    public void onExecute() {
+
+        final String url = SystemConfig.s("sync.url", null);
+        final String appid = SystemConfig.s("sync.appid", null);
+        final String appkey = SystemConfig.s("sync.appkey", null);
+        if (!X.isEmpty(url) && !X.isEmpty(appid) && !X.isEmpty(appkey)) {
+
+            for (String collection : collections.keySet()) {
+                sync(collection, url, appid, appkey);
+            }
+        }
+
+    }
+
+    @Override
+    public String getName() {
+        return "sync.task";
+    }
+
+    @Override
+    public void onFinish() {
+
+        log.info("sync.task done.......................");
+
+        this.schedule(X.AHOUR);
+    }
+
+}

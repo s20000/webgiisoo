@@ -1,0 +1,50 @@
+<div class='head'>$lang.get('module.create.title')</div>
+
+<div class='tabs'>
+	<a href='/admin/module'>$lang.get('a.module')</a>
+	<a href='/admin/module/create' class='selected'>$lang.get('a.module.create')</a>
+</div>
+
+#parse('/widget/widget.message.html')
+
+<div class='notes'>
+	<p>创建新模块，自动生成Eclipse项目工程。</p>
+	<p>在项目工程中，请使用ant编译创建模块包("??.zip")， 并在模板管理中上传模块包。</p>
+</div>
+
+<div class='form'>
+
+	<div><label><h3>ID</h3>:<input type='text' name='id' value='200'/><g>数字越大，越先被加载</g></label></div>
+	<div><label><h3>Name</h3>:<input type='text' name='name' value='demo'/></label></div>
+	<div><label><h3>Package</h3>:<input type='text' name='package' value='com.giisoo.demo.web' onblur='onpackage' /></label></div>
+	<div><label><h3>LifeListener</h3>:<input type='text' name='lifelistener' value='com.giisoo.demo.web.DemoListener'/></label><g>listen on the app life cycle</g></div>
+	<div><label><h3>Setting</h3>:<input type='text' name='setting' value='com.giisoo.demo.web.admin.demo'/></label></div>
+	<div><label><h3>Readme</h3>:<input type='text' name='readme' value='demo'/></label></div>
+
+	<div><a class='btn' href='javascript:;' onclick='oncreate();'>$lang.get('btn.create')</a></div>
+	
+</div>
+
+<iframe id='download' style='display: none'></iframe>
+
+<script>
+function oncreate() {
+	processing && processing.show();
+	var p = {};
+	$('div.form input').each(function(i, e){
+		e = $(e);
+		p[e.attr('name')] = e.val();
+	})
+	$.post('/admin/module/create', p, function(d){
+		processing && processing.hide();
+		
+		if(d.state == 200) {
+			$('#download').attr('src', d.file);
+		} else if(d.message) {
+			$.message(d.message);
+		} else {
+			$.error('未知错误！');
+		}
+	})
+}
+</script>

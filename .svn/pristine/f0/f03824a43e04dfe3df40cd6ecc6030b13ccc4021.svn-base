@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="DEMO" default="build" basedir=".">
+
+	<!-- Project Properties -->
+
+	<property file="src/module.ini" />
+
+	<property name="DEPLOYDIR" value="/opt/d/joe/www/webdemo" />
+	<property name="REPOSITORY" value="http://s1/repository" />
+
+	<tstamp>
+		<format property="TODAY" pattern="yyMMdd" locale="zh,CN" />
+		<format property="BUILDNO" pattern="yyMMddhhmm" locale="zh,CN" />
+	</tstamp>
+
+	<!-- Path Definitions -->
+	<path id="classpath">
+		<pathelement location="lib/servlet-api-2.3.jar" />
+		<fileset dir="depends">
+			<include name="*.jar" />
+		</fileset>
+	</path>
+
+	<!-- Task Definitions -->
+	<target name="build" description="build sever" depends="compile">
+		<delete file="target/${name}_${TODAY}.zip" />
+
+		<zip destfile="target/${name}_${TODAY}.zip">
+			<fileset dir="target/web${name}">
+				<exclude name="**/classes/**" />
+				<exclude name="override/**" />
+			</fileset>
+		</zip>
+	</target>
+
+	<target name="compile" description="compile Java source"
+		depends="">
+		<delete dir="target" quiet="false" />
+		<mkdir dir="target/classes" />
+
+		<copy todir="target/web${name}">
+			<fileset dir="src">
+				<exclude name="**/java/**" />
+			</fileset>
+		</copy>
+
+		<replaceregexp byline="true">
+			<fileset file="target/web${name}/module.ini" />
+			<regexp pattern="^build=\d+" />
+			<substitution expression="build=${BUILDNO}" />
+		</replaceregexp>
+
+		<javac srcdir="src/model/java" destdir="target/classes" debug="true"
+			encoding="utf-8" target='1.6' source="1.6" includeantruntime="false">
+			<classpath refid="classpath" />
+		</javac>
+
+		<jar destfile="target/web${name}/model/web-${name}_${TODAY}.jar"
+			basedir="target/classes" excludes="**/*Test.class" />
+	</target>
+
+	<target name="help" description="display the Help message">
+		<echo message="Quick Start web application" />
+		<echo message="===========================" />
+		<echo />
+		<echo message="Main targets:" />
+		<echo />
+		<echo message="build                 build web application WAR file" />
+		<echo message="compile               compile Java code" />
+		<echo
+			message="update                update the depends, download the latest depends jars" />
+		<echo message="help                  display the Help message" />
+		<echo />
+		<echo />
+	</target>
+
+	<target name="download-jar">
+		<sequential>
+			<get src="${REPOSITORY}/${jarName}" dest="depends/${jarName}"
+				verbose="true" usetimestamp="true" />
+		</sequential>
+	</target>
+
+	<target name="update">
+
+		<delete>
+			<fileset dir="depends" excludes="**/ant-contrib-1.0b3.jar" />
+		</delete>
+
+		<get src="${REPOSITORY}/list?modules=default" dest="depends/list" verbose="true"
+			usetimestamp="true" />
+
+		<loadfile property="jarNames" srcFile="depends/list"
+			encoding="UTF8" />
+
+		<foreach target="download-jar" param="jarName" list="${jarNames}"
+			delimiter=";">
+		</foreach>
+
+		<delete file="depends/list" />
+	</target>
+
+	<target name="deploy" depends="">
+		<delete dir="${DEPLOYDIR}/modules/${name}/" />
+
+		<copy todir="${DEPLOYDIR}/modules/${name}/">
+			<fileset dir="target/web${name}/" excludes="**/com/**" />
+		</copy>
+	</target>
+
+	<taskdef resource="net/sf/antcontrib/antcontrib.properties">
+		<classpath>
+			<pathelement location="depends/ant-contrib-1.0b3.jar" />
+		</classpath>
+	</taskdef>
+
+</project>

@@ -1,0 +1,30 @@
+	<div><label><h3>$lang.get('system.time')</h3>:<input type='text' name='time' value='$time' readonly=readonly/><a href='#leanmodal' rel='leanModal'>设置</a></label></div>
+	<div><label><h3>$lang.get('label.ntp')</h3>:<input type='text' name='ntp' value=#if($ntp)'$ntp' #else '' #end/></label></div>
+
+	<div><label><h3>$lang.get('label.deploycode')</h3>:<i>$!system_code</i></label></div>
+	<div><label><h3>$lang.get('label.systemcode')</h3>:<i>$lang.get("node.type_$module.node_type")</i></label></div>
+	<div><label><h3>$lang.get('label.nodename')</h3>:<input type='text' name='nodename' value="$!nodename"/></label></div>
+
+	<div><label class='full'><h3>$lang.get('label.pubkey')</h3>:<textarea name='pubkey'>$!pubkey</textarea></label></div>
+
+<div id='leanmodal' class='settime'>
+	<div class='leanmodal_header'><label><h3>$lang.get('system.settime')</h3>:<i></i></label></div>
+	<div><label><h3>$lang.get('system.time')</h3>:<input type='text' name='time' value='$time'/></label></div>
+	<button onclick='settime()'>$lang.get('btn.ok')</button>
+</div>
+<script>
+function settime(){
+	$.post('/admin/setting/settime', {time:$('#leanmodal input[name=time]').val()}, function(d){
+		if(d.state == 200) {
+			$('#panel input[name=time]').val(d.time);
+			$('#lean_overlay').click();
+			$.message('系统时间设置成功');
+		} else {
+			$.error(d.error);
+		}
+	})
+}
+$(function(){
+	 $("a[rel*=leanModal]").leanModal();
+})
+</script>
