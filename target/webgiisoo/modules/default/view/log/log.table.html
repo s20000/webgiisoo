@@ -1,0 +1,35 @@
+<table id='log-table' class='tablesorter nospace' border="0" cellpadding="0" cellspacing="1">
+	<thead>
+		<tr>
+			<th class='date'>$lang.get('log.created')</th>
+			<th>$lang.get('log.type')</th>
+			<th>$lang.get('log.op')</th>
+			<th style='width: 40%'>$lang.get('log.message')</th>
+			<th>$lang.get('log.system')</th>
+			<th>$lang.get('user.name')</th>
+			<th>$lang.get('log.ip')</th>
+		</tr>
+	</thead>
+	<tbody>
+#foreach($f in $list)
+	<tr class='log_type_$f.type'>
+		<td>$lang.format($f.created, 'yy-MM-dd hh:mm:ss')</td>
+		<td class='type'>#if($f.type)$lang.get("log.type_$f.type")#end</td>
+		<td>#if($f.op)$lang.get("log.opt_$f.op")#end</td>
+		<td>#if($f.message)$f.message#end</td>
+		<td>#if($f.system)$f.system#end</td>
+		<td>#if($f.user)<i class='user'>$f.user.name</i>#end</td>
+		<td>#if($f.ip)$f.ip#end</td>
+	</tr>
+#end
+	</tbody>
+</table>
+
+#parse('/widget/goto.page.html')
+
+<div class='btns'>
+	<a href='javascript:;' onclick='back();'>$lang.get('a.back')</a>
+</div>
+<script>
+$('#log-table').tablesorter();
+</script>

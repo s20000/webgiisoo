@@ -1,0 +1,67 @@
+package com.giisoo.core.stat;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Tree {
+
+    Map<Object, Attribute> attr = new HashMap<Object, Attribute>();
+    String name = "N/A";
+
+    public Tree set(String name) {
+
+        this.name = name;
+        return this;
+
+    }
+
+    public String get() {
+        return name;
+    }
+
+    public Attribute get(Object name) {
+
+        Attribute a = attr.get(name);
+        if (a == null) {
+            a = new Attribute();
+            attr.put(name, a);
+        }
+        return a;
+
+    }
+
+    public static class Attribute {
+        Map<String, Object> attr = new HashMap<String, Object>();
+
+        public Attribute set(String name, Object val) {
+            attr.put(name, val);
+            return this;
+        }
+
+        public Object get(String name) {
+            return attr.get(name);
+        }
+
+        public Tree create() {
+            Tree t = (Tree) attr.get("_");
+            if (t == null) {
+                t = new Tree();
+                attr.put("_", t);
+            }
+            return t;
+        }
+
+        public Tree tree() {
+            return (Tree) attr.get("_");
+        }
+
+        public String toString() {
+            return attr.toString();
+        }
+    }
+
+    public String toString() {
+        return name + "@" + attr;
+    }
+
+}

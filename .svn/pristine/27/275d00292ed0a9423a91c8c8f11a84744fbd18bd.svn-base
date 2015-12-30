@@ -1,0 +1,39 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=10" />
+<meta name="viewport" content="width=device-width" />
+<link rel="shortcut icon" href="/favicon.ico"
+	type="image/vnd.microsoft.icon" />
+<title>#if($browser_title) $browser_title | #end
+	$lang.get('browser.title')</title>
+<link href='/css/hint.min.css' rel='stylesheet' />
+<link href='/css/jquery.jscrollpane.css' rel='stylesheet' />
+<link href='/css/tablesorter.css' rel='stylesheet' />
+<link href='/css/beatpicker.css' rel='stylesheet' />
+<link href='/css/icons.css?$!module.module("default").build' rel='stylesheet' />
+<link href='/css/giisoo.css?$!module.module("default").build' rel='stylesheet' />
+<link href='/docs/css/style.css' rel='stylesheet' />
+
+<script type="text/javascript" src="/js/jquery-2.1.3.min.js"></script>
+<script type="text/javascript" src="/js/jquery.easing.1.3.js"></script>
+<script type="text/javascript" src="/js/jquery.leanmodal.js"></script>
+<script type="text/javascript" src="/js/jquery.menu.js"></script>
+<script type="text/javascript" src="/js/jquery.message.js"></script>
+<script type="text/javascript" src='/js/giisoo.js?$!module.module("default").build'></script>
+</head>
+<body>
+	<div id='head'>
+		<div class='center'>
+			<a href="/docs/index.html"><div id="logo"><img src="/images/giisoo.png"></div></a>
+			<ul class="navigation">
+				<li><a href='/docs/WebgiisooManualV3.2.pdf' target='_blank'>快速入门</a></li>
+				<li><a href='https://github.com/s20000/webgiisoo' target='_blank'>源码</a></li>
+				<li><a href='/docs/webgiisoo.war' target='_blank'>下载War包</a></li>
+				<li><a href="/docs/apidocs/index.html">Javadoc</a></li>
+				<li><a href="/admin">配置管理</a></li>
+			</ul>
+		</div>
+	</div>
+	

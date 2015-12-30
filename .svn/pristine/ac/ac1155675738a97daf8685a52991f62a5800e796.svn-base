@@ -1,0 +1,69 @@
+<div class='head'>$lang.get('cluster.index.title')</div>
+
+#parse('/widget/widget.message.html')
+
+<div class='tabs'>
+	<a href='/admin/cluster' class='selected'>$lang.get('a.cluster')</a>
+</div>
+
+<table id='cluster-table' class='tablesorter nospace' border="0" cellpadding="0" cellspacing="1">
+	<thead>
+		<tr>
+			<th>$lang.get('cluster.nodeid')</th>
+			<th>$lang.get('cluster.node')</th>
+			<th>$lang.get('cluster.ip')</th>
+			<th>$lang.get('cluster.status')</th>
+			<th>$lang.get('cluster.started')</th>
+			<th>$lang.get('cluster.version')</th>
+			<th>$lang.get('cluster.home')</th>
+			<th>Master</th>
+			<th>$lang.get('cluster.op')</th>
+		</tr>
+	</thead>
+	<tbody>
+#foreach($f in $list)
+	<tr class='cluster-status-$f.status'>
+		<td>$f.id</td>
+		<td>$!f.node</td>
+		<td>$!f.ip</td>
+		<td>$!f.status</td>
+		<td>$lang.format($!f.started, 'yyyy-MM-dd HH:mm')</td>
+		<td>$!f.version</td>
+		<td>$!f.home</td>
+		<td>#if($f.master) YES #end</td>
+		<td>
+			<a href='javascript:;' onclick='_delete("$f.id")'>$lang.get("a.delete")</a>
+			<a href='/admin/cluster/traffic?id=$f.id'>$lang.get("a.traffic")</a>
+		</td>
+	</tr>
+#end
+	</tbody>
+</table>
+
+ #parse('/widget/goto.page.html')
+
+<div class='btns'>
+	<a href='/admin/cluster/add'>$lang.get('a.add')</a>
+</div>
+
+<script>
+$(function(){
+	$('#cluster-table').tablesorter();
+	
+	if($('#cluster-table .cluster-status-installing').length > 0) {
+		if('#cluster-table'.length >0) {
+			setTimeout(function(){
+				reload();
+			}, 10000);
+		}
+	}
+})
+
+function _delete(id) {
+	processing && processing.show();
+	$.post("/admin/cluster/delete", {id:id}, function(d){
+		processing && processing.hide();
+		reload();
+	})
+}
+</script>

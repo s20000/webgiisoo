@@ -1,0 +1,8 @@
+	<div><label><h3>$lang.get('label.node')</h3>:<i>#if($node)$node #end</i></label></div>
+##	<div><label><h3>$lang.get('label.cross_context')</h3>:<input type='checkbox' name='cross_context' #if($cross_context=='true') checked #end/></label></div>
+##	<div><label><h3>$lang.get('label.session_key')</h3>:<input type='text' name='session_key' value=#if($session_key)'$session_key' #else '' #end/><g>$lang.get("session.key.note")</g></label></div>
+	<div><label><h3>$lang.get('label.oauth_enabled')</h3>:<input type='checkbox' name='oauth_enabled' #if($oauth_enabled=='true') checked #end/></label></div>
+	<div><label><h3>$lang.get('label.oauth_url')</h3>:<input type='text' name='oauth_url' value=#if($oauth_url)'$oauth_url' #else '' #end/><g>$lang.get("oauth.url.note")</g></label></div>
+	<div><label><h3>$lang.get('label.oauth_appid')</h3>:<input type='text' name='oauth_appid' value=#if($oauth_appid)'$oauth_appid' #else '' #end/></label></div>
+	<div><label><h3>$lang.get('label.oauth_key')</h3>:<input type='text' name='oauth_key' value=#if($oauth_key)'$oauth_key' #else '' #end/></label></div>
+	<div><label><h3>$lang.get('label.oauth_callback')</h3>:<input type='text' name='oauth_callback' value=#if($oauth_callback)'$oauth_callback' #else '' #end/></label></div>

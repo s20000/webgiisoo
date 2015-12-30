@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Created-By: Apache Maven
+Built-By: yjiang
+Build-Jdk: 1.6.0_16
+Specification-Title: webgiisoo Maven Webapp
+Specification-Version: 1.0
+Implementation-Title: webgiisoo Maven Webapp
+Implementation-Version: 1.0
+Implementation-Vendor-Id: com.giisoo.app
+

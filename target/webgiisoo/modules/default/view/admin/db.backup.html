@@ -1,0 +1,23 @@
+<div class='head'>$lang.get('db.backup.title')</div>
+
+#parse('/widget/widget.message.html')
+
+<div class='progress'>
+	<span class='bar'></span>
+</div>
+
+<script>
+function progress() {
+	$.post('/admin/db/progress', {}, function(d){
+		if(d.progress >= 100) {
+			clearInterval(timer);
+			load('/admin/db');
+		}
+		var e = $('#panel div.progress .bar');
+		e.css('width', d.progress + '%');
+		e.text(d.progress + '%');
+	});
+}
+
+var timer = setInterval(progress, 2000);
+</script>

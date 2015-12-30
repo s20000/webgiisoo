@@ -1,0 +1,3 @@
+<div class='tabs'>
+	<a href='/admin/mdc' class='selected'>$lang.get('a.mdc')</a>
+</div>

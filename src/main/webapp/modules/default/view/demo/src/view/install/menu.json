@@ -1,0 +1,16 @@
+[{'name':'admin', seq:10, 'childs':[
+]},
+{'name':'home', seq: 20, childs:[
+]},
+{'name':'user', seq:30, childs:[
+	{name:'menu.accounts', url:'', click:'', classes:'accounts', content:'',  seq:-1, childs:[
+		{name:'menu.base', url:'', click:'load("/user/my/base")', classes:'user.base', content:'', seq:10},
+	]},
+	{name:'menu.articles', url:'', click:'', classes:'articles', content:'',  seq:-1, childs:[
+		{name:'menu.article', url:'', click:'load("/user/article")', classes:'article', content:'', seq:10},
+		{name:'menu.comment', url:'', click:'load("/user/comment")', classes:'comment', content:'', seq:20},
+	]},
+	{name:'menu.files', url:'', click:'', access:'access.sfile.edit', classes:'files', content:'',  seq:-1, childs:[
+		{name:'menu.sfile', url:'', click:'load("/sfile")', classes:'sfile', content:'', seq:10},
+	]},
+]}]

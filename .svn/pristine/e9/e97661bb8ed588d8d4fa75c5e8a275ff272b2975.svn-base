@@ -1,0 +1,88 @@
+<div class='head'>$lang.get('title.dashboard.admin') 	
+	<span class='btns right'>
+		<a rel="leanModal" href='#leanmodal.restart' class='recycle hint hint--bottom' data-hint='重启应用服务'>$lang.get('a.restart.service')</a>
+		<a rel="leanModal" href='#leanmodal.restart_host' class='restart hint hint--bottom' data-hint='初始化数据库'>初始化数据库</a>
+	</span></div>
+
+<div class='chart'>
+	<iframe class='cpu_gauge' src="/admin/gauge/cpu"></iframe>
+	<iframe class='mem_gauge' src="/admin/gauge/mem"></iframe>
+	<iframe class='disk_usage' src="/admin/gauge/disk"></iframe>
+</div>
+
+<div class='state' style='display:block;'>
+	<div class='login'>$lang.get('label.node'):$node</div>
+	<div class='login'>$lang.get('label.user'):$!{me.nickname}</div>
+	<div class='uptime'>$lang.get('label.uptime'):<span class='uptime'>$uptime</span>, $lang.get('label.past'):<span class='past'>$past</span></div>
+	<div class='release'>$lang.get('label.release'):$release</div>
+	<div class='build'>$lang.get('label.build'):$build</div>
+	
+</div>
+
+<div id='leanmodal' class="restart">
+	<div class='leanmodal_header'><label><h3>重启应用服务</h3></label></div>
+	<div><label><h3>$lang.get('user.password.restart')</h3>:<input type='password' name='password'/></label></div>
+	
+	<button onclick='_restart();'>$lang.get('btn.ok')</button>
+</div>
+
+<div id='leanmodal' class="restart_host">
+	<div class='leanmodal_header'><label><h3>初始化数据库</h3></label></div>
+	<div><label><h3>$lang.get('user.password.restart')</h3>:<input type='password' name='password'/></label></div>
+	
+	<button onclick='_restart_host();'>$lang.get('btn.ok')</button>
+</div>
+
+<script>
+var _timer = false;
+$(function(){
+	 $("a[rel*=leanModal]").leanModal();
+})
+function _restart(){
+	$('#lean_overlay').click();
+
+	processing && processing.show();
+	$.post('/admin/system/restart', {pwd:$('#leanmodal.restart input[name=password]').val()}, function(d){
+		if(d.state == 'ok') {
+			_timer = setInterval(_load, 5000);
+		} else {
+			processing && processing.hide();
+			$.error(d.message);
+		}
+	})
+}
+
+function _restart_host(){
+	$('#lean_overlay').click();
+
+	processing && processing.show();
+	$.post('/admin/system/init', {pwd:$('#leanmodal.restart_host input[name=password]').val()}, function(d){
+		if(d.state == 'ok') {
+			_timer = setInterval(_load, 5000);
+		} else {
+			processing && processing.hide();
+			$.error(d.message);
+		}
+	})
+}
+
+function _shutdown(){
+	$('#lean_overlay').click();
+
+	processing && processing.show();
+	$.post('/admin/system/shutdown', {pwd:$('#leanmodal.shutdown input[name=password]').val()}, function(d){
+		if(d.state == 'ok') {
+			_timer = setInterval(_load, 5000);
+		} else {
+			processing && processing.hide();
+			$.error(d.message);
+		}
+	})
+}
+
+function _load() {
+	$.get('/admin/dashboard', {}, function(d){
+		window.location.href = window.location.href;
+	});
+}
+</script>

@@ -1,0 +1,15 @@
+<div class='head'>$lang.get('keypair.add.title')</div>
+
+#parse('/widget/widget.message.html')
+
+<div class='tabs'>
+	<a href='/admin/keypair'>$lang.get('a.keypair')</a>
+	<a href='/admin/keypair/add' class='selected' >$lang.get('a.add')</a>
+</div>
+
+<form action='/admin/keypair/add'  method='post' class='form' enctype="multipart/form-data">
+	<div><label><h3>$lang.get('label.memo')</h3>:<input type='text' name='memo' value=#if($memo) '$memo' #else '' #end/></label></div>
+	<div><label><h3>$lang.get('label.length')</h3>:<input type='text' name='length' value=#if($length) '$length' #else '' #end/><g>2048</g></label></div>
+
+	<div><button type='submit'>$lang.get('btn.add')</button></div>
+</form>

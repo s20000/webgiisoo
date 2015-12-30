@@ -1,0 +1,22 @@
+[{'name':'admin', seq:10, 'childs':[
+	{name:'menu.system', url:'', click:'', classes:'system', content:'', seq:10, childs:[
+		{name:'menu.keypair', url:'', click:'load("/admin/keypair")', seq:80, classes:'keypair', access:'access.admin'},
+	]},
+	{name:'menu.content', url:'', click:'', classes:'content', seq:-1},
+]},
+{'name':'home', seq: 20, childs:[
+		{name:'menu.home', url:'/', click:'', classes:'home', content:'', seq:10},
+		{name:'menu.zixun', url:'/zixun', click:'', classes:'home.zixun', content:'', seq:-1},
+]},
+{'name':'user', seq:30, childs:[
+	{name:'menu.accounts', url:'', click:'', classes:'accounts', content:'',  seq:-1, childs:[
+		{name:'menu.base', url:'', click:'load("/user/my/base")', classes:'user.base', content:'', seq:10},
+	]},
+	{name:'menu.articles', url:'', click:'', classes:'articles', content:'',  seq:-1, childs:[
+		{name:'menu.article', url:'', click:'load("/user/article")', classes:'article', content:'', seq:10},
+		{name:'menu.comment', url:'', click:'load("/user/comment")', classes:'comment', content:'', seq:20},
+	]},
+	{name:'menu.files', url:'', click:'', access:'access.sfile.edit', classes:'files', content:'',  seq:-1, childs:[
+		{name:'menu.sfile', url:'', click:'load("/sfile")', classes:'sfile', content:'', seq:10},
+	]},
+]}]

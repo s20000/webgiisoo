@@ -1,0 +1,171 @@
+package com.giisoo.core.stat;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import org.w3c.dom.Element;
+
+import com.giisoo.core.worker.WorkerTask;
+
+public class ID3 extends WorkerTask {
+
+    public boolean done = false;
+
+    private List<String> attributes;
+    private Map<String, List<String>> attributevalue = new HashMap<String, List<String>>(); // 存储每个属性的取值
+    String decatt; // 决策变量在属性集中的索引
+
+    List<Map<String, Object>> data;
+    Map<String, Map<String, Object>> results = new HashMap<String, Map<String, Object>>();
+
+    public ID3(List<Map<String, Object>> data, List<String> attributes) {
+        this.data = data;
+        this.attributes = attributes;
+    }
+
+    @Override
+    public void onExecute() {
+        ID3 inst = new ID3(null, null);
+        // inst.readARFF(new File("/home/orisun/test/weather.nominal.arff"));
+        inst.setDec("play");
+        LinkedList<String> ll = new LinkedList<String>();
+        // for (int i = 0; i < inst.attributes.size(); i++) {
+        // if (i != inst.decatt)
+        ll.addAll(inst.attributes);
+        ll.remove(inst.decatt);
+        // }
+        ArrayList<Integer> al = new ArrayList<Integer>();
+        for (int i = 0; i < inst.data.size(); i++) {
+            al.add(i);
+        }
+        inst.buildDT("DecisionTree", "null", al, ll);
+        // inst.writeXML("/home/orisun/test/dt.xml");
+        return;
+    }
+
+    @Override
+    public void onFinish() {
+        done = true;
+    }
+
+    // 设置决策变量
+    // public void setDec(int n) {
+    // if (n < 0 || n >= attributes.size()) {
+    // System.err.println("决策变量指定错误。");
+    // System.exit(2);
+    // }
+    // decatt = n;
+    // }
+
+    public void setDec(String name) {
+        decatt = name;
+        // int n = attributes.indexOf(name);
+        // setDec(n);
+    }
+
+    // 给一个样本（数组中是各种情况的计数），计算它的熵
+    public double getEntropy(int[] arr) {
+        double entropy = 0.0;
+        int sum = 0;
+        for (int i = 0; i < arr.length; i++) {
+            entropy -= arr[i] * Math.log(arr[i] + Double.MIN_VALUE) / Math.log(2);
+            sum += arr[i];
+        }
+        entropy += sum * Math.log(sum + Double.MIN_VALUE) / Math.log(2);
+        entropy /= sum;
+        return entropy;
+    }
+
+    // 给一个样本数组及样本的算术和，计算它的熵
+    public double getEntropy(int[] arr, int sum) {
+        double entropy = 0.0;
+        for (int i = 0; i < arr.length; i++) {
+            entropy -= arr[i] * Math.log(arr[i] + Double.MIN_VALUE) / Math.log(2);
+        }
+        entropy += sum * Math.log(sum + Double.MIN_VALUE) / Math.log(2);
+        entropy /= sum;
+        return entropy;
+    }
+
+    public boolean infoPure(List<Integer> subset) {
+        Object value = data.get(subset.get(0)).get(decatt);
+        for (int i = 1; i < subset.size(); i++) {
+            Object next = data.get(subset.get(i)).get(decatt);
+            // equals表示对象内容相同，==表示两个对象指向的是同一片内存
+            if (!value.equals(next))
+                return false;
+        }
+        return true;
+    }
+
+    // 给定原始数据的子集(subset中存储行号),当以第index个属性为节点时计算它的信息熵
+    public double calNodeEntropy(List<Integer> subset, String attr) {
+        int sum = subset.size();
+        double entropy = 0.0;
+        int[][] info = new int[attributevalue.get(attr).size()][];
+        for (int i = 0; i < info.length; i++)
+            info[i] = new int[attributevalue.get(decatt).size()];
+
+        int[] count = new int[attributevalue.get(attr).size()];
+        for (int i = 0; i < sum; i++) {
+            int n = subset.get(i);
+            Object nodevalue = data.get(n).get(attr);
+            int nodeind = attributevalue.get(attr).indexOf(nodevalue);
+            count[nodeind]++;
+            Object decvalue = data.get(n).get(decatt);
+            int decind = attributevalue.get(decatt).indexOf(decvalue);
+            info[nodeind][decind]++;
+        }
+        for (int i = 0; i < info.length; i++) {
+            entropy += getEntropy(info[i]) * count[i] / sum;
+        }
+        return entropy;
+    }
+
+    // 构建决策树
+    public void buildDT(String name, String value, ArrayList<Integer> subset, LinkedList<String> selatt) {
+        // Element ele = null;
+        // @SuppressWarnings("unchecked")
+        // List<Element> list = root.selectNodes("//" + name);
+        // Iterator<Element> iter = list.iterator();
+        // while (iter.hasNext()) {
+        // ele = iter.next();
+        // if (ele.attributeValue("value").equals(value))
+        // break;
+        // }
+        // if (infoPure(subset)) {
+        // ele.setText(data.get(subset.get(0)).get(decatt));
+        // return;
+        // }
+        String nodeName = null;// attribute.get(minIndex);
+        // String minIndex = null;
+        double minEntropy = Double.MAX_VALUE;
+        for (int i = 0; i < selatt.size(); i++) {
+            if (decatt.equals(selatt.get(i)))
+                continue;
+            double entropy = calNodeEntropy(subset, selatt.get(i));
+            if (entropy < minEntropy) {
+                nodeName = selatt.get(i);
+                minEntropy = entropy;
+            }
+        }
+        // String nodeName = attribute.get(minIndex);
+        selatt.remove(nodeName);
+        List<String> attvalues = attributevalue.get(nodeName);
+        for (String val : attvalues) {
+            // ele.addElement(nodeName).addAttribute("value", val);
+            ArrayList<Integer> al = new ArrayList<Integer>();
+            for (int i = 0; i < subset.size(); i++) {
+                if (data.get(subset.get(i)).get(nodeName).equals(val)) {
+                    al.add(subset.get(i));
+                }
+            }
+            buildDT(nodeName, val, al, selatt);
+        }
+    }
+}

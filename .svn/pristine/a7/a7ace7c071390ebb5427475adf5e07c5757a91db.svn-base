@@ -1,0 +1,47 @@
+#parse('/docs/head.html')
+
+<div id="content">
+	<div class='center'>
+		<h1>开始使用 Webgiisoo</h1>
+		<p>Webgiisoo focuses on ease-of-use, ease-of-reuse, you can quickly and
+			easily developing and deploy  your web application, the application in Webgiiso is called a module, 
+			you can easily reuse or override a module. Get started!</p>
+		<p>Here are some links related help you get started with Webgiisoo:</p>
+		<ul>
+			<li>
+				<p>
+					<strong><a href='/docs/introduction.html'>Introduction</a></strong><br /> Webgiisoo's
+					first and foremost goal is to be easy to use and reuse. it provide module management, 
+					the modules can be easily developing and deploying in Webgiisoo.
+				</p>
+			</li>
+			<li>
+				<p>
+					<strong><a href='/docs/getstarted.html'>Get started</a></strong><br /> Webgiisoo provides many useful web development APIs, 
+					configuration, database pool, thread pool, web request/response wrapper, security management etc. 
+					You don't have to develop these module again and again.
+				</p>
+			</li>
+			<li>
+				<p>
+					<strong><a href='/docs/firstapp.html'>Your first application</a></strong><br />
+					Let's start with a simple application, create, development, deploy and start your first application in Webgiisoo.
+				</p>
+			</li>
+			<li>
+				<p>
+					<strong><a href='/docs/architecture.html'>Architecture</a></strong><br />Here, Learn more about Webgiisoo's architecture, 
+					you can manage your application effectively.
+				</p>
+			</li>
+			<li>
+				<p>
+					<strong><a href='/docs/apidocs/index.html'>API Docs</a></strong><br />
+					Webgiisoo APIs.
+				</p>
+			</li>
+		</ul>
+	</div>
+</div>
+
+#parse('/docs/foot.html')

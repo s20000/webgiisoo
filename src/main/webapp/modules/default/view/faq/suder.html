@@ -1,0 +1,27 @@
+<div class="blog_main">
+	<div class="head">添加用户到sudoer列表中</div>
+
+	<div id="blog_content" class="blog_content">
+			<p>&nbsp;<br>
+			添加用户到sudoer列表中</p>
+			<p><br>
+			Linux默认是没有将用户添加到sudoers列表中的，需要root手动将账户添加到sudoers列表中，才能让普通账户执行sudo命令。 </p>
+			<p>root 账户键入visudo即可进入sudo配置，这个命令要比vim /etc/sudoers要好很多，因为使用visudo进行sudo配置，将会得到很多提示.
+			</p>
+			<p>键入visudo后，在编辑器下键入 /root 寻找root，找到第三个root的那一行 </p>
+			<p>&nbsp;&nbsp;&nbsp; root&nbsp;&nbsp;&nbsp; ALL=(ALL)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ALL </p>
+			<p>按yyp键复制并在粘贴在下一行，在这一行的 root处输入cw将root替换为你所需要添加用户的账户名，比如Blinux，结果就是 </p>
+			<p>&nbsp;&nbsp;&nbsp; root&nbsp;&nbsp;&nbsp; ALL=(ALL)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ALL <br>
+			&nbsp;&nbsp;&nbsp; blinux&nbsp; ALL=(ALL)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ALL </p>
+			<p>如果你希望之后执行sudo命令时不需要输入密码，那么可以形如 </p>
+			<p>&nbsp;&nbsp;&nbsp; root&nbsp;&nbsp;&nbsp; ALL=(ALL)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ALL <br>
+			&nbsp;&nbsp;&nbsp; blinux&nbsp; ALL=(ALL)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; NOPASSWD:ALL </p>
+			<p>输入:wq保存即可。 </p>
+			<p>之后执行sudo命令时直接在命令前端键入sudo 空&#26684;即可，比如sudo shutdown -h now执行立即关机命令. </p>
+			<p>如果需要输入口令，则输入用户密码即可，而不是root密码. </p>
+			<p>&nbsp;&nbsp;&nbsp; 注：如果用户不在sudoers列表中，将会得到以下提示. </p>
+			<p>&nbsp;&nbsp;&nbsp; Blinux is not in the sudoers file.&nbsp; This incident will be reported.</p>
+	</div>
+
+
+</div>
