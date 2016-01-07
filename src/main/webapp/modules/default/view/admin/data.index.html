@@ -1,0 +1,127 @@
+<div class='head'>数据集查询</div>
+
+#parse('/widget/widget.message.html')
+
+<div class='tabs'>
+	<a href='/admin/data?collection=$!collection&_query=$!_query' class='selected'>数据集查询</a>
+	<a href='/admin/data/update?collection=$!collection'>修改数据</a>
+</div>
+
+<div class='search'>
+	<form action='/admin/data' method='get' class='form'>
+		<span><label><h3>Collection</h3>:<input type='text' name='collection' value="$!collection" /></label></span>
+		<span><label><h3>Query</h3>:<input type='text' name='_query' value="$!_query" /></label></span>
+	
+		<button class='btns1' type='submit'>$lang.get('a.search')</button>
+	</form>
+	<div class='s1tab #if($currentpage>0) down #else up #end'>
+		<div class='arrow'></div>
+	</div>
+</div>
+
+<table id='data-table' class='tablesorter nospace' border="0" cellpadding="0" cellspacing="1">
+	<thead>
+		<tr>
+			<th>_ID</th>
+			#foreach($name in $fields)
+			<th>$!name</th>
+			#end
+			#if($hasmore)
+			<th>...</th>
+			#end
+		</tr>
+	</thead>
+	<tbody>
+#foreach($f in $list)
+	<tr>
+		<td><a href='/admin/data/detail?collection=$collection&id=$f.id'>$!f.id</a></td>
+		#foreach($name in $fields)
+		<td>$!f.get($name)</td>
+		#end
+		#if($hasmore)
+		<td>...</td>
+		#end
+	</tr>
+#end
+	</tbody>
+</table>
+
+ #parse('/widget/goto.page.html')
+
+<div class='btns'>
+	<a href='javascript:;' onclick='_export();'>$lang.get('a.export')</a>
+	<a href='javascript:;' onclick='_export_excel();'>$lang.get('a.export.excel')</a>
+	<a href='javascript:;' onclick="var e = $('#addbatch'); if(e.hasClass('opened')){e.slideUp();e.removeClass('opened');}else{e.slideDown();e.addClass('opened')}">$lang.get('a.import')</a>
+</div>
+
+<iframe id='download' style='display:none'></iframe>
+
+<div id='addbatch' style='display: none'>
+	<input type='file' name='file' resume='true'/>
+	<div class='notes'>
+		请选择数据数据文件(json)，并上传。
+	</div>
+</div> 
+
+<script>
+$(function(){
+	$('#data-table').tablesorter();
+	
+	$('#addbatch input[resume=true]').upload({
+		caption : '上传数据文件',
+		hint : '请选择数据文件',
+		done : function(url) {
+			$.message('正在导入，请等待...');
+			$.post('/admin/data/addbatch', {
+				url : url
+			}, function(d) {
+				show(d);
+			});
+		}
+	});
+
+})
+
+function _export_excel() {
+	processing && processing.show();
+	$.post('/admin/data/export', {collection:$('form input[name=collection]').val(), _query:$('form input[name=_query]').val(), type:'excel'}, function(d) {
+		processing && processing.hide();
+		_exporting();
+	});
+}
+
+function _export() {
+	processing && processing.show();
+	$.post('/admin/data/export', {collection:$('form input[name=collection]').val(), _query:$('form input[name=_query]').val()}, function(d) {
+		processing && processing.hide();
+		_exporting();
+	});
+}
+
+function _exporting(){
+	if($('#download').length == 0) {
+		return;
+	}
+	
+	processing && processing.show();
+	$.post('/admin/data/exporting',{}, function(d){
+		processing && processing.hide();
+		
+		if(d.message) {
+			$.error(d.message);
+		} else{
+			if(d.done) {
+				$.message('成功导出：' + d.count);
+			} else {
+				$.message('正在导出：' + d.count);
+			}
+		}
+		if(d.file) {
+			$('#download').attr('src', d.file);
+		}
+		if(d.done != 1) {
+			setTimeout(_exporting, 2000);		
+		}
+	})
+}
+</script>

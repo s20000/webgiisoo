@@ -1,0 +1,55 @@
+<div class='head'>$lang.get('role.index.title')</div>
+
+#parse('/widget/widget.message.html')
+
+<div class='tabs'>
+	<a href='/admin/role' class='selected'>$lang.get('a.role')</a>
+</div>
+
+#set($edit = $me.hasAccess('access.user.admin'))
+
+<table id='role-table' class='tablesorter nospace' border="0" cellpadding="0" cellspacing="1">
+	<thead>
+		<tr>
+#if($edit)
+			<th class='checkbox'><label><input type='checkbox'/>$lang.get('select.all')</label></th>
+#end
+			<th>ID</th>
+			<th>$lang.get('role.name')</th>
+			<th>$lang.get('role.memo')</th>
+		</tr>
+	</thead>
+	<tbody>
+#foreach($f in $list)
+	<tr>
+	#if($edit)
+		<td class='checkbox'><input type='checkbox' name='id' value='$f.id'/></td>
+		<td>$f.id</td>
+		<td><a href='/admin/role/edit?id=$f.id'>$f.name</a></td>
+	#else
+		<td>$f.id</td>
+		<td>$f.name</td>
+	#end
+		<td>#if($f.memo)$f.memo#end</td>
+	</tr>
+#end
+	</tbody>
+</table>
+
+ #parse('/widget/goto.page.html')
+
+<div class='btns'>
+#if($edit)
+	<a href='/admin/role/add'>$lang.get('a.add')</a>
+	<a href='javascript:;' onclick='_post("/admin/role/edit", "#role-table", 1);'>$lang.get('a.edit')</a>
+	<a href='javascript:;' onclick='_post("/admin/role/delete", "#role-table", -1);'>$lang.get('a.delete')</a>
+#end
+</div>
+
+<script>
+#if($edit)
+$('#user-table').tablesorter({headers:{0:{sorter:false}}});
+#else
+	$('#user-table').tablesorter();
+#end	
+</script>

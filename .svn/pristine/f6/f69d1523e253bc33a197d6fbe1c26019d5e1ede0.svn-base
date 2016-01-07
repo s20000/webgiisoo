@@ -1,0 +1,108 @@
+<div class="blog_main">
+	<div class="head">SSH 免密码登录</div>
+
+	<div id="blog_content" class="blog_content">
+		<p>
+			SSH 无密码登录要使用公钥与私钥。linux下可以用用ssh-keygen生成公钥/私钥对，下面我以CentOS为例。<br /> <br />有机器A(192.168.1.155)，B(192.168.1.181)。现想A通过ssh免密码登录到B。<br />
+			<br />1.在A机下生成公钥/私钥对。
+		</p>
+		<div
+			style="border-right: #cccccc 1px solid; padding-right: 5px; border-top: #cccccc 1px solid; padding-left: 4px; font-size: 13px; padding-bottom: 4px; border-left: #cccccc 1px solid; width: 98%; padding-top: 4px; border-bottom: #cccccc 1px solid; background-color: #eeeeee;">
+			<span style="color: #000000;">[chenlb@A</span><span
+				style="color: #000000;"> </span><span style="color: #000000;">~</span><span
+				style="color: #000000;">]$ ssh</span><span style="color: #000000;">-</span><span
+				style="color: #000000;">keygen </span><span style="color: #000000;">-</span><span
+				style="color: #000000;">t rsa </span><span style="color: #000000;">-</span><span
+				style="color: #000000;">P </span><span style="color: #800000;">''</span>
+		</div>
+		<p>
+			<br />-P表示密码，-P '' 就表示空密码，也可以不用-P参数，这样就要三车回车，用-P就一次回车。<br />它在/home/chenlb下生成.ssh目录，.ssh下有id_rsa和id_rsa.pub。<br />
+			<br />2.把A机下的id_rsa.pub复制到B机下，在B机的.ssh/authorized_keys文件里，我用scp复制。
+		</p>
+		<div
+			style="border-right: #cccccc 1px solid; padding-right: 5px; border-top: #cccccc 1px solid; padding-left: 4px; font-size: 13px; padding-bottom: 4px; border-left: #cccccc 1px solid; width: 98%; padding-top: 4px; border-bottom: #cccccc 1px solid; background-color: #eeeeee;">
+			<span style="color: #000000;">[chenlb@A </span><span
+				style="color: #000000;">~</span><span style="color: #000000;">]$
+				scp .ssh</span><span style="color: #000000;">/</span><span
+				style="color: #000000;">id_rsa.pub chenlb@</span><span
+				style="color: #000000;">192.168</span><span style="color: #000000;">.</span><span
+				style="color: #000000;">1.181</span><span style="color: #000000;">:</span><span
+				style="color: #000000;">/</span><span style="color: #000000;">home</span><span
+				style="color: #000000;">/</span><span style="color: #000000;">chenlb</span><span
+				style="color: #000000;">/</span><span style="color: #000000;">id_rsa.pub
+				<br />chenlb@
+			</span><span style="color: #000000;">192.168</span><span
+				style="color: #000000;">.</span><span style="color: #000000;">1.181</span><span
+				style="color: #800000;">'</span><span style="color: #800000;">s
+				password:</span><span style="color: #800000;"><br /></span><span
+				style="color: #000000;">id_rsa.pub </span><span
+				style="color: #000000;">100</span><span style="color: #000000;">%</span><span
+				style="color: #000000;"> </span><span style="color: #000000;">223</span><span
+				style="color: #000000;"> 0.2KB</span><span style="color: #000000;">/</span><span
+				style="color: #000000;">s </span><span style="color: #000000;">00</span><span
+				style="color: #000000;">:</span><span style="color: #000000;">00</span>
+		</div>
+		<p>
+			<br />由于还没有免密码登录的，所以要输入密码。<br /> <br />3.B机把从A机复制的id_rsa.pub添加到.ssh/authorzied_keys文件里。
+		</p>
+		<div
+			style="border-right: #cccccc 1px solid; padding-right: 5px; border-top: #cccccc 1px solid; padding-left: 4px; font-size: 13px; padding-bottom: 4px; border-left: #cccccc 1px solid; width: 98%; padding-top: 4px; border-bottom: #cccccc 1px solid; background-color: #eeeeee;">
+			<span style="color: #000000;">[chenlb@B </span><span
+				style="color: #000000;">~</span><span style="color: #000000;">]$
+				cat id_rsa.pub </span><span style="color: #000000;">&gt;&gt;</span><span
+				style="color: #000000;"> .ssh</span><span style="color: #000000;">/</span><span
+				style="color: #000000;">authorized_keys<br />[chenlb@B
+			</span><span style="color: #000000;">~</span><span style="color: #000000;">]$
+				chmod </span><span style="color: #000000;">600</span><span
+				style="color: #000000;"> .ssh</span><span style="color: #000000;">/</span><span
+				style="color: #000000;">authorized_keys</span>
+		</div>
+		<p>
+			<br /> <strong style="color: #ff6600;">authorized_keys的权限要是600</strong>。<br />
+			<br />4.A机登录B机。
+		</p>
+		<div
+			style="border-right: #cccccc 1px solid; padding-right: 5px; border-top: #cccccc 1px solid; padding-left: 4px; font-size: 13px; padding-bottom: 4px; border-left: #cccccc 1px solid; width: 98%; padding-top: 4px; border-bottom: #cccccc 1px solid; background-color: #eeeeee;">
+			<span style="color: #000000;">[chenlb@A </span><span
+				style="color: #000000;">~</span><span style="color: #000000;">]$
+				ssh </span><span style="color: #000000;">192.168</span><span
+				style="color: #000000;">.</span><span style="color: #000000;">1.181</span><span
+				style="color: #000000;"><br />The authenticity of host </span><span
+				style="color: #800000;">'</span><span style="color: #800000;">192.168.1.181
+				(192.168.1.181)</span><span style="color: #800000;">'</span><span
+				style="color: #000000;"> can</span><span style="color: #800000;">'</span><span
+				style="color: #800000;">t be established.</span><span
+				style="color: #800000;"><br /></span><span style="color: #000000;">RSA
+				key fingerprint </span><span style="color: #0000ff;">is</span><span
+				style="color: #000000;"> </span><span style="color: #000000;">00</span><span
+				style="color: #000000;">:a6:a8:</span><span style="color: #000000;">87</span><span
+				style="color: #000000;">:eb:c7:</span><span style="color: #000000;">40</span><span
+				style="color: #000000;">:</span><span style="color: #000000;">10</span><span
+				style="color: #000000;">:</span><span style="color: #000000;">39</span><span
+				style="color: #000000;">:cc:a0:eb:</span><span
+				style="color: #000000;">50</span><span style="color: #000000;">:d9:6a:5b.<br />Are
+				you sure you want to
+			</span><span style="color: #0000ff;">continue</span><span
+				style="color: #000000;"> connecting (yes</span><span
+				style="color: #000000;">/</span><span style="color: #000000;">no)?
+				yes<br />Warning: Permanently added
+			</span><span style="color: #800000;">'</span><span style="color: #800000;">192.168.1.181</span><span
+				style="color: #800000;">'</span><span style="color: #000000;">
+				(RSA) to the list of known hosts.<br />Last login: Thu Jul
+			</span><span style="color: #000000;">3</span><span style="color: #000000;">
+				0</span><span style="color: #000000;">9</span><span style="color: #000000;">:</span><span
+				style="color: #000000;">53</span><span style="color: #000000;">:</span><span
+				style="color: #000000;">18</span><span style="color: #000000;">
+			</span><span style="color: #000000;">2008</span><span
+				style="color: #000000;"> </span><span style="color: #0000ff;">from</span><span
+				style="color: #000000;"> chenlb</span><span style="color: #000000;"><br />[chenlb@B
+			</span><span style="color: #000000;">~</span><span style="color: #000000;">]$</span>
+		</div>
+		<p>
+			<br />第一次登录是时要你输入yes。<br /> <br />现在A机可以无密码登录B机了。<br /> <br />小结：登录的机子可有私钥，被登录的机子要有登录机子的公钥。这个公钥/私钥对一般在私钥宿主机产生。上面是用rsa算法的公钥/私钥对，当然也可以用dsa(对应的文件是id_dsa，id_dsa.pub)<br />
+			<br />想让A，B机无密码互登录，那B机以上面同样的方式配置即可。
+		</p>
+	</div>
+
+
+</div>

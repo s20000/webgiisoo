@@ -1,0 +1,136 @@
+#slider {
+	width: 800px;
+	height: 100%;
+	position: relative;
+}
+
+#slider .panel {
+	position: relative;
+	height: 100%;
+	width: 100%;
+}
+
+#slider .block {
+	width: 100%;
+	display: inline-block;
+	position: absolute;
+	left: 0;
+	top: 0;
+}
+
+#slider .block div {
+	position: absolute;
+	left: -100%;
+	top: 0;
+	width: 100%;
+	display: inline-block;
+	height: 100%;
+	color: #fff;
+}
+
+#slider .block span {
+	position: absolute;
+	display: inline-block;
+}
+
+#slider .slider-panel {
+	position: absolute;
+	width: 100%;
+	height: 40px;
+	background: rgba(1, 1, 1, 0.2);
+	left: 0;
+	top: 210px;
+	text-align: right;
+}
+
+#slider .slider-panel .dot {
+	display: inline-block;
+	width: 10px;
+	height: 10px;
+	background: #aaa;
+	margin-right: 10px;
+	margin-top: 15px;
+	cursor: pointer;
+}
+
+#slider .slider-panel .dot.current {
+	background: #f33;
+}
+
+#slider .b1 .t0 {
+	top: 30px;
+	left: 350px;
+}
+
+#slider .b1 .t1 {
+	top: 120px;
+	left: 400px;
+}
+
+#slider .b1 .t2 {
+	top: 150px;
+	left: 404px;
+}
+
+#slider .b1 .t3 {
+	top: 180px;
+	left: 580px;
+	color: #ddd;
+}
+
+#slider .b2 .t0 {
+	top: 30px;
+	left: 160px;
+}
+
+#slider .b2 .t1 {
+	top: 60px;
+	left: 418px;
+	font-size: 18pt;
+	color: #afa;
+}
+
+#slider .b2 .t2 {
+	top: 135px;
+	left: 470px;
+}
+
+#slider .b3 .t0 {
+	top: 30px;
+	left: 430px;
+}
+
+#slider .b3 .t1 {
+	top: 100px;
+	left: 350px;
+}
+
+#slider .b3 .t2 {
+	top: 160px;
+	left: 170px;
+}
+
+#slider .b4 .t0 {
+	top: 10px;
+	left: 140px;
+}
+
+#slider .b4 .t1 {
+	top: 50px;
+	left: 400px;
+}
+
+#slider .b4 .t2 {
+	top: 150px;
+	left: 500px;
+}
+
+#slider .b4 .t3 {
+	top: 20px;
+	left: 620px;
+}
+
+#slider .b4 .t4 {
+	top: 150px;
+	left: 290px;
+}

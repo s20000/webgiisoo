@@ -1,0 +1,29 @@
+<div class='head'>$lang.get('user.edit.me.title')</div>
+
+#parse('/widget/widget.message.html')
+
+<form action='/user/edit'  method='post' class='form' enctype="multipart/form-data">
+	<input type='hidden' name='name' value='$!name'/>
+	<div><label><h3>$lang.get('user.name')</h3>:<i>$!name</i></label></div>
+	<div><label><h3>$lang.get('user.nickname')</h3>:<input type='text' name='nickname' value='$!nickname'/></label></div>
+	<div><label><h3>$lang.get('user.modify.password')</h3>:
+		<input type='checkbox' name='modify_password' onchange='_modify_password()'/>
+		<input type='password' name='password' value='' style='display:none'/>
+	</label></div>
+	<div><label><h3>$lang.get('user.title')</h3>:<input type='text' name='title' value='$!title' /></label></div>
+
+	<div><button type='submit'>$lang.get('btn.save')</button></div>
+</form>
+
+<script>
+function _modify_password(){
+	var v = $('form input[name=modify_password]')[0].checked;
+	var e = $('form input[name=password]');
+	if(v){
+		e.show();
+	}else {
+		e.hide();
+		e[0].value='';
+	}
+}
+</script>

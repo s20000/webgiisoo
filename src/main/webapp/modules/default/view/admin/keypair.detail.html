@@ -1,0 +1,16 @@
+<div class='head'>$lang.get('keypair.detail.title')</div>
+
+<div class='tabs'>
+	<a href='/admin/keypair'>$lang.get('a.keypair')</a>
+	<a href='/admin/keypair/detail?created=$created' class='selected' >$lang.get('a.detail')</a>
+</div>
+
+<div class='form'>
+	<div><label><h3>$lang.get('label.created')</h3>:<i>$lang.format($created, 'yyyy-MM-dd hh:mm:ss')</i></label></div>
+	<div><label><h3>$lang.get('label.memo')</h3>:<i>#if($memo) $memo #end</i></label></div>
+	<div><label><h3>$lang.get('label.length')</h3>:<i>$length</i></label></div>
+	<div><label class='full'><h3>$lang.get('label.pubkey')</h3>:<textarea readonly='readonly'>$pubkey</textarea></label></div>
+	<div><label class='full'><h3>$lang.get('label.prikey')</h3>:<textarea readonly='readonly'>$prikey</textarea></label></div>
+
+	<div><a href='/admin/keypair/edit?created=$created'>$lang.get('a.edit')</a></div>
+</div>

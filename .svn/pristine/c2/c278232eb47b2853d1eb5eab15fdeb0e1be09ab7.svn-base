@@ -1,0 +1,65 @@
+<link href='/css/giisoo.css' rel='stylesheet' />
+<link href='/css/chart.css' rel='stylesheet' />
+<script type="text/javascript" src="/js/jquery-2.1.3.min.js"></script>
+<script type="text/javascript" src="/hc/highcharts.js"></script>
+<script type="text/javascript" src="/hc/highcharts-more.js"></script>
+
+<div id='gauge'>
+</div>
+
+<script>
+$(function () {
+    $('#gauge').highcharts({
+        chart: {
+            type: 'column'
+        },
+        title: {
+            text: '磁盘空间（GB）'
+        },
+        xAxis: {
+        	categories: [#foreach($d in $list) "$d.name" , #end]
+        },
+        credits:{
+        	enabled: false
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: ''
+            },
+            stackLabels: {
+                enabled: true,
+                style: {
+                    fontWeight: 'bold',
+                    color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray'
+                }
+            }
+        },
+        tooltip: {
+            formatter: function() {
+                return '<b>'+ this.x +'</b><br>'+
+                    this.series.name +': '+ this.y +'<br>'+
+                    '总共(G): '+ this.point.stackTotal;
+            }
+        },
+        plotOptions: {
+            column: {
+                stacking: 'normal',
+                dataLabels: {
+                    enabled: true,
+                    color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white'
+                }
+            }
+        },
+        series: [{
+            name: '空闲(G)',
+            data: [#foreach($d in $list) $d.free, #end],
+            color: '#009df5'
+        }, {
+            name: '使用(G)',
+            data: [#foreach($d in $list) $d.used, #end],
+            color: '#961616'
+        }]
+    });
+});				
+</script>

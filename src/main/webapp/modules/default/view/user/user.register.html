@@ -1,0 +1,71 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=10" />
+
+<link rel="shortcut icon" href="/favicon.ico"
+	type="image/vnd.microsoft.icon" />
+<title>#if($browser_title) $browser_title | #end
+	$lang.get('browser.title')</title>
+<link href='/css/giisoo.min.css' rel='stylesheet' />
+<link href='/css/user.css' rel='stylesheet' />
+<link href='/css/user1.css' rel='stylesheet' />
+
+<script type="text/javascript" src="/js/jquery-1.10.js"></script>
+</head>
+<body>
+	<div id='wrapper'>
+		<div id='head'>
+			<div class='center'>
+				<div class='logo'>$lang.get('site.logo')</div>
+				<div class='title'>$lang.get('site.title')</div>
+			</div>
+		</div>
+
+		<div id="content" class="login">
+			<div class='center'>
+				<div class='outter'>
+					<div class='inner'>
+
+
+					<form method="post" class="register">
+					#if($message)<div class='message'>$message</div>#end
+						<div class="title">
+							<span class="lock"></span>$lang.get('user.register')
+						</div>
+						<div class="left">
+							<div><label>$lang.get('user.name'):</label><input type="text" name="name" value=""></div>
+							<div class='note'>$lang.get('user.name.note')</div>
+							<div><label>$lang.get('user.nickname'):</label><input type="text" name="nickname" value=""></div>
+							<div class='note'>$lang.get('user.nickname.note')</div>
+							<div><label>$lang.get('user.email'):</label><input type="text" name="email" value=""></div>
+							<div class='note'>$lang.get('user.email.note')</div>
+							<div><label>$lang.get('user.mobile'):</label><input type="text" name="mobile" value=""></div>
+							<div class='note'>$lang.get('user.mobile.note')</div>
+							<div><label>$lang.get('user.pwd'):</label><input type="password" name="pwd" value=""></div>
+							<div class="btn">
+								<button type="submit">$lang.get('btn.register')</button>
+							</div>
+						</div>
+					</form>
+
+
+
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div id='foot'>
+			<div class='center'>
+				<div class='links'>$lang.get('user.foot.links')</div>
+				<div class='copyright'>
+					<span class='copyright'>$lang.get('copyright')</span> <span
+						class='designed'>$lang.get('designedby')</span>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>
