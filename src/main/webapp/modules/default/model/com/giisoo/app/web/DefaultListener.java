@@ -40,9 +40,11 @@ import com.giisoo.core.conf.Config;
 import com.giisoo.core.conf.SystemConfig;
 import com.giisoo.core.db.DB;
 import com.giisoo.core.worker.WorkerTask;
+import com.giisoo.framework.common.AccessLog;
 import com.giisoo.framework.common.Cluster;
 import com.giisoo.framework.common.Menu;
 import com.giisoo.framework.common.OpLog;
+import com.giisoo.framework.common.Temp;
 import com.giisoo.framework.mdc.utils.IP;
 import com.giisoo.framework.utils.FileUtil;
 import com.giisoo.framework.utils.Shell;
@@ -132,7 +134,7 @@ public class DefaultListener implements LifeListener {
         Cluster.self = Cluster.load(id);
 
         HeartbeatTask.owner.schedule(X.AMINUTE);
-
+        new CleanupTask(conf).schedule(X.AMINUTE);
     }
 
     /*
@@ -399,6 +401,7 @@ public class DefaultListener implements LifeListener {
     public static class UpgradeTask extends WorkerTask {
 
         private static UpgradeTask owner = new UpgradeTask();
+        private static String USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.130 Safari/537.36";
 
         long interval = X.AMINUTE;
 
@@ -435,7 +438,7 @@ public class DefaultListener implements LifeListener {
                 DefaultHttpClient client = new DefaultHttpClient();
                 HttpGet get = new HttpGet(url + "/admin/upgrade/ver?modules=" + getModules());
                 get.addHeader("User-Agent", USER_AGENT);
-                
+
                 HttpResponse resp = client.execute(get);
                 HttpEntity e = resp.getEntity();
                 if (e == null) {
@@ -610,7 +613,128 @@ public class DefaultListener implements LifeListener {
         }
 
     }
-    
-    public static final String USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.130 Safari/537.36";
+
+    /**
+     * clean up the oplog, temp file in Temp
+     * 
+     * @author joe
+     * 
+     */
+    private static class CleanupTask extends WorkerTask {
+
+        static Log log = LogFactory.getLog(CleanupTask.class);
+
+        String home;
+
+        /**
+         * Instantiates a new cleanup task.
+         * 
+         * @param conf
+         *            the conf
+         */
+        public CleanupTask(Configuration conf) {
+            home = conf.getString("home");
+        }
+
+        @Override
+        public String getName() {
+            return "cleanup.task";
+        }
+
+        /*
+         * (non-Javadoc)
+         * 
+         * @see com.giisoo.worker.WorkerTask#onExecute()
+         */
+        @Override
+        public void onExecute() {
+            try {
+                /**
+                 * clean up the local temp files
+                 */
+                int count = 0;
+                for (String f : folders) {
+                    String path = home + f;
+                    count += cleanup(path, X.ADAY);
+                }
+
+                /**
+                 * clean files in Temp
+                 */
+                if (!X.isEmpty(Temp.ROOT)) {
+                    count += cleanup(Temp.ROOT, X.ADAY);
+                }
+
+                /**
+                 * clean temp files in tomcat
+                 */
+                if (!X.isEmpty(Model.TOMCAT_HOME)) {
+                    // do it
+                    count += cleanup(Model.TOMCAT_HOME + "/work", X.ADAY);
+                    count += cleanup(Model.TOMCAT_HOME + "/logs", X.ADAY * 3);
+                }
+                log.info("cleanup temp files: " + count);
+
+                OpLog.cleanup();
+
+                AccessLog.cleanup();
+
+            } catch (Exception e) {
+                // eat the exception
+            }
+        }
+
+        private int cleanup(String path, long expired) {
+            int count = 0;
+            try {
+                File f = new File(path);
+
+                /**
+                 * test the file last modified exceed the cache time
+                 */
+                if (f.isFile() && System.currentTimeMillis() - f.lastModified() > expired) {
+                    f.delete();
+                    log.info("delete file: " + f.getCanonicalPath());
+                    count++;
+                } else if (f.isDirectory()) {
+                    File[] list = f.listFiles();
+                    if (list != null) {
+                        /**
+                         * cleanup the sub folder
+                         */
+                        for (File f1 : list) {
+                            count += cleanup(f1.getAbsolutePath(), expired);
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+            }
+
+            return count;
+        }
+
+        /*
+         * (non-Javadoc)
+         * 
+         * @see com.giisoo.worker.WorkerTask#priority()
+         */
+        @Override
+        public int priority() {
+            return Thread.MIN_PRIORITY;
+        }
+
+        /*
+         * (non-Javadoc)
+         * 
+         * @see com.giisoo.worker.WorkerTask#onFinish()
+         */
+        @Override
+        public void onFinish() {
+            this.schedule(X.AHOUR);
+        }
+
+        static String[] folders = { "/tmp/_cache", "/tmp/_raw" };
+    }
 
 }

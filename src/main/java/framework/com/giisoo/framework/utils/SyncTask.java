@@ -276,6 +276,7 @@ public class SyncTask extends WorkerTask {
                                 if (df != null && df.filter != null) {
                                     df.filter.process("set", p);
                                 }
+                                p.set("collection", collection);
 
                                 if (Publisher.publish(p) > 0) {
                                     jo.put(X._ID, p.get(X._ID));

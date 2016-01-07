@@ -320,7 +320,7 @@ public class module extends Model {
                 /**
                  * store all entry in temp file
                  */
-                String temp = Integer.toString(Bean.millis2Date(System.currentTimeMillis()));
+                String temp = Language.getLanguage().format(System.currentTimeMillis(), "yyyyMMdd");
                 String root = Model.HOME + "/modules/" + temp + "/";
 
                 ZipEntry z = in.getNextEntry();

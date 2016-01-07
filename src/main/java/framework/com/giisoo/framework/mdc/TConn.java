@@ -788,12 +788,6 @@ public class TConn extends Bean {
 
     }
 
-    public JSONObject getJSON() {
-        JSONObject jo = new JSONObject();
-        this.toJSON(jo);
-        return jo;
-    }
-
     public void setValid(boolean b) {
         valid = b;
     }

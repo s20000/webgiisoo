@@ -150,11 +150,6 @@ public class GiisooServlet extends HttpServlet {
 			 */
 			Temp.init(conf);
 
-			/**
-			 * start cleanup task
-			 */
-			new CleanupTask(conf).schedule(X.AMINUTE);
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

@@ -20,46 +20,53 @@ import com.giisoo.core.bean.X;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Path {
 
-	/**
-	 * Path.
-	 * 
-	 * @return the string
-	 */
-	String path() default X.NONE;
+    /**
+     * the URI path, default is "none"
+     * 
+     * @return String
+     */
+    String path() default X.NONE;
 
-	/**
-	 * Method.
-	 * 
-	 * @return the int
-	 */
-	int method() default Model.METHOD_GET | Model.METHOD_POST
-			| Model.METHOD_MDC;
+    /**
+     * the method of request, default for all
+     * 
+     * @return int
+     */
+    int method() default Model.METHOD_GET | Model.METHOD_POST | Model.METHOD_MDC;
 
-	/**
-	 * Login.
-	 * 
-	 * @return true, if successful
-	 */
-	boolean login() default false;
+    /**
+     * login required, default is "false"
+     * 
+     * @return boolean
+     */
+    boolean login() default false;
 
-	/**
-	 * Access.
-	 * 
-	 * @return the string
-	 */
-	String access() default X.NONE;
+    /**
+     * the access key that required, default is "none"
+     * 
+     * @return String
+     */
+    String access() default X.NONE;
 
-	/**
-	 * Log.
-	 * 
-	 * @return the int
-	 */
-	int log() default 0;
+    /**
+     * Log the data of request and response, default is "none"
+     * 
+     * @return int
+     */
+    int log() default 0;
 
-	/**
-	 * Config.
-	 * 
-	 * @return the string[]
-	 */
-	String[] config() default {};
+    /**
+     * the support device, default is for all
+     * 
+     * @return String
+     */
+    String device() default X.NONE;
+
+    /**
+     * log the access of client info, default is true
+     * 
+     * @return boolean
+     */
+    boolean accesslog() default true;
+
 }

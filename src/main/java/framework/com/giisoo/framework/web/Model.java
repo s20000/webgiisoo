@@ -70,6 +70,11 @@ public class Model {
     public static String HOME;
 
     /**
+     * the home of the tomcat
+     */
+    public static String TOMCAT_HOME;
+
+    /**
      * session is
      */
     private String sid;
@@ -203,7 +208,7 @@ public class Model {
      * @param method
      *            the method
      */
-    final protected void dispatch(String uri, HttpServletRequest req, HttpServletResponse resp, HTTPMethod method) {
+    final protected Path dispatch(String uri, HttpServletRequest req, HttpServletResponse resp, HTTPMethod method) {
 
         // created = System.currentTimeMillis();
 
@@ -295,7 +300,7 @@ public class Model {
                                             } else {
                                                 gotoLogin();
                                             }
-                                            return;
+                                            return pp;
                                         }
 
                                         if (!X.NONE.equals(pp.access()) && !login.hasAccess(pp.access().split("\\|"))) {
@@ -311,7 +316,7 @@ public class Model {
                                             }
 
                                             OpLog.warn("deny", uri, "requred: " + lang.get(pp.access()), login.getId(), this.getRemoteHost());
-                                            return;
+                                            return pp;
                                         }
                                     }
 
@@ -337,7 +342,7 @@ public class Model {
 
                                         if (!validbrowser()) {
                                             notsupport();
-                                            return;
+                                            return pp;
                                         }
 
                                         break;
@@ -415,7 +420,7 @@ public class Model {
                                                 getUser() == null ? -1 : getUser().getId(), this.getRemoteHost());
                                     }
 
-                                    return;
+                                    return pp;
                                 }
                             }
                         } catch (Exception e) {
@@ -442,7 +447,7 @@ public class Model {
 
                 if (!validbrowser()) {
                     notsupport();
-                    return;
+                    return null;
                 }
 
                 /**
@@ -489,7 +494,7 @@ public class Model {
 
                 if (!validbrowser()) {
                     notsupport();
-                    return;
+                    return null;
                 }
 
                 /**
@@ -552,6 +557,7 @@ public class Model {
         } finally {
             _currentmodule.remove();
         }
+        return null;
     }
 
     private void createQuery() {
@@ -2537,4 +2543,10 @@ public class Model {
     public static void setCurrentModule(Module e) {
         _currentmodule.set(e);
     }
+
+    public final boolean isMobile() {
+        String useragent = module.get("mobile", ".*");
+        return Pattern.matches(useragent, this.browser());
+    }
+
 }

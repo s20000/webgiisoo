@@ -608,8 +608,9 @@ public class Stats {
         if (list != null && list.size() > 0) {
             Calendar cal = Calendar.getInstance();
             for (Stat s : list) {
-                int date = Bean.toInt(s.getDate().substring(0, 8));
-                cal.setTimeInMillis(Bean.date2Millis(date));
+                // int date = Bean.toInt(s.getDate().substring(0, 8));
+                cal.setTimeInMillis(Language.getLanguage().parse(s.getDate().substring(0, 8), "yyyyMMdd"));
+                // Bean.date2Millis(date));
                 int year = cal.get(Calendar.YEAR);
                 int week = cal.get(Calendar.WEEK_OF_YEAR);
                 s.setDate(year + "W" + week);

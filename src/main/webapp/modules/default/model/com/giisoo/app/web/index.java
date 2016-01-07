@@ -5,6 +5,8 @@
  */
 package com.giisoo.app.web;
 
+import java.util.regex.Pattern;
+
 import com.giisoo.core.bean.Beans;
 import com.giisoo.framework.common.Menu;
 import com.giisoo.framework.web.*;
@@ -17,22 +19,28 @@ import com.giisoo.framework.web.*;
  */
 public class index extends Model {
 
-	/* (non-Javadoc)
-	 * @see com.giisoo.framework.web.Model#onGet()
-	 */
-	@Override
-	public void onGet() {
-		this.set("me", this.getUser());
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.giisoo.framework.web.Model#onGet()
+     */
+    @Override
+    public void onGet() {
+        this.set("me", this.getUser());
 
-		Menu m = Menu.load(0, "home");
-		if (m != null) {
-			Beans<Menu> bs = m.submenu();
-			if (bs != null) {
-				this.set("menu", bs.getList());
-			}
-		}
+        Menu m = Menu.load(0, "home");
+        if (m != null) {
+            Beans<Menu> bs = m.submenu();
+            if (bs != null) {
+                this.set("menu", bs.getList());
+            }
+        }
 
-		this.show("/docs/index.html");
-	}
+        if (isMobile()) {
+            this.show("/docs/mobile.html");
+        } else {
+            this.show("/docs/index.html");
+        }
+    }
 
 }

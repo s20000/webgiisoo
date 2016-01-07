@@ -83,6 +83,17 @@ public class Controller implements IStub {
 
         Model.HOME = conf.getString("home");
 
+        Model.TOMCAT_HOME = System.getenv("TOMCAT_HOME");
+        if (X.isEmpty(Model.TOMCAT_HOME)) {
+            Model.TOMCAT_HOME = System.getenv("CATALINA_HOME");
+        }
+        System.out.println("tomcat.home=" + Model.TOMCAT_HOME);
+        System.out.println("webgiisoo.home=" + Model.HOME);
+
+        log.info("webgiisoo is starting ...");
+        log.info("tomcat.home=" + Model.TOMCAT_HOME);
+        log.info("webgiisoo.home=" + Model.HOME);
+
         /**
          * initialize the module
          */
@@ -139,15 +150,7 @@ public class Controller implements IStub {
             JSONObject r = new JSONObject();
 
             final JSONObject header2 = new JSONObject();
-            Map<String, Object> h2 = new Bean() {
-
-                public void set(String name, Object o) {
-                    header2.put(name, o);
-                }
-
-            };
-
-            MDCHttpResponse resp = MDCHttpResponse.create(r, h2);
+            MDCHttpResponse resp = MDCHttpResponse.create(r, header2);
 
             /**
              * send http request to controller
@@ -258,15 +261,17 @@ public class Controller implements IStub {
         Model mo = Module.home.loadModelFromCache(uri);
         if (mo != null) {
 
-            mo.dispatch(uri, req, resp, method);
+            Path p = mo.dispatch(uri, req, resp, method);
 
-            log.info(method + " " + uri + " - " + t.past() + "ms -" + mo.getRemoteHost() + " " + mo);
-            V v = V.create("method", method.toString()).set("cost", t.past()).set("sid", mo.sid());
-            User u1 = mo.getUser();
-            if (u1 != null) {
-                v.set("uid", u1.getId()).set("username", u1.get("name"));
+            if (p == null || p.accesslog()) {
+                log.info(method + " " + uri + " - " + t.past() + "ms -" + mo.getRemoteHost() + " " + mo);
+                V v = V.create("method", method.toString()).set("cost", t.past()).set("sid", mo.sid());
+                User u1 = mo.getUser();
+                if (u1 != null) {
+                    v.set("uid", u1.getId()).set("username", u1.get("name"));
+                }
+                AccessLog.create(mo.getRemoteHost(), uri, v);
             }
-            AccessLog.create(mo.getRemoteHost(), uri, v);
 
             // Counter.max("web.request.max", t.past(), uri);
             return;
@@ -336,7 +341,7 @@ public class Controller implements IStub {
                             }
                         }
 
-//                        resp.addHeader("Last-Modified", date2);
+                        // resp.addHeader("Last-Modified", date2);
 
                         in = new FileInputStream(f);
                         out = resp.getOutputStream();
@@ -401,15 +406,17 @@ public class Controller implements IStub {
              */
             mo = getModel(uri);
             if (mo != null) {
-                mo.dispatch(uri, req, resp, method);
+                Path p = mo.dispatch(uri, req, resp, method);
 
-                log.info(method + " " + uri + " - " + t.past() + "ms -" + mo.getRemoteHost() + " " + mo);
-                V v = V.create("method", method.toString()).set("cost", t.past()).set("sid", mo.sid());
-                User u1 = mo.getUser();
-                if (u1 != null) {
-                    v.set("uid", u1.getId()).set("username", u1.get("name"));
+                if (p == null || p.accesslog()) {
+                    log.info(method + " " + uri + " - " + t.past() + "ms -" + mo.getRemoteHost() + " " + mo);
+                    V v = V.create("method", method.toString()).set("cost", t.past()).set("sid", mo.sid());
+                    User u1 = mo.getUser();
+                    if (u1 != null) {
+                        v.set("uid", u1.getId()).set("username", u1.get("name"));
+                    }
+                    AccessLog.create(mo.getRemoteHost(), uri, v);
                 }
-                AccessLog.create(mo.getRemoteHost(), uri, v);
 
                 // Counter.max("web.request.max", t.past(), uri);
                 return;
@@ -419,15 +426,17 @@ public class Controller implements IStub {
                  */
                 mo = getModel(uri + "/index");
                 if (mo != null) {
-                    mo.dispatch(uri, req, resp, method);
+                    Path p = mo.dispatch(uri, req, resp, method);
 
-                    log.info(method + " " + uri + " - " + t.past() + "ms -" + mo.getRemoteHost() + " " + mo);
-                    V v = V.create("method", method.toString()).set("cost", t.past()).set("sid", mo.sid());
-                    User u1 = mo.getUser();
-                    if (u1 != null) {
-                        v.set("uid", u1.getId()).set("username", u1.get("name"));
+                    if (p == null || p.accesslog()) {
+                        log.info(method + " " + uri + " - " + t.past() + "ms -" + mo.getRemoteHost() + " " + mo);
+                        V v = V.create("method", method.toString()).set("cost", t.past()).set("sid", mo.sid());
+                        User u1 = mo.getUser();
+                        if (u1 != null) {
+                            v.set("uid", u1.getId()).set("username", u1.get("name"));
+                        }
+                        AccessLog.create(mo.getRemoteHost(), uri, v);
                     }
-                    AccessLog.create(mo.getRemoteHost(), uri, v);
 
                     // Counter.max("web.request.max", t.past(), uri);
                     return;
@@ -443,15 +452,17 @@ public class Controller implements IStub {
                         mo = getModel(u);
                         if (mo != null) {
                             mo.setPath(path);
-                            mo.dispatch(u, req, resp, method);
+                            Path p = mo.dispatch(u, req, resp, method);
 
-                            log.info(method + " " + uri + " - " + t.past() + "ms -" + mo.getRemoteHost() + " " + mo);
-                            V v = V.create("method", method.toString()).set("cost", t.past()).set("sid", mo.sid());
-                            User u1 = mo.getUser();
-                            if (u1 != null) {
-                                v.set("uid", u1.getId()).set("username", u1.get("name"));
+                            if (p == null || p.accesslog()) {
+                                log.info(method + " " + uri + " - " + t.past() + "ms -" + mo.getRemoteHost() + " " + mo);
+                                V v = V.create("method", method.toString()).set("cost", t.past()).set("sid", mo.sid());
+                                User u1 = mo.getUser();
+                                if (u1 != null) {
+                                    v.set("uid", u1.getId()).set("username", u1.get("name"));
+                                }
+                                AccessLog.create(mo.getRemoteHost(), uri, v);
                             }
-                            AccessLog.create(mo.getRemoteHost(), uri, v);
 
                             // Counter.max("web.request.max", t.past(), uri);
                             return;
@@ -470,15 +481,16 @@ public class Controller implements IStub {
                      */
                     // Module.home.modelMap.put(uri, (Class<Model>)
                     // mo.getClass());
-                    mo.dispatch(uri, req, resp, method);
-
-                    log.info(method + " " + uri + " - " + t.past() + "ms -" + mo.getRemoteHost() + " " + mo);
-                    V v = V.create("method", method.toString()).set("cost", t.past()).set("sid", mo.sid());
-                    User u1 = mo.getUser();
-                    if (u1 != null) {
-                        v.set("uid", u1.getId()).set("username", u1.get("name"));
+                    Path p = mo.dispatch(uri, req, resp, method);
+                    if (p == null || p.accesslog()) {
+                        log.info(method + " " + uri + " - " + t.past() + "ms -" + mo.getRemoteHost() + " " + mo);
+                        V v = V.create("method", method.toString()).set("cost", t.past()).set("sid", mo.sid());
+                        User u1 = mo.getUser();
+                        if (u1 != null) {
+                            v.set("uid", u1.getId()).set("username", u1.get("name"));
+                        }
+                        AccessLog.create(mo.getRemoteHost(), uri, v);
                     }
-                    AccessLog.create(mo.getRemoteHost(), uri, v);
 
                     // Counter.max("web.request.max", t.past(), uri);
                 }

@@ -18,587 +18,600 @@ import net.sf.json.JSONObject;
  */
 public class QueryString implements Cloneable {
 
-	HashMap<String, String> query = new HashMap<String, String>();
+    HashMap<String, String> query = new HashMap<String, String>();
 
-	String q;
-	String path;
+    String q;
+    String path;
 
-	/**
-	 * Size.
-	 * 
-	 * @return the int
-	 */
-	public int size() {
-		return query.size();
-	}
+    /**
+     * Size.
+     * 
+     * @return the int
+     */
+    public int size() {
+        return query.size();
+    }
 
-	/**
-	 * Query.
-	 * 
-	 * @return the string
-	 */
-	public String query() {
-		StringBuilder sb = new StringBuilder();
+    /**
+     * Query.
+     * 
+     * @return the string
+     */
+    public String query() {
+        StringBuilder sb = new StringBuilder();
 
-		for (Iterator<String> it = query.keySet().iterator(); it.hasNext();) {
-			String k = it.next();
-			String s = query.get(k);
-			if (k != null && s != null && s.length() > 0 && k.length() > 0) {
-				if (sb.length() > 0)
-					sb.append("&");
-				try {
-					sb.append(k).append("=")
-							.append(URLEncoder.encode(s, "utf-8"));
-				} catch (UnsupportedEncodingException e) {
-				}
-			}
-		}
+        for (Iterator<String> it = query.keySet().iterator(); it.hasNext();) {
+            String k = it.next();
+            String s = query.get(k);
+            if (k != null && s != null && s.length() > 0 && k.length() > 0) {
+                if (sb.length() > 0)
+                    sb.append("&");
+                try {
+                    sb.append(k).append("=").append(URLEncoder.encode(s, "utf-8"));
+                } catch (UnsupportedEncodingException e) {
+                }
+            }
+        }
 
-		return sb.toString();
-	}
+        return sb.toString();
+    }
 
-	/**
-	 * Values.
-	 * 
-	 * @param k
-	 *            the k
-	 * @return the list
-	 */
-	public List<String> values(String k) {
-		String s = query.get(k);
-		if (s != null) {
-			String[] ss = s.split("_");
-			List<String> list = new ArrayList<String>(ss.length);
-			for (String s1 : ss) {
-				list.add(s1);
-			}
-			return list;
-		}
-		return null;
-	}
+    /**
+     * Values.
+     * 
+     * @param k
+     *            the k
+     * @return the list
+     */
+    public List<String> values(String k) {
+        String s = query.get(k);
+        if (s != null) {
+            String[] ss = s.split("_");
+            List<String> list = new ArrayList<String>(ss.length);
+            for (String s1 : ss) {
+                list.add(s1);
+            }
+            return list;
+        }
+        return null;
+    }
 
-	/**
-	 * Dec.
-	 * 
-	 * @param o
-	 *            the o
-	 * @param n
-	 *            the n
-	 * @return the query string
-	 */
-	public QueryString dec(String o, String n) {
-		int i1 = getInt(o);
-		int i2 = getInt(n);
-		set(o, i1 - i2);
-		return this;
-	}
+    /**
+     * Dec.
+     * 
+     * @param o
+     *            the o
+     * @param n
+     *            the n
+     * @return the query string
+     */
+    public QueryString dec(String o, String n) {
+        int i1 = getInt(o);
+        int i2 = getInt(n);
+        set(o, i1 - i2);
 
-	/**
-	 * Checks for.
-	 * 
-	 * @param o
-	 *            the o
-	 * @param n
-	 *            the n
-	 * @return true, if successful
-	 */
-	public boolean has(String o, String n) {
-		String s = get(o);
-		if (s == null) {
-			return false;
-		} else {
-			if (n.indexOf(":") > -1) {
-				String[] nn = n.split(":");
-				String[] ss = s.split("_");
-				for (String s1 : ss) {
-					String[] ss1 = s1.split(":");
-					if (ss1[0].equals(nn[0])) {
-						return true;
-					}
-				}
-			} else {
-				String[] ss = s.split("_");
-				for (String s1 : ss) {
-					if (s1.equals(n)) {
-						return true;
-					}
-				}
-			}
-		}
+        q = null;
+        return this;
+    }
 
-		return false;
-	}
+    /**
+     * Checks for.
+     * 
+     * @param o
+     *            the o
+     * @param n
+     *            the n
+     * @return true, if successful
+     */
+    public boolean has(String o, String n) {
+        String s = get(o);
+        if (s == null) {
+            return false;
+        } else {
+            if (n.indexOf(":") > -1) {
+                String[] nn = n.split(":");
+                String[] ss = s.split("_");
+                for (String s1 : ss) {
+                    String[] ss1 = s1.split(":");
+                    if (ss1[0].equals(nn[0])) {
+                        return true;
+                    }
+                }
+            } else {
+                String[] ss = s.split("_");
+                for (String s1 : ss) {
+                    if (s1.equals(n)) {
+                        return true;
+                    }
+                }
+            }
+        }
 
-	/**
-	 * Link.
-	 * 
-	 * @param o
-	 *            the o
-	 * @param n
-	 *            the n
-	 * @return the query string
-	 */
-	public QueryString link(String o, String n) {
-		String s = get(o);
-		if (s == null) {
-			set(o, n);
-		} else {
-			if (n.indexOf(":") > 0) {
-				String[] nn = n.split(":");
-				String[] ss = s.split("_");
-				StringBuilder sb = new StringBuilder();
-				boolean found = false;
-				for (String s1 : ss) {
-					String[] ss1 = s1.split(":");
-					if (ss1[0].equals(nn[0])) {
-						found = true;
-					} else {
-						if (sb.length() > 0)
-							sb.append("_");
-						sb.append(s1);
-					}
-				}
-				if (!found)
-					sb.append("_").append(n);
+        return false;
+    }
 
-				set(o, sb.toString());
-			} else {
-				String[] ss = s.split("_");
-				StringBuilder sb = new StringBuilder();
-				boolean found = false;
-				for (String s1 : ss) {
-					if (s1.equals(n)) {
-						found = true;
-					} else {
-						if (sb.length() > 0)
-							sb.append("_");
-						sb.append(s1);
-					}
-				}
-				if (!found)
-					sb.append("_").append(n);
+    /**
+     * Link.
+     * 
+     * @param o
+     *            the o
+     * @param n
+     *            the n
+     * @return the query string
+     */
+    public QueryString link(String o, String n) {
+        String s = get(o);
+        if (s == null) {
+            set(o, n);
+        } else {
+            if (n.indexOf(":") > 0) {
+                String[] nn = n.split(":");
+                String[] ss = s.split("_");
+                StringBuilder sb = new StringBuilder();
+                boolean found = false;
+                for (String s1 : ss) {
+                    String[] ss1 = s1.split(":");
+                    if (ss1[0].equals(nn[0])) {
+                        found = true;
+                    } else {
+                        if (sb.length() > 0)
+                            sb.append("_");
+                        sb.append(s1);
+                    }
+                }
+                if (!found)
+                    sb.append("_").append(n);
 
-				set(o, sb.toString());
-			}
-		}
+                set(o, sb.toString());
+            } else {
+                String[] ss = s.split("_");
+                StringBuilder sb = new StringBuilder();
+                boolean found = false;
+                for (String s1 : ss) {
+                    if (s1.equals(n)) {
+                        found = true;
+                    } else {
+                        if (sb.length() > 0)
+                            sb.append("_");
+                        sb.append(s1);
+                    }
+                }
+                if (!found)
+                    sb.append("_").append(n);
 
-		return this;
-	}
+                set(o, sb.toString());
+            }
+        }
 
-	/**
-	 * Adds the.
-	 * 
-	 * @param o
-	 *            the o
-	 * @param n
-	 *            the n
-	 * @return the query string
-	 */
-	public QueryString add(String o, String n) {
-		int i1 = getInt(o);
-		int i2 = getInt(n);
-		set(o, i1 + i2);
-		return this;
-	}
+        q = null;
+        return this;
+    }
 
-	public String getPath() {
-		return path;
-	}
+    /**
+     * Adds the.
+     * 
+     * @param o
+     *            the o
+     * @param n
+     *            the n
+     * @return the query string
+     */
+    public QueryString add(String o, String n) {
+        int i1 = getInt(o);
+        int i2 = getInt(n);
+        set(o, i1 + i2);
+        
+        q = null;
+        return this;
+    }
 
-	/**
-	 * Append.
-	 * 
-	 * @param k
-	 *            the k
-	 * @param s
-	 *            the s
-	 * @return the query string
-	 */
-	public QueryString append(String k, String s) {
-		String s1 = query.get(k);
+    public String getPath() {
+        return path;
+    }
 
-		if (s1 == null) {
-			query.put(k, s);
-		} else {
-			String[] ss = s1.split("[ ,;'\"]");
-			for (String s2 : ss) {
-				if (s2.equals(s)) {
-					return this;
-				}
-			}
-			s1 += " " + s;
-			query.put(k, s1);
-		}
+    /**
+     * Append.
+     * 
+     * @param k
+     *            the k
+     * @param s
+     *            the s
+     * @return the query string
+     */
+    public QueryString append(String k, String s) {
+        String s1 = query.get(k);
 
-		q = null;
-		return this;
-	}
+        if (s1 == null) {
+            query.put(k, s);
+        } else {
+            String[] ss = s1.split("[ ,;'\"]");
+            for (String s2 : ss) {
+                if (s2.equals(s)) {
+                    return this;
+                }
+            }
+            s1 += " " + s;
+            query.put(k, s1);
+        }
 
-	/**
-	 * Instantiates a new query string.
-	 * 
-	 * @param path
-	 *            the path
-	 */
-	public QueryString(String path) {
-		this.path = path;
-	}
+        q = null;
+        return this;
+    }
 
-	/**
-	 * Copy.
-	 * 
-	 * @param jo
-	 *            the jo
-	 * @param names
-	 *            the names
-	 * @return the query string
-	 */
-	public QueryString copy(JSONObject jo, String... names) {
-		if (jo != null) {
-			if (names != null && names.length > 0) {
-				for (String name : names) {
-					if (jo.has(name)) {
-						this.set(name, jo.getString(name));
-					}
-				}
-			} else {
-				for (Object name : jo.keySet()) {
-					this.set((String) name, jo.getString((String) name));
-				}
-			}
-		}
+    /**
+     * Instantiates a new query string.
+     * 
+     * @param path
+     *            the path
+     */
+    public QueryString(String path) {
+        q = null;
+        this.path = path;
+    }
 
-		return this;
-	}
+    /**
+     * Copy.
+     * 
+     * @param jo
+     *            the jo
+     * @param names
+     *            the names
+     * @return the query string
+     */
+    public QueryString copy(JSONObject jo, String... names) {
+        if (jo != null) {
+            if (names != null && names.length > 0) {
+                for (String name : names) {
+                    if (jo.has(name)) {
+                        this.set(name, jo.getString(name));
+                    }
+                }
+            } else {
+                for (Object name : jo.keySet()) {
+                    this.set((String) name, jo.getString((String) name));
+                }
+            }
+        }
+        
+        q = null;
+        return this;
+    }
 
-	/**
-	 * Path.
-	 * 
-	 * @param path
-	 *            the path
-	 * @return the query string
-	 */
-	public QueryString path(String path) {
-		this.path = path;
+    /**
+     * Path.
+     * 
+     * @param path
+     *            the path
+     * @return the query string
+     */
+    public QueryString path(String path) {
+        this.path = path;
+        this.q = null;
+        
+        return this;
+    }
 
-		return this;
-	}
+    /**
+     * Copy.
+     * 
+     * @return the query string
+     */
+    public QueryString copy() {
+        try {
+            QueryString q = (QueryString) super.clone();
+            q.query = new HashMap<String, String>();
+            q.q = null;
+            
+            for (Iterator<String> it = query.keySet().iterator(); it.hasNext();) {
+                String s = it.next();
+                q.query.put(s, query.get(s));
+            }
 
-	/**
-	 * Copy.
-	 * 
-	 * @return the query string
-	 */
-	public QueryString copy() {
-		try {
-			QueryString q = (QueryString) super.clone();
-			q.query = new HashMap<String, String>();
+            return q;
+        } catch (Exception e) {
+            return null;
+        }
+    }
 
-			for (Iterator<String> it = query.keySet().iterator(); it.hasNext();) {
-				String s = it.next();
-				q.query.put(s, query.get(s));
-			}
+    /**
+     * Copy.
+     * 
+     * @param m
+     *            the m
+     * @return the query string
+     */
+    public QueryString copy(Model m) {
+        Enumeration<String> it = m.getParameterNames();
+        while (it.hasMoreElements()) {
+            String name = it.nextElement();
+            this.set(name, m.getString(name));
+        }
+        q = null;
+        return this;
+    }
 
-			return q;
-		} catch (Exception e) {
-			return null;
-		}
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Object#toString()
+     */
+    public String toString() {
+        if (q == null) {
+            StringBuilder sb = new StringBuilder();
 
-	/**
-	 * Copy.
-	 * 
-	 * @param m
-	 *            the m
-	 * @return the query string
-	 */
-	public QueryString copy(Model m) {
-		Enumeration<String> it = m.getParameterNames();
-		while (it.hasMoreElements()) {
-			String name = it.nextElement();
-			this.set(name, m.getString(name));
-		}
-		return this;
-	}
+            for (Iterator<String> it = query.keySet().iterator(); it.hasNext();) {
+                String k = it.next();
+                String s = query.get(k);
+                if (k != null && s != null && s.length() > 0 && k.length() > 0) {
+                    if (sb.length() > 0)
+                        sb.append("&");
+                    try {
+                        sb.append(k).append("=").append(URLEncoder.encode(s, "utf-8"));
+                    } catch (UnsupportedEncodingException e) {
+                    }
+                }
+            }
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
-	public String toString() {
-		if (q == null) {
-			StringBuilder sb = new StringBuilder();
+            if (sb.length() > 0) {
+                q = path + "?" + sb.toString();
+            }
+        }
 
-			for (Iterator<String> it = query.keySet().iterator(); it.hasNext();) {
-				String k = it.next();
-				String s = query.get(k);
-				if (k != null && s != null && s.length() > 0 && k.length() > 0) {
-					if (sb.length() > 0)
-						sb.append("&");
-					try {
-						sb.append(k).append("=")
-								.append(URLEncoder.encode(s, "utf-8"));
-					} catch (UnsupportedEncodingException e) {
-					}
-				}
-			}
+        return q;
+    }
 
-			q = path + "?" + sb.toString();
-		}
+    /**
+     * Sets the.
+     * 
+     * @param jo
+     *            the jo
+     * @return the query string
+     */
+    public QueryString set(JSONObject jo) {
+        for (Object name : jo.keySet()) {
+            Object v = jo.get(name);
 
-		return q;
-	}
+            set((String) name, (String) v);
+        }
 
-	/**
-	 * Sets the.
-	 * 
-	 * @param jo
-	 *            the jo
-	 * @return the query string
-	 */
-	public QueryString set(JSONObject jo) {
-		for (Object name : jo.keySet()) {
-			Object v = jo.get(name);
-			
-			set((String) name, (String)v);
-		}
+        q = null;
+        return this;
+    }
 
-		return this;
-	}
+    /**
+     * Sets the.
+     * 
+     * @param k
+     *            the k
+     * @param s
+     *            the s
+     * @return the query string
+     */
+    public QueryString set(String k, String s) {
+        if (k != null && s != null) {
+            k = k.trim();
+            s = s.trim();
+            if (k.length() > 0 && s.length() > 0) {
+                query.put(k, s);
+            } else {
+                query.remove(k);
+            }
+        } else if (s == null) {
+            query.remove(k);
+        }
 
-	/**
-	 * Sets the.
-	 * 
-	 * @param k
-	 *            the k
-	 * @param s
-	 *            the s
-	 * @return the query string
-	 */
-	public QueryString set(String k, String s) {
-		if (k != null && s != null) {
-			k = k.trim();
-			s = s.trim();
-			if (k.length() > 0 && s.length() > 0) {
-				query.put(k, s);
-			} else {
-				query.remove(k);
-			}
-		} else if (s == null) {
-			query.remove(k);
-		}
+        q = null;
+        return this;
+    }
 
-		q = null;
-		return this;
-	}
+    /**
+     * Sets the.
+     * 
+     * @param k
+     *            the k
+     * @param s
+     *            the s
+     * @return the query string
+     */
+    public QueryString set(String k, int s) {
+        return set(k, Integer.toString(s));
+    }
 
-	/**
-	 * Sets the.
-	 * 
-	 * @param k
-	 *            the k
-	 * @param s
-	 *            the s
-	 * @return the query string
-	 */
-	public QueryString set(String k, int s) {
-		return set(k, Integer.toString(s));
-	}
+    /**
+     * Removes the.
+     * 
+     * @param k
+     *            the k
+     * @return the query string
+     */
+    public QueryString remove(String... k) {
+        for (String s1 : k) {
+            query.remove(s1);
 
-	/**
-	 * Removes the.
-	 * 
-	 * @param k
-	 *            the k
-	 * @return the query string
-	 */
-	public QueryString remove(String... k) {
-		for (String s1 : k) {
-			query.remove(s1);
+            q = null;
+        }
+        return this;
+    }
 
-			q = null;
-		}
-		return this;
-	}
+    /**
+     * Gets the.
+     * 
+     * @param k
+     *            the k
+     * @return the string
+     */
+    public String get(String k) {
+        return query.get(k);
+    }
 
-	/**
-	 * Gets the.
-	 * 
-	 * @param k
-	 *            the k
-	 * @return the string
-	 */
-	public String get(String k) {
-		return query.get(k);
-	}
+    /**
+     * Encode.
+     * 
+     * @param k
+     *            the k
+     * @return the string
+     */
+    public String encode(String k) {
+        String s = query.get(k);
+        try {
+            if (s != null) {
+                return URLEncoder.encode(s, "utf8");
+            }
+        } catch (Exception e) {
+        }
 
-	/**
-	 * Encode.
-	 * 
-	 * @param k
-	 *            the k
-	 * @return the string
-	 */
-	public String encode(String k) {
-		String s = query.get(k);
-		try {
-			if (s != null) {
-				return URLEncoder.encode(s, "utf8");
-			}
-		} catch (Exception e) {
-		}
+        return null;
+    }
 
-		return null;
-	}
+    /**
+     * Checks if is.
+     * 
+     * @param k
+     *            the k
+     * @param value
+     *            the value
+     * @return true, if successful
+     */
+    public boolean is(String k, String value) {
+        String v = get(k);
 
-	/**
-	 * Checks if is.
-	 * 
-	 * @param k
-	 *            the k
-	 * @param value
-	 *            the value
-	 * @return true, if successful
-	 */
-	public boolean is(String k, String value) {
-		String v = get(k);
+        return v == null && value == null || v != null && v.equals(value);
+    }
 
-		return v == null && value == null || v != null && v.equals(value);
-	}
+    /**
+     * Gets the.
+     * 
+     * @param k
+     *            the k
+     * @param defaultValue
+     *            the default value
+     * @return the string
+     */
+    public String get(String k, String defaultValue) {
+        String v = get(k);
+        if (v == null) {
+            return defaultValue;
+        } else {
+            return v;
+        }
+    }
 
-	/**
-	 * Gets the.
-	 * 
-	 * @param k
-	 *            the k
-	 * @param defaultValue
-	 *            the default value
-	 * @return the string
-	 */
-	public String get(String k, String defaultValue) {
-		String v = get(k);
-		if (v == null) {
-			return defaultValue;
-		} else {
-			return v;
-		}
-	}
+    /**
+     * Gets the int.
+     * 
+     * @param k
+     *            the k
+     * @return the int
+     */
+    public int getInt(String k) {
+        String s = get(k);
 
-	/**
-	 * Gets the int.
-	 * 
-	 * @param k
-	 *            the k
-	 * @return the int
-	 */
-	public int getInt(String k) {
-		String s = get(k);
+        if (s != null) {
+            try {
+                return Integer.parseInt(s);
+            } catch (Exception e) {
 
-		if (s != null) {
-			try {
-				return Integer.parseInt(s);
-			} catch (Exception e) {
+            }
+        }
 
-			}
-		}
+        return 0;
+    }
 
-		return 0;
-	}
+    /**
+     * Gets the long.
+     * 
+     * @param k
+     *            the k
+     * @return the long
+     */
+    public long getLong(String k) {
+        String s = get(k);
 
-	/**
-	 * Gets the long.
-	 * 
-	 * @param k
-	 *            the k
-	 * @return the long
-	 */
-	public long getLong(String k) {
-		String s = get(k);
+        if (s != null) {
+            try {
+                return Long.parseLong(s);
+            } catch (Exception e) {
 
-		if (s != null) {
-			try {
-				return Long.parseLong(s);
-			} catch (Exception e) {
+            }
+        }
 
-			}
-		}
+        return 0;
+    }
 
-		return 0;
-	}
+    /**
+     * Gets the float.
+     * 
+     * @param k
+     *            the k
+     * @return the float
+     */
+    public float getFloat(String k) {
+        String s = get(k);
 
-	/**
-	 * Gets the float.
-	 * 
-	 * @param k
-	 *            the k
-	 * @return the float
-	 */
-	public float getFloat(String k) {
-		String s = get(k);
+        if (s != null) {
+            try {
+                return Float.parseFloat(s);
+            } catch (Exception e) {
 
-		if (s != null) {
-			try {
-				return Float.parseFloat(s);
-			} catch (Exception e) {
+            }
+        }
 
-			}
-		}
+        return 0;
+    }
 
-		return 0;
-	}
+    /**
+     * Gets the double.
+     * 
+     * @param k
+     *            the k
+     * @return the double
+     */
+    public double getDouble(String k) {
+        String s = get(k);
 
-	/**
-	 * Gets the double.
-	 * 
-	 * @param k
-	 *            the k
-	 * @return the double
-	 */
-	public double getDouble(String k) {
-		String s = get(k);
+        if (s != null) {
+            try {
+                return Double.parseDouble(s);
+            } catch (Exception e) {
 
-		if (s != null) {
-			try {
-				return Double.parseDouble(s);
-			} catch (Exception e) {
+            }
+        }
 
-			}
-		}
+        return 0;
+    }
 
-		return 0;
-	}
+    /**
+     * Parses the.
+     * 
+     * @param s
+     *            the s
+     */
+    public void parse(String s) {
+        try {
+            s = URLDecoder.decode(s, "utf-8");
+            String[] ss = s.split("&");
+            for (String s1 : ss) {
+                int i = s1.indexOf("=");
+                if (i > -1) {
+                    String n = s1.substring(0, i);
+                    String v = s1.substring(i + 1);
+                    set(n, v);
+                }
+            }
+        } catch (Exception e) {
+            // eat it
+        }
+    }
 
-	/**
-	 * Parses the.
-	 * 
-	 * @param s
-	 *            the s
-	 */
-	public void parse(String s) {
-		try {
-			s = URLDecoder.decode(s, "utf-8");
-			String[] ss = s.split("&");
-			for (String s1 : ss) {
-				int i = s1.indexOf("=");
-				if (i > -1) {
-					String n = s1.substring(0, i);
-					String v = s1.substring(i + 1);
-					set(n, v);
-				}
-			}
-		} catch (Exception e) {
-			// eat it
-		}
-	}
-
-	/**
-	 * Clean.
-	 * 
-	 * @return the query string
-	 */
-	public QueryString clean() {
-		query.clear();
-		q = null;
-		return this;
-	}
+    /**
+     * Clean.
+     * 
+     * @return the query string
+     */
+    public QueryString clean() {
+        query.clear();
+        q = null;
+        return this;
+    }
 
 }

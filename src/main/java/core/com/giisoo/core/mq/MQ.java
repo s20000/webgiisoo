@@ -64,12 +64,12 @@ public final class MQ {
     private static Connection connection;
     private static Session session;
     private static boolean enabled = false;
-    private static String url;
+    private static String url; // failover:(tcp://localhost:61616,tcp://remotehost:61616)?initialReconnectDelay=100
     private static String user;
     private static String password;
     private static ActiveMQConnectionFactory factory;
 
-    private static boolean check() {
+    private static boolean init() {
         if (enabled && (session == null)) {
             try {
                 if (factory == null) {
@@ -117,7 +117,7 @@ public final class MQ {
             }
         }
 
-        return check();
+        return init();
 
     }
 
@@ -153,7 +153,7 @@ public final class MQ {
             this.name = group + name;
             this.cb = cb;
 
-            if (check()) {
+            if (enabled) {
                 Destination dest = null;
                 if (mode == Mode.QUEUE) {
                     dest = new ActiveMQQueue(group + name);
@@ -294,7 +294,7 @@ public final class MQ {
         if (message == null)
             return -1;
 
-        if (!check()) {
+        if (!enabled) {
             return -1;
         }
 
@@ -374,7 +374,7 @@ public final class MQ {
         if (message == null)
             return -1;
 
-        if (!check()) {
+        if (!enabled) {
             return -1;
         }
 
@@ -469,7 +469,7 @@ public final class MQ {
         if (message == null)
             return -1;
 
-        if (!check()) {
+        if (!enabled) {
             return -1;
         }
 
@@ -551,7 +551,7 @@ public final class MQ {
         if (message == null)
             return -1;
 
-        if (!check()) {
+        if (!enabled) {
             return -1;
         }
 
@@ -622,7 +622,7 @@ public final class MQ {
      */
     private static MessageProducer getQueue(String name) {
         synchronized (queues) {
-            if (check()) {
+            if (enabled) {
                 if (queues.containsKey(name)) {
                     return queues.get(name);
                 }
@@ -645,7 +645,7 @@ public final class MQ {
 
     private static MessageProducer getTopic(String name) {
         synchronized (topics) {
-            if (check()) {
+            if (enabled) {
                 if (topics.containsKey(name)) {
                     return topics.get(name);
                 }

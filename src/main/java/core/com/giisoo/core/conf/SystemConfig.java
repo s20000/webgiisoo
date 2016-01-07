@@ -178,7 +178,7 @@ public class SystemConfig extends Bean {
      */
     private static SystemConfig getConfig(String name) {
         SystemConfig c = data.get(name);
-        if (c != null && c.youngerThan(X.AMINUTE * 10)) {
+        if (c != null && c.age() < X.AMINUTE * 10) {
             return c;
         }
 

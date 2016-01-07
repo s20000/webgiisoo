@@ -145,7 +145,7 @@ public class log extends Model {
         final BasicDBObject q = getW(jo);
 
         String id = UID.id(login.get("name"), jo.toString());
-        String name = "oplog_" + Bean.millis2Date(System.currentTimeMillis()) + ".csv";
+        String name = "oplog_" + lang.format(System.currentTimeMillis(), "yyyMMdd") + ".csv";
         final File f = Temp.get(id, name);
 
         if (f.exists() && System.currentTimeMillis() - f.lastModified() > X.AHOUR) {

@@ -5,8 +5,6 @@
  */
 package com.giisoo.app.web.admin;
 
-import java.util.List;
-
 import net.sf.json.JSONObject;
 
 import com.giisoo.framework.utils.Host;
@@ -18,60 +16,60 @@ import com.giisoo.framework.web.Path;
  */
 public class gauge extends Model {
 
-	public void onGet() {
-		this.redirect("/user");
-	}
+    public void onGet() {
+        this.redirect("/user");
+    }
 
-	/**
-	 * Cpu.
-	 */
-	@Path(path = "cpu", login = true, access = "access.config.admin")
-	public void cpu() {
-		this.show("/admin/gauge.cpu.html");
-	}
+    /**
+     * Cpu.
+     */
+    @Path(path = "cpu", login = true, access = "access.config.admin", accesslog = false)
+    public void cpu() {
+        this.show("/admin/gauge.cpu.html");
+    }
 
-	/**
-	 * Cpu_status.
-	 */
-	@Path(path = "cpu/status", login = true, access = "access.config.admin")
-	public void cpu_status() {
-		// todo
-		JSONObject jo = new JSONObject();
-		jo.put("usage", Host.getCpuUsage());
+    /**
+     * Cpu_status.
+     */
+    @Path(path = "cpu/status", login = true, access = "access.config.admin", accesslog = false)
+    public void cpu_status() {
+        // todo
+        JSONObject jo = new JSONObject();
+        jo.put("usage", Host.getCpuUsage());
 
-		this.response(jo);
+        this.response(jo);
 
-	}
+    }
 
-	/**
-	 * Mem_status.
-	 */
-	@Path(path = "mem/status", login = true, access = "access.config.admin")
-	public void mem_status() {
-		// todo
-		JSONObject jo = new JSONObject();
-		jo.put("used", Host.getMemUsed());
+    /**
+     * Mem_status.
+     */
+    @Path(path = "mem/status", login = true, access = "access.config.admin", accesslog = false)
+    public void mem_status() {
+        // todo
+        JSONObject jo = new JSONObject();
+        jo.put("used", Host.getMemUsed());
 
-		this.response(jo);
+        this.response(jo);
 
-	}
+    }
 
-	/**
-	 * Mem.
-	 */
-	@Path(path = "mem", login = true, access = "access.config.admin")
-	public void mem() {
-		this.set("total", Host.getMemTotal());
-		this.show("/admin/gauge.mem.html");
-	}
+    /**
+     * Mem.
+     */
+    @Path(path = "mem", login = true, access = "access.config.admin", accesslog = false)
+    public void mem() {
+        this.set("total", Host.getMemTotal());
+        this.show("/admin/gauge.mem.html");
+    }
 
-	/**
-	 * Disk.
-	 */
-	@Path(path = "disk", login = true, access = "access.config.admin")
-	public void disk() {
-		this.set("list", Host.getDisks());
-		this.show("/admin/gauge.disk.html");
-	}
+    /**
+     * Disk.
+     */
+    @Path(path = "disk", login = true, access = "access.config.admin", accesslog = false)
+    public void disk() {
+        this.set("list", Host.getDisks());
+        this.show("/admin/gauge.disk.html");
+    }
 
 }

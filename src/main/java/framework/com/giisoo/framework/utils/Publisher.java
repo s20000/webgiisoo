@@ -38,8 +38,11 @@ public class Publisher {
              */
             DBMapping mapping = (DBMapping) b.getClass().getAnnotation(DBMapping.class);
             if (mapping == null) {
-                log.error("mapping missed in [" + b.getClass() + "] declaretion", new Exception("nothing but log"));
-                return 0;
+                String collection = b.getString("collection");
+                if (X.isEmpty(collection)) {
+                    log.error("mapping missed in [" + b.getClass() + "] declaretion", new Exception("nothing but log"));
+                    return 0;
+                }
             } else {
                 if (!X.isEmpty(mapping.collection())) {
                     jo.put("collection", mapping.collection());

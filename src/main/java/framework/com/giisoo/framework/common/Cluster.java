@@ -108,7 +108,7 @@ public class Cluster extends Bean {
                 }
             }
 
-            if (tmp != null) {
+            if (tmp != null && self != null) {
                 for (String name1 : tmp.keySet()) {
                     Map<String, Integer> map1 = tmp.get(name1);
                     for (String type1 : map1.keySet()) {

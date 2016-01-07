@@ -7,14 +7,13 @@ import com.giisoo.framework.web.Path;
 
 public class device extends Model {
 
-	@Path()
-	public void onGet() {
-		AccessLog.create(this.getRemoteHost(), this.path,
-				V.create("agent", this.browser()));
+    @Path()
+    public void onGet() {
+        AccessLog.create(this.getRemoteHost(), this.path, V.create("agent", this.browser()));
 
-		this.set("ip", this.getRemoteHost());
-		this.set("agent", this.browser());
-		this.show("/device.html");
-	}
+        this.set("ip", this.getRemoteHost());
+        this.set("agent", this.browser());
+        this.show("/device.html");
+    }
 
 }

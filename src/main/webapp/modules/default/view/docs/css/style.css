@@ -10,7 +10,7 @@ html, body {
 
 .center {
 	position: relative;
-	width: 960px;
+	width: 90%;
 	margin: auto;
 	padding: 0 10px 0 10px;
 	text-align: left;
@@ -47,7 +47,7 @@ a:hover {
 #head .center {
 	height: 100%;
 	display: inline-block;
-	width: 960px;
+	width: 90%;
 }
 
 #head ul.navigation a {
@@ -76,7 +76,7 @@ a:hover {
 }
 
 #content .center {
-	width: 960px;
+	width: 90%;
 	line-height: 32px;
 }
 
@@ -122,7 +122,7 @@ ul.navigation a {
 	width: 206px;
 	height: 70px;
 	position: absolute;
-	right: -70px;
+	right: 0;
 	top: -42px;
 	display: inline-block;
 }
