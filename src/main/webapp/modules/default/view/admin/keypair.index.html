@@ -1,0 +1,36 @@
+<div class='head'>$lang.get('keypair.index.title')</div>
+
+#parse('/widget/widget.message.html')
+
+<div class='tabs'>
+	<a href='/admin/keypair' class='selected' >$lang.get('a.keypair')</a>
+</div>
+
+<table id='user-table' class='tablesorter' border="0" cellpadding="0" cellspacing="1">
+	<thead>
+		<tr>
+			<th>$lang.get('head.created')</th>
+			<th>$lang.get('head.memo')</th>
+			<th>$lang.get('head.length')</th>
+		</tr>
+	</thead>
+	<tbody>
+#foreach($f in $list)
+	<tr>
+		<td><a href='/admin/keypair/detail?created=$f.created'>$lang.format($f.created, 'yyyy-MM-dd hh:mm:ss')</a></td>
+		<td>$f.memo</td>
+		<td>$f.length</td>
+	</tr>
+#end
+	</tbody>
+</table>
+
+#parse('/widget/goto.page.html')
+
+<div class='btns'>
+	<a href='/admin/keypair/add'>$lang.get('a.keypair.add')</a>
+</div>
+
+<script>
+	$('#user-table').tablesorter();
+</script>
