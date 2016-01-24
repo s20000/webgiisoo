@@ -1,0 +1,7 @@
+[{'name':'admin', seq:10, 'childs':[
+		{name:'menu.demo',  load:'/admin/user', seq:-1, classes:'icon-user2'},
+]},
+{'name':'home', seq: 20, childs:[
+]},
+{'name':'user', seq:30, childs:[
+]}]

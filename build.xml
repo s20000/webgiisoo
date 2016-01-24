@@ -1,0 +1,110 @@
+<project name="webgiisoo" default="package" basedir=".">
+
+	<property name="dist" value="/opt/d/joe/www" />
+
+	<property file="src/main/webapp/modules/default/module.ini" />
+
+	<tstamp>
+		<format property="TODAY" pattern="yyMMdd" locale="zh,CN" />
+		<format property="BUILDNO" pattern="yyMMddHHmm" locale="zh,CN" />
+	</tstamp>
+
+	<target name="package" description="build sever all" depends="tar, zip">
+	</target>
+
+	<target name="zip" description="build sever all">
+		<delete file="target/webgiisoo_*.zip" />
+
+		<replaceregexp byline="true">
+			<fileset file="target/webgiisoo/modules/default/view/release.txt" />
+			<regexp pattern="^build=\d+" />
+			<substitution expression="build=${BUILDNO}" />
+		</replaceregexp>
+
+		<replaceregexp byline="true">
+			<fileset file="target/webgiisoo/modules/default/module.ini" />
+			<regexp pattern="^build=\d+" />
+			<substitution expression="build=${BUILDNO}" />
+		</replaceregexp>
+
+		<copy todir="target/webgiisoo/modules/default/WEB-INF">
+			<fileset dir="target/webgiisoo/WEB-INF" />
+		</copy>
+
+		<delete>
+			<fileset dir="target/webgiisoo/modules/default/view/docs/" includes="giisoo_*.tar.gz" />
+		</delete>
+
+		<zip destfile="target/webgiisoo_${version}_${BUILDNO}.zip">
+			<fileset dir="target/webgiisoo/modules/default">
+				<exclude name="**/WEB-INF/classes/**" />
+				<exclude name="**/model/com/**" />
+			</fileset>
+		</zip>
+
+		<copy todir="../archieves">
+			<fileset file="target/webgiisoo_${version}_${BUILDNO}.zip" />
+		</copy>
+
+	</target>
+
+	<target name="tar" description="build sever all">
+		<delete file="target/giisoo_*.tar.gz" />
+		<delete dir="target/giisoo" />
+
+		<replaceregexp byline="true">
+			<fileset file="target/webgiisoo/modules/default/view/release.txt" />
+			<regexp pattern="^build=\d+" />
+			<substitution expression="build=${BUILDNO}" />
+		</replaceregexp>
+
+		<replaceregexp byline="true">
+			<fileset file="target/webgiisoo/modules/default/module.ini" />
+			<regexp pattern="^build=\d+" />
+			<substitution expression="build=${BUILDNO}" />
+		</replaceregexp>
+
+		<copy todir="target/giisoo">
+			<fileset dir="target/../tomcat" />
+		</copy>
+
+		<copy todir="target/giisoo/webgiisoo">
+			<fileset dir="target/webgiisoo">
+				<exclude name="target/giisoo/webgiisoo/modules/default/WEB-INF/**"/>
+				<exclude name="target/giisoo/webgiisoo/modules/default/view/docs/giisoo_*.tar.gz"/>
+			</fileset>
+		</copy>
+
+		<tar destfile="target/giisoo_${version}.tar">
+			<tarfileset dir="target/giisoo" prefix="giisoo">
+				<exclude name="**/WEB-INF/classes/**" />
+				<exclude name="**/model/com/**" />
+			</tarfileset>
+			<tarfileset dir="target/giisoo" prefix="giisoo" filemode="755">
+				<include name="**/*.sh" />
+			</tarfileset>
+		</tar>
+
+		<gzip destfile="target/giisoo_${version}_${BUILDNO}.tar.gz" src="target/giisoo_${version}.tar" />
+		
+		<delete file="target/giisoo_${version}.tar" />
+		
+		<copy todir="../archieves">
+			<fileset file="target/giisoo_${version}_${BUILDNO}.tar.gz" />
+		</copy>
+
+	</target>
+
+	<target name="help" description="display the Help message">
+		<echo message="Quick Start web application" />
+		<echo message="===========================" />
+		<echo />
+		<echo message="Main targets:" />
+		<echo />
+		<echo message="deploy                 copy all to /opt/d/joe/www" />
+		<echo message="help                  display the Help message" />
+		<echo />
+		<echo />
+	</target>
+
+</project>
