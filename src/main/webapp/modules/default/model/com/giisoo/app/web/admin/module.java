@@ -13,7 +13,6 @@ import net.sf.json.JSONObject;
 
 import org.apache.commons.fileupload.FileItem;
 
-import com.giisoo.core.bean.Bean;
 import com.giisoo.core.bean.UID;
 import com.giisoo.core.bean.X;
 import com.giisoo.core.worker.WorkerTask;
@@ -384,7 +383,7 @@ public class module extends Model {
                     if (!X.isEmpty(repo)) {
                         log.debug("old.repo=" + repo + ", new.repo=" + url);
                         Entity e1 = Repo.loadByUri(repo);
-                        if (e1 != null && !e1.getId().equals(e.getId())) {
+                        if (e1 != null && !X.isSame(e1.getId(), e.getId())) {
                             // not the same file
                             e1.delete();
                         }
@@ -442,7 +441,7 @@ public class module extends Model {
 
                 jo.put(X.STATE, 202);
                 jo.put("result", "fail");
-                jo.put("message", "invalid module package");
+                jo.put("message", lang.get("invalid.module.package"));
             } finally {
                 e.close();
             }

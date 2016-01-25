@@ -237,13 +237,13 @@ function hook() {
 				}
 				__history.push(__url);
 
-				if (url.indexOf('?') > 0) {
-					url += '&' + new Date().getTime();
+				if (__url.indexOf('?') > 0) {
+					__url += '&' + new Date().getTime();
 				} else {
-					url += '?' + new Date().getTime();
+					__url += '?' + new Date().getTime();
 				}
 
-				$.get(url, {}, function(d) {
+				$.get(__url, {}, function(d) {
 							show(d);
 							processing && processing.hide();
 						});

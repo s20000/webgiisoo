@@ -1578,7 +1578,7 @@ public class Model {
             // Parse the request
             try {
                 List<FileItem> items = upload.parseRequest(req);
-                if (items != null) {
+                if (items != null && items.size() > 0) {
                     for (FileItem f : items) {
                         if (uploads.containsKey(f.getFieldName())) {
                             Object o = uploads.get(f.getFieldName());
@@ -1594,6 +1594,8 @@ public class Model {
                             uploads.put(f.getFieldName(), f);
                         }
                     }
+                } else {
+                    log.warn("nothing got!!!");
                 }
             } catch (FileUploadException e) {
                 log.error(e);
@@ -2173,6 +2175,11 @@ public class Model {
         this.path = m.path;
         this.sid = m.sid;
         this.uri = m.uri;
+        this._multipart = ServletFileUpload.isMultipartContent(req);
+        if (this._multipart) {
+            this.uploads = m.getFiles();
+        }
+
     }
 
     /**

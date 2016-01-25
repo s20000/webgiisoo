@@ -58,11 +58,7 @@ public class setting extends Model {
         if (c != null) {
             try {
                 setting s = c.newInstance();
-                s.req = this.req;
-                s.resp = this.resp;
-                s.login = this.login;
-                s.lang = this.lang;
-                s.module = this.module;
+                s.copy(this);
                 s.get();
 
                 s.set("lang", lang);
@@ -87,11 +83,7 @@ public class setting extends Model {
         if (c != null) {
             try {
                 setting s = c.newInstance();
-                s.req = this.req;
-                s.resp = this.resp;
-                s.lang = this.lang;
-                s.login = this.login;
-                s.module = this.module;
+                s.copy(this);
                 s.set();
 
                 s.set("lang", lang);
@@ -159,6 +151,8 @@ public class setting extends Model {
             SystemConfig.setConfig("mdc.allow.uid", this.getString("mdc_allow_uid"));
             SystemConfig.setConfig("mdc.allow.user", this.getString("mdc_allow_user"));
 
+            log.debug("request=" + this.getJSON() + ", mpart=" + this.isMultipart());
+
             // if (!X.isEmpty(this.getString("prikey"))) {
             // SystemConfig.setConfig("pri_key", this.getString("prikey")
             // .trim());
@@ -188,7 +182,7 @@ public class setting extends Model {
         @Override
         public void get() {
 
-            this.set("nodename", SystemConfig.s("node.name", null));
+            this.set("node", SystemConfig.s("node", null));
             this.set("system_code", SystemConfig.l("system.code", 1));
             this.set("mdc_tcp", SystemConfig.s("mdc.tcp.enabled", null));
             this.set("mdc_tcp_host", SystemConfig.s("mdc.tcp.host", null));

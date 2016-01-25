@@ -7,7 +7,7 @@
 	type="image/vnd.microsoft.icon" />
 <title>#if($browser_title) $browser_title | #end
 	$lang.get('browser.title')</title>
-<meta name="description" content="一个Web Java快速开发框架，高性能应用系统开发，快速上手"/>
+<meta name="description" content="$!browser.description"/>
 <link href='/css/icons.css?$!module.module("default").build' rel='stylesheet' />
 <link href='/css/giisoo.css?$!module.module("default").build' rel='stylesheet' />
 <link href='/docs/css/style.css' rel='stylesheet' />
@@ -61,6 +61,9 @@
 		<div class="foot-shield"></div>
 	</div>
 </div>
+
+<script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+
 <script>
 var _hmt = _hmt || [];
 (function() {
@@ -70,60 +73,21 @@ var _hmt = _hmt || [];
   s.parentNode.insertBefore(hm, s);
 })();
 
-	var imgUrl = "/images/giisoo_300x300.png";
-    var lineLink = "http://www.giisoo.com";
-    var descContent = '一个Web Java的快速开发框架[webgiisoo]，高性能应用系统开发，快速上手';
-    var shareTitle = 'Web Java快速开发框架[webgiisoo]';
-    var appid = '';
-    
-    function shareFriend() {
-        WeixinJSBridge.invoke('sendAppMessage',{
-            "appid": appid,
-            "img_url": imgUrl,
-            "img_width": "200",
-            "img_height": "200",
-            "link": lineLink,
-            "desc": descContent,
-            "title": shareTitle
-        }, function(res) {
-            //_report('send_msg', res.err_msg);
-        })
+//分享给好友
+wx.onMenuShareAppMessage({
+    title: '$!browser.title', // 分享标题
+    desc: '$!browser.description', // 分享描述
+    link: 'http://www.giisoo.com', // 分享链接
+    imgUrl: '/images/giisoo_300x300.png', // 分享图标
+    type: 'link', // 分享类型,music、video或link，不填默认为link
+    dataUrl: '', // 如果type是music或video，则要提供数据链接，默认为空
+    success: function () { 
+        // 用户确认分享后执行的回调函数
+    },
+    cancel: function () { 
+        // 用户取消分享后执行的回调函数
     }
-    function shareTimeline() {
-        WeixinJSBridge.invoke('shareTimeline',{
-            "img_url": imgUrl,
-            "img_width": "200",
-            "img_height": "200",
-            "link": lineLink,
-            "desc": descContent,
-            "title": shareTitle
-        }, function(res) {
-               //_report('timeline', res.err_msg);
-        });
-    }
-    function shareWeibo() {
-        WeixinJSBridge.invoke('shareWeibo',{
-            "content": descContent,
-            "url": lineLink,
-        }, function(res) {
-            //_report('weibo', res.err_msg);
-        });
-    }
-    // 当微信内置浏览器完成内部初始化后会触发WeixinJSBridgeReady事件。
-    document.addEventListener('WeixinJSBridgeReady', function onBridgeReady() {
-        // 发送给好友
-        WeixinJSBridge.on('menu:share:appmessage', function(argv){
-            shareFriend();
-        });
-        // 分享到朋友圈
-        WeixinJSBridge.on('menu:share:timeline', function(argv){
-            shareTimeline();
-        });
-        // 分享到微博
-        WeixinJSBridge.on('menu:share:weibo', function(argv){
-            shareWeibo();
-        });
-    }, false);
+});
 </script>
 </body>
 </html>

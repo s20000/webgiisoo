@@ -445,6 +445,9 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
                 if (!X.EMPTY.equals(dbname)) {
                     MongoOptions mo = new MongoOptions();
                     mo.connectionsPerHost = conf.getInt("mongo[" + database + "].conns", 50);
+                    mo.autoConnectRetry = true;
+                    // mo.socketTimeout = 2000;
+                    mo.connectTimeout = 2000;
                     // mo.autoConnectRetry = true;
                     Mongo mongodb = new Mongo(list, mo);
                     g = mongodb.getDB(dbname);
