@@ -15,6 +15,12 @@ import com.giisoo.framework.utils.Http;
 import com.giisoo.framework.utils.Http.Response;
 import com.giisoo.utils.base.DES;
 
+/**
+ * the {@code Publisher} Class lets publish the data to remote by "manual"
+ * 
+ * @author joe
+ *
+ */
 public class Publisher {
 
     static Log log = LogFactory.getLog(Publisher.class);

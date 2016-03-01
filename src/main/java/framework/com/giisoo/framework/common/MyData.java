@@ -7,6 +7,12 @@ import com.giisoo.core.bean.UID;
 import com.giisoo.core.bean.X;
 import com.mongodb.BasicDBObject;
 
+/**
+ * MyData, used to record user customer data, please refer model ("/mydata")
+ * 
+ * @author joe
+ *
+ */
 @DBMapping(collection = "gi_mydata")
 public class MyData extends Bean {
 

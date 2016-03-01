@@ -352,10 +352,14 @@ public class QueryString implements Cloneable {
                 }
             }
 
+            if (path.endsWith("/index")) {
+                path = path.substring(0, path.length() - 5);
+            }
+
             if (sb.length() > 0) {
                 q = path + "?" + sb.toString();
             } else {
-                q = path;
+                q = path + "?";
             }
         }
 

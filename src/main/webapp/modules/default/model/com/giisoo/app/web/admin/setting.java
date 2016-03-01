@@ -14,6 +14,15 @@ import com.giisoo.framework.common.OpLog;
 import com.giisoo.framework.utils.Shell;
 import com.giisoo.framework.web.*;
 
+/**
+ * web api: /admin/setting
+ * <p>
+ * use to custom setting, all module configuration MUST inherit from this class,
+ * and override the "set" and "get" method
+ * 
+ * @author joe
+ *
+ */
 public class setting extends Model {
 
     private static Map<String, Class<? extends setting>> settings = new LinkedHashMap<String, Class<? extends setting>>();

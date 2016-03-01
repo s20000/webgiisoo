@@ -5,14 +5,12 @@
  */
 package com.giisoo.app.web;
 
-import java.util.regex.Pattern;
-
 import com.giisoo.core.bean.Beans;
 import com.giisoo.framework.common.Menu;
 import com.giisoo.framework.web.*;
 
 /**
- * Web首页
+ * Web home
  * 
  * @author joe
  * 

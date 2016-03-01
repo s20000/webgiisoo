@@ -417,10 +417,10 @@ public class Stats {
                 map.put(group, s);
             } else {
                 if (stat == STAT_TOTAL) {
-                    s1.count += s.count;
+                    s1.add(s.getCount());
                 } else if (stat == STAT_MAX) {
-                    if (s.count > s1.count) {
-                        s1.count = s.count;
+                    if (s.getCount() > s1.getCount()) {
+                        s1.setCount(s.getCount());
                     }
                 }
             }
@@ -527,13 +527,13 @@ public class Stats {
                     return 0;
 
                 if (sort == 0) {
-                    if (o1.count > o2.count) {
+                    if (o1.getCount() > o2.getCount()) {
                         return -1;
                     } else {
                         return 1;
                     }
                 } else {
-                    if (o1.count > o2.count) {
+                    if (o1.getCount() > o2.getCount()) {
                         return 1;
                     } else {
                         return -1;

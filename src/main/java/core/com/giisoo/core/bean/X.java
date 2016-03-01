@@ -5,9 +5,11 @@ import java.util.TimeZone;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class X.
+ * The {@code X} Class used to define contains.
+ * 
+ * @author joe
+ *
  */
 public class X {
 
@@ -215,7 +217,7 @@ public class X {
         }
         return defaultValue;
     }
-    
+
     /**
      * parse a object to a integer.
      * 

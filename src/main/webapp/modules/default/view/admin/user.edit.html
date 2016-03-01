@@ -5,13 +5,13 @@
 <div class='tabs'>
 	<a href='/admin/user'>$lang.get('a.user')</a>
 	<a href='/admin/user/history' >$lang.get('a.history')</a>
-	<a href='/admin/user/edit?id=id' class='selected'>$lang.get('a.user.edit')</a>
+	<a href='/admin/user/edit?id=$id' class='selected'>$lang.get('a.user.edit')</a>
 </div>
 
 <form action='/admin/user/edit'  method='post' class='form' enctype="multipart/form-data">
 	<input type='hidden' name="id" value="$id"/>
-	<div><label><h3>$lang.get('user.name')</h3>:<i>$name</i></label></div>
-	<div><label><h3>$lang.get('user.nickname')</h3>:<input type='text' name='nickname' value=#if($nickname) '$nickname' #else '' #end/></label></div>
+	<div><label><h3>$lang.get('user.name')</h3>:<i>$!name</i></label></div>
+	<div><label><h3>$lang.get('user.nickname')</h3>:<input type='text' name='nickname' value='$!nickname'/></label></div>
 	<div>
 		<label><h3>$lang.get('user.modify.password')</h3>:
 			<input type='checkbox' name='modify_password' onchange='_modify_password()'/>
@@ -19,13 +19,11 @@
 		</label>
 		<div class='note'></div>
 	</div>
-	<div><label><h3>$lang.get('user.company')<r>*</r></h3>:<input type='text' name='company' value="$!company"/></label></div>
-	<div><label><h3>$lang.get('user.department')<r>*</r></h3>:<input type='text' name='department' value="$!department"/></label></div>
-	<div><label><h3>$lang.get('user.title')</h3>:<input type='text' name='title' value=#if($title) '$title' #else '' #end /></label></div>
-	<div><label><h3>$lang.get('user.phone')</h3>:<input type='text' name='phone' value= #if($phone)'$phone' #else '' #end /></label></div>
+	<div><label><h3>$lang.get('user.title')</h3>:<input type='text' name='title' value='$!title' /></label></div>
+	<div><label><h3>$lang.get('user.phone')</h3>:<input type='text' name='phone' value= '$!phone' /></label></div>
 
 	<div><label><h3>$lang.get('user.lock')</h3>:</label><input type="checkbox" name='locked' #if($locked=='on' || $locked==1) checked #end /></label></div>
-	<div><label><h3>$lang.get('user.failtimes')</h3>:</label><input type="text" name='failtimes' value='$failtimes' /></label></div>
+	<div><label><h3>$lang.get('user.failtimes')</h3>:</label><input type="text" name='failtimes' value='$!failtimes' /></label></div>
 
 	<table id='user-table' class='tablesorter' border="0" cellpadding="0" cellspacing="1">
 		<thead>

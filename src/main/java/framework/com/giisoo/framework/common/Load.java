@@ -11,6 +11,12 @@ import com.giisoo.core.bean.UID;
 import com.giisoo.core.bean.X;
 import com.mongodb.BasicDBObject;
 
+/**
+ * word load in cluster
+ * 
+ * @author joe
+ *
+ */
 @DBMapping(collection = "gi_load")
 public class Load extends Bean {
 

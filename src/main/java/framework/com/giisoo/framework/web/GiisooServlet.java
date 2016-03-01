@@ -5,7 +5,6 @@
  */
 package com.giisoo.framework.web;
 
-import java.io.File;
 import java.io.IOException;
 
 import javax.servlet.*;
@@ -24,6 +23,8 @@ import com.giisoo.framework.common.Temp;
 import com.giisoo.framework.web.Model.HTTPMethod;
 
 /**
+ * the {@code GiisooServlet} Class handles all the request, and dispatch to
+ * appropriate {@code Model}
  * 
  * @author yjiang
  * 

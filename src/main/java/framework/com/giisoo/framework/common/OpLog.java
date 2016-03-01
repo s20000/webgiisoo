@@ -486,8 +486,13 @@ public class OpLog extends Bean {
 
         long t = System.currentTimeMillis();
         String id = UID.id(t, op, message);
-        int i = Bean.insertCollection(V.create("id", id).set("created", t).set("system", system).set("module", module).set("op", op).set("brief", brief).set("message", message).set("uid", uid).set(
-                "ip", ip).set("type", type), OpLog.class);
+        V v = V.create("id", id).set("created", t).set("system", system).set("module", module).set("op", op).set("uid", uid).set("ip", ip).set("type", type);
+        if (X.isEmpty(brief)) {
+            v.set("brief", message);
+        } else {
+            v.set("brief", brief).set("message", message);
+        }
+        int i = Bean.insertCollection(v, OpLog.class);
 
         if (i > 0) {
             // Category.update(system, module, op);

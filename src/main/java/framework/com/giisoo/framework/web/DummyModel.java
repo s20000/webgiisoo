@@ -55,6 +55,7 @@ public class DummyModel extends Model {
                  */
                 this.set(this.getJSON());
                 show(uri);
+
                 return;
             } else if (f.isFile()) {
                 /**
@@ -116,7 +117,7 @@ public class DummyModel extends Model {
         }
 
         // check where has .html or htm
-        Template t1 = getTemplate(uri + ".html", true);
+        Template t1 = getTemplate(uri + ".html", false);
         if (t1 != null) {
             // String date = this.getHeader("If-Modified-Since");
             // String date2 = lang.format(t1.getLastModified(),
@@ -129,11 +130,12 @@ public class DummyModel extends Model {
             // this.setHeader("Last-Modified", date2);
             this.set(this.getJSON());
             show(uri + ".html");
+
             return;
         }
 
         // check where has .html or htm
-        t1 = getTemplate(uri + ".htm", true);
+        t1 = getTemplate(uri + ".htm", false);
         if (t1 != null) {
             // String date = this.getHeader("If-Modified-Since");
             // String date2 = lang.format(t1.getLastModified(),
@@ -146,6 +148,7 @@ public class DummyModel extends Model {
             // this.setHeader("Last-Modified", date2);
             this.set(this.getJSON());
             show(uri + ".htm");
+
             return;
         }
 

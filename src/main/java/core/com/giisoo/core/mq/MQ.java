@@ -33,9 +33,10 @@ import com.giisoo.core.bean.X;
 import com.giisoo.core.worker.WorkerTask;
 
 /**
- * the distribute message system, <br>
- * the performance: sending 1w/300ms <br>
- * recving 1w/1500ms<br>
+ * the distribute message system, used to bind, receive, and send message to
+ * another module in distribute system
+ * <p>
+ * the performance: sending 1w/300ms, recving 1w/1500ms
  * 
  * @author joe
  *
@@ -47,9 +48,12 @@ public final class MQ {
     private static Log log = LogFactory.getLog(MQ.class);
 
     /**
-     * the message stub type <br>
-     * TOPIC: all stub will read it <br>
+     * the message stub type
+     * 
+     * <pre>
+     * TOPIC: all stub will read it 
      * QUEUE: only one will read it
+     * </pre>
      * 
      * @author joe
      *
@@ -95,7 +99,16 @@ public final class MQ {
     }
 
     /**
-     * initialize the MQ
+     * initialize the MQ, the required configuration:
+     * 
+     * <pre>
+     * mq.enabled=no/yes, yes is enabled
+     * mq.url=, tcp://[host]:61616?jms.prefetchPolicy.all=2&jms.useAsyncSend=true
+     * mq.user=,
+     * mq.password=,
+     * mq.group=, the group of the queue, like "sub system" in whole distribute system
+     * 
+     * </pre>
      * 
      * @param conf
      * @return boolean
@@ -122,7 +135,7 @@ public final class MQ {
     }
 
     /**
-     * listen on the name
+     * listen on the name, with the call back stub, with the mode
      * 
      * @param name
      * @param stub
@@ -132,12 +145,21 @@ public final class MQ {
         return new Receiver(name, stub, mode);
     }
 
+    /**
+     * bind a call back stub on the name, with "queue" mode
+     * 
+     * @param name
+     * @param stub
+     * @return Receiver
+     * @throws JMSException
+     */
     public static Receiver bind(String name, IStub stub) throws JMSException {
         return bind(name, stub, Mode.QUEUE);
     }
 
     /**
-     * QueueTask
+     * the {@code Receiver} Class is used for message consume, and lets "client"
+     * can handle or control consumer
      * 
      * @author joe
      * 
@@ -169,7 +191,7 @@ public final class MQ {
         }
 
         /**
-         * 
+         * unbind the consumer
          */
         public void unbind() {
             /**
@@ -178,6 +200,9 @@ public final class MQ {
 
         }
 
+        /**
+         * process the message when come in
+         */
         @Override
         public void onMessage(Message m) {
             try {
@@ -189,12 +214,13 @@ public final class MQ {
                     BytesMessage m1 = (BytesMessage) m;
                     process(name, m1, cb);
                 } else {
-                    System.out.println(m);
+                    log.warn(m);
                 }
 
-                if (count % 10000 == 0) {
-                    System.out.println("process the 10000 messages, cost " + t.reset() + "ms");
-                }
+                // if (count % 10000 == 0) {
+                // System.out.println("process the 10000 messages, cost " +
+                // t.reset() + "ms");
+                // }
 
             } catch (Exception e) {
                 log.error(e.getMessage(), e);

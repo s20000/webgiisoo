@@ -12,8 +12,9 @@ import com.giisoo.framework.mdc.TConnCenter;
 import com.giisoo.framework.web.*;
 
 /**
- * Web 接口: /bye <br>
- * MDC 客户端断开链接时候，调用改接口
+ * web api: /bye
+ * <p>
+ * it will be accessed when mdc client disconnected;
  * 
  * @author joe
  * 

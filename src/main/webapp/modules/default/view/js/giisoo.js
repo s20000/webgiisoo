@@ -144,7 +144,7 @@ function show(html) {
 	try {
 		$('#panel .content').html(html);
 	} catch (e) {
-		console.log(e);
+		console.error(e);
 	}
 
 	hook();

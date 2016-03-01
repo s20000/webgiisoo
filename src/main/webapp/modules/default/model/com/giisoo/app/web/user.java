@@ -20,7 +20,6 @@ import com.giisoo.core.bean.Bean.V;
 import com.giisoo.core.bean.Bean.W;
 import com.giisoo.core.bean.X;
 import com.giisoo.core.conf.SystemConfig;
-import com.giisoo.core.db.DB;
 import com.giisoo.framework.common.App;
 import com.giisoo.framework.common.Cluster.Counter;
 import com.giisoo.framework.common.OpLog;
@@ -35,8 +34,9 @@ import com.giisoo.utils.base.DES;
 import com.mongodb.BasicDBObject;
 
 /**
- * Web接口： /user/register, /user/login, /user/logout, /user/forget,
- * /user/callback, /user/message
+ * web api： /user
+ * <p>
+ * used to login or logout, etc.
  * 
  * @author joe
  * 
@@ -543,17 +543,17 @@ public class user extends Model {
      */
     @Path(path = "verify", login = true, access = "access.user.query")
     public void verify() {
-        String name = this.getString("name");
-        String value = this.getString("value");
+        String name = this.getString("name").trim();
+        String value = this.getString("value").trim();
 
         JSONObject jo = new JSONObject();
         if ("name".equals(name)) {
-            if (User.exists(W.create("name", value).and("deleted", 0, W.OP_EQ).and("locked", 0, W.OP_EQ).and("remote", 0, W.OP_EQ))) {
+            if (User.exists(new BasicDBObject("name", value))) {
 
                 jo.put(X.STATE, 201);
                 jo.put(X.MESSAGE, lang.get("user.name.exists"));
 
-            } else if (User.exists(W.create("name", value).and("locked", 0, W.OP_EQ).and("remote", 0, W.OP_EQ))) {
+            } else if (User.exists(new BasicDBObject("name", value))) {
                 jo.put(X.STATE, 202);
                 jo.put(X.MESSAGE, lang.get("user.override.exists"));
             } else {
@@ -566,31 +566,11 @@ public class user extends Model {
                     jo.put(X.STATE, 200);
                 }
             }
-        } else if ("certid".equals(name)) {
-            if (X.isEmpty(value)) {
-                jo.put(X.STATE, 200);
-            } else {
-                User u = User.loadById(value);
-                if (u != null) {
-                    jo.put(X.STATE, 201);
-                    jo.put(X.MESSAGE, lang.get("user.certid.exists"));
-                } else {
-                    value = value.toLowerCase();
-                    String allow = Module._conf.getString("user.certid", "^[0-9]{17}[0-9x]$");
-                    if (!value.matches(allow)) {
-                        jo.put(X.STATE, 201);
-                        jo.put(X.MESSAGE, lang.get("user.certid.format.error"));
-                    } else {
-                        jo.put(X.STATE, 200);
-                    }
-                }
-            }
         } else if ("password".equals(name)) {
             if (X.isEmpty(value)) {
                 jo.put(X.STATE, 201);
                 jo.put(X.MESSAGE, lang.get("user.password.format.error"));
             } else {
-
                 String allow = SystemConfig.s("user.password", "^[a-zA-Z0-9]{6,16}$");
                 if (!value.matches(allow)) {
                     jo.put(X.STATE, 201);
@@ -621,7 +601,7 @@ public class user extends Model {
         if (!X.isEmpty(access)) {
             list = User.loadByAccess(access);
         } else {
-            Beans<User> bs = User.load(W.create().and("id", 0, W.OP_GT), 0, 1000);
+            Beans<User> bs = User.load(new BasicDBObject(X._ID, new BasicDBObject("$gt", 0)), 0, 1000);
             if (bs != null) {
                 list = bs.getList();
             }

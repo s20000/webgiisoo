@@ -32,10 +32,28 @@ import com.giisoo.core.bean.Bean.V;
 import com.giisoo.core.bean.X;
 import com.giisoo.core.conf.SystemConfig;
 import com.giisoo.framework.mdc.command.*;
+import com.giisoo.utils.base.H64;
 import com.giisoo.utils.base.Html;
 
 /**
- * all web api base class
+ * the {@code Model} Class is base model, all class that provides web api should
+ * inherit it
+ * <p>
+ * it provides api mapping, path/method mapping, contains all the parameters
+ * from the request, and contains all key/value will be pass to view.
+ * <p>
+ * it package all the request in getHeader, or getString method.
+ * 
+ * <p>
+ * the most important method:
+ * 
+ * <pre>
+ * getString(String name), get the value of parameter in request, it will convert HTML tag to "special" tag, to avoid destroy;
+ * getHtml(String name), get the value of the parameter in request as original HTML format;
+ * getHeader(String name),get the value from header;
+ * getFile(String name),get the File value from the request;
+ * set(String, Object), set the key/value back to view;
+ * </pre>
  * 
  * @author yjiang
  * 
@@ -46,12 +64,12 @@ public class Model {
     public static String ENCODING = "UTF-8";
 
     /**
-     * request
+     * the original request (http, mdc)
      */
     protected HttpServletRequest req;
 
     /**
-     * response
+     * the original response
      */
     protected HttpServletResponse resp;
 
@@ -60,8 +78,15 @@ public class Model {
      */
     protected Language lang;
 
+    /**
+     * the request method(POST, GET, MDC)
+     */
     protected HTTPMethod method;
 
+    /**
+     * the response context, includes all the response key-value, used by
+     * view(html)
+     */
     protected VelocityContext context;
 
     /**
@@ -75,7 +100,7 @@ public class Model {
     public static String GIISOO_HOME;
 
     /**
-     * session is
+     * session id
      */
     private String sid;
 
@@ -105,36 +130,32 @@ public class Model {
      */
     private static Map<String, Template> cache = new HashMap<String, Template>();
 
-    public static long UPTIME = System.currentTimeMillis();
+    /**
+     * the uptime of the system
+     */
+    public final static long UPTIME = System.currentTimeMillis();
 
     /**
-     * contentType will return
+     * contentType of response
      */
     private String contentType;
 
+    /**
+     * associated login user
+     */
     protected User login = null;
-
-    // protected long created = System.currentTimeMillis();
 
     private static final ThreadLocal<Module> _currentmodule = new ThreadLocal<Module>();
 
-    // final protected boolean expired() {
-    // long expired = Module.home.getInt("request.expired");
-    // if (expired > 0) {
-    // return System.currentTimeMillis() - created > expired * 1000;
-    // }
-    //
-    // return false;
-    // }
-
     /**
-     * Clean.
+     * Clean the template cache
      */
     public static void clean() {
         cache.clear();
     }
 
     /**
+     * get the request as inputstream
      * 
      * @return InputStream
      * @throws IOException
@@ -144,12 +165,27 @@ public class Model {
     }
 
     /**
+     * get the response as outputstream
      * 
      * @return OutputStream
      * @throws IOException
      */
     final public OutputStream getOutputStream() throws IOException {
         return resp.getOutputStream();
+    }
+
+    /**
+     * the response status
+     */
+    protected int status = HttpServletResponse.SC_OK;
+
+    /**
+     * get the response state code
+     * 
+     * @return int of state code
+     */
+    final public int getStatus() {
+        return status;
     }
 
     /**
@@ -303,7 +339,8 @@ public class Model {
                                                 this.set(X.STATE, 201);
                                                 this.set(X.MESSAGE, "login required");
 
-                                                log.debug("login required: " + pp + ", session: " + this.sid());
+                                                if (log.isDebugEnabled())
+                                                    log.debug("login required: " + pp + ", session: " + this.sid());
 
                                             } else {
                                                 gotoLogin();
@@ -372,10 +409,16 @@ public class Model {
                                             boolean error = false;
 
                                             StringBuilder sb = new StringBuilder();
-                                            JSONObject jo = this.getJSON();
-                                            jo.remove("password");
-                                            jo.remove("pwd");
-                                            jo.remove("passwd");
+                                            JSONObject jo = JSONObject.fromObject(this.getJSON());
+                                            if (jo.has("password")) {
+                                                jo.put("password", "******");
+                                            }
+                                            if (jo.has("pwd")) {
+                                                jo.put("pwd", "******");
+                                            }
+                                            if (jo.has("passwd")) {
+                                                jo.put("passwd", "******");
+                                            }
 
                                             sb.append("<b>IN</b>=").append(jo.toString());
                                             String message = null;
@@ -407,32 +450,20 @@ public class Model {
                                             }
                                         }
                                     } catch (Exception e) {
-                                        log.error(e.getMessage(), e);
+                                        if (log.isErrorEnabled())
+                                            log.error(e.getMessage(), e);
 
-                                        StringBuilder sb = new StringBuilder();
-                                        JSONObject jo = this.getJSON();
-                                        jo.remove("password");
-                                        jo.remove("pwd");
-                                        jo.remove("passwd");
-
-                                        sb.append("IN=").append(jo.toString());
-
-                                        sb.append("; OUT=");
-
-                                        StringWriter sw = new StringWriter();
-                                        PrintWriter out = new PrintWriter(sw);
-                                        e.printStackTrace(out);
-                                        sb.append(sw.toString());
-
-                                        OpLog.error(this.getClass().getName(), path == null ? uri : uri + "/" + path, lang.get("oplog.exception"), sb.toString().replaceAll("\r\n", "<br>"),
-                                                getUser() == null ? -1 : getUser().getId(), this.getRemoteHost());
+                                        error(e);
                                     }
 
                                     return pp;
                                 }
                             }
                         } catch (Exception e) {
-                            log.error(s, e);
+                            if (log.isErrorEnabled())
+                                log.error(s, e);
+
+                            error(e);
                         }
                     }
                 }
@@ -561,7 +592,7 @@ public class Model {
             } // end default handler
 
         } catch (Exception e) {
-            onError(e);
+            error(e);
         } finally {
             _currentmodule.remove();
         }
@@ -570,7 +601,7 @@ public class Model {
 
     private void createQuery() {
         String url = uri;
-        if (this.path != null) {
+        if (this.path != null && !"index".equals(this.path)) {
             url += "/" + path;
         }
 
@@ -583,7 +614,7 @@ public class Model {
      * Goto login.
      */
     final protected void gotoLogin() {
-        if (this.uri != null && !(this.uri.indexOf("/usr/") > 0)) {
+        if (this.uri != null && this.uri.indexOf("/user/") < 0) {
             if (query == null) {
                 createQuery();
             }
@@ -606,7 +637,8 @@ public class Model {
     }
 
     /**
-     * Sid.
+     * get the current session sid, if not present, create a new one, please
+     * refer {@code sid(boolean)}
      * 
      * @return the string
      */
@@ -615,21 +647,29 @@ public class Model {
     }
 
     /**
-     * Sid.
+     * get the current session, the sequence of session from request:
+     * 
+     * <pre>
+     * sid=? in cookie
+     * sid=? in header
+     * token=? in query
+     * sid=? in query
+     * </pre>
      * 
      * @param newSession
-     *            the new session
+     *            if true && not presented, create a new one, otherwise return
+     *            null
      * @return the string
      */
     final public String sid(boolean newSession) {
         if (sid == null) {
-            sid = this.getString("sid");
+            sid = this.getCookie("sid");
             if (sid == null) {
-                sid = this.getString("token");
+                sid = this.getHeader("sid");
                 if (sid == null) {
-                    sid = this.getHeader("sid");
+                    sid = this.getString("token");
                     if (sid == null) {
-                        sid = this.getCookie("sid");
+                        sid = this.getString("sid");
                         if (sid == null && newSession) {
                             do {
                                 sid = H64.toString((int) (Math.random() * Integer.MAX_VALUE)) + H64.toString(System.currentTimeMillis());
@@ -652,39 +692,18 @@ public class Model {
     }
 
     /**
-     * On error.
-     * 
-     * @param e
-     *            the e
-     */
-    final protected void onError(Throwable e) {
-        log.error(e.getMessage(), e);
-
-        if (method.isMdc()) {
-            this.put(X.STATE, 202);
-            this.put(X.MESSAGE, "server error");
-            this.put(X.ERROR, e.getMessage());
-        } else {
-            if (resp != null) {
-                this.put("e", e);
-                show("error.html");
-            }
-        }
-    }
-
-    /**
-     * Redirect.
+     * response and redirect to the url
      * 
      * @param url
      *            the url
      */
     final protected void redirect(String url) {
-        resp.setStatus(HttpServletResponse.SC_MOVED_TEMPORARILY);
         resp.setHeader("Location", url);
+        setStatus(HttpServletResponse.SC_MOVED_TEMPORARILY);
     }
 
     /**
-     * Forward.
+     * Forward to the model(url), do not response yet
      * 
      * @param model
      *            the model
@@ -697,18 +716,32 @@ public class Model {
 
     /**
      * Mock mdc.
+     * 
+     * @deprecated
      */
     final protected void mockMdc() {
         mockMdc = new JSONObject();
     }
 
     /**
-     * Put.
+     * get all ouput key-value for MDC
+     * 
+     * @return JSONObject
+     */
+    final public JSONObject getOutput() {
+        if (resp instanceof MDCHttpResponse) {
+            return ((MDCHttpResponse) resp).getOutput();
+        }
+        return null;
+    }
+
+    /**
+     * Put the name=object to the model
      * 
      * @param name
      *            the name
      * @param o
-     *            the o
+     *            the object
      */
     final public void put(String name, Object o) {
         // System.out.println("put:" + name + "=>" + o);
@@ -749,6 +782,11 @@ public class Model {
         return;
     }
 
+    /**
+     * remove the name from the model
+     * 
+     * @param name
+     */
     final protected void remove(String name) {
         if (context != null) {
             context.remove(name);
@@ -761,7 +799,7 @@ public class Model {
      * @param name
      *            the name
      * @param o
-     *            the o
+     *            the object
      */
     final protected void set(String name, Object o) {
         put(name, o);
@@ -793,14 +831,25 @@ public class Model {
     }
 
     /**
-     * Sets Beans back to Model which accessed by view
+     * set response the date header name=value
+     * 
+     * @param name
+     * @param date
+     */
+    final protected void setDateHeader(String name, long date) {
+        resp.setDateHeader(name, date);
+    }
+
+    /**
+     * Sets Beans back to Model which accessed by view, it will auto paging
+     * according the start and number per page
      * 
      * @param bs
-     *            the bs
+     *            the Beans<? extends Bean>
      * @param s
-     *            the s
+     *            the start position
      * @param n
-     *            the n
+     *            the number per page
      */
     final public void set(Beans<? extends Bean> bs, int s, int n) {
         if (bs != null) {
@@ -821,9 +870,10 @@ public class Model {
      * Sets Map back to the Model which accessed by view.
      * 
      * @param jo
-     *            the jo
+     *            the map of data
      * @param names
-     *            the names
+     *            the names that will be set back to model, if null, will set
+     *            all
      */
     final public void set(Map<Object, Object> jo, String... names) {
         if (jo == null) {
@@ -846,22 +896,22 @@ public class Model {
     }
 
     /**
-     * Checks for.
+     * Checks if has the name in the model for response
      * 
      * @param name
      *            the name
-     * @return true, if successful
+     * @return true, if has
      */
     final protected boolean has(String name) {
         return context != null && context.containsKey(name);
     }
 
     /**
-     * Gets the header.
+     * Gets the request header.
      * 
      * @param tag
-     *            the tag
-     * @return the header
+     *            the header tag
+     * @return String of the header
      */
     final protected String getHeader(String tag) {
         try {
@@ -887,7 +937,7 @@ public class Model {
     }
 
     /**
-     * Gets the int.
+     * Gets the int parameter from request
      * 
      * @param tag
      *            the tag
@@ -900,6 +950,7 @@ public class Model {
     /**
      * Gets the int.
      * 
+     * @deprecated
      * @param jo
      *            the jo
      * @param tag
@@ -917,6 +968,7 @@ public class Model {
     /**
      * Gets the int.
      * 
+     * @deprecated
      * @param jo
      *            the jo
      * @param tag
@@ -939,7 +991,9 @@ public class Model {
     }
 
     /**
-     * Gets the int.
+     * Gets the int from the request parameter, if the tag is not presented,
+     * then get the value from the session, if the value less than minvalue,
+     * then get the minvalue, and store the value in session
      * 
      * @param tag
      *            the tag
@@ -962,10 +1016,10 @@ public class Model {
             s.set(tagInSession, r).store();
         }
 
-        if (r > 500) {
-            r = 500;
-            log.error("the page number exceed max[500]: " + r);
-        }
+        // if (r > 500) {
+        // r = 500;
+        // log.error("the page number exceed max[500]: " + r);
+        // }
         return r;
     }
 
@@ -996,7 +1050,8 @@ public class Model {
     }
 
     /**
-     * Gets the int.
+     * Gets the int in request parameter, if not presented, return the
+     * defaultvalue
      * 
      * @param tag
      *            the tag
@@ -1010,7 +1065,8 @@ public class Model {
     }
 
     /**
-     * Gets the long.
+     * Gets the long request parameter, if not presented, return the
+     * defaultvalue
      * 
      * @param tag
      *            the tag
@@ -1022,7 +1078,7 @@ public class Model {
     }
 
     /**
-     * get the long param
+     * get the long request value, if not presented, return 0;
      * 
      * @param tag
      * @return long
@@ -1062,6 +1118,7 @@ public class Model {
     }
 
     /**
+     * get the request
      * 
      * @return HttpServletRequest
      */
@@ -1070,6 +1127,7 @@ public class Model {
     }
 
     /**
+     * get the response
      * 
      * @return HttpServletResponse
      */
@@ -1078,7 +1136,7 @@ public class Model {
     }
 
     /**
-     * Browser.
+     * get the user-agent of browser
      * 
      * @return the string
      */
@@ -1087,6 +1145,7 @@ public class Model {
     }
 
     /**
+     * test is mdc
      * 
      * @return boolean
      */
@@ -1095,29 +1154,12 @@ public class Model {
     }
 
     /**
-     * Adds the cookie.
-     * 
-     * @param key
-     *            the key
-     * @param value
-     *            the value
-     * @param expireseconds
-     *            the expireseconds
-     */
-    // final protected TConn getConnection() {
-    // if (req instanceof MDCHttpRequest) {
-    // return ((MDCHttpRequest) req).getConnection();
-    // }
-    //
-    // return null;
-    // }
-
-    /**
      * set the cookie back to the response
      * 
      * @param key
      * @param value
      * @param expireseconds
+     *            seconds
      */
     final protected void addCookie(String key, String value, int expireseconds) {
         if (key == null) {
@@ -1175,7 +1217,7 @@ public class Model {
     }
 
     /**
-     * trying to get the client ip
+     * trying to get the client ip from request header
      * 
      * @return String
      */
@@ -1193,7 +1235,7 @@ public class Model {
     }
 
     /**
-     * get all param names
+     * get all parameter names
      * 
      * @return Enumeration
      */
@@ -1202,10 +1244,13 @@ public class Model {
         try {
             return req.getParameterNames();
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            if (log.isErrorEnabled())
+                log.error(e.getMessage(), e);
             return null;
         }
     }
+
+    transient JSONObject _json;
 
     /**
      * get the request as JSON
@@ -1213,26 +1258,56 @@ public class Model {
      * @return JSONObject
      */
     final protected JSONObject getJSON() {
-        if (req instanceof MDCHttpRequest) {
-            return ((MDCHttpRequest) req).getJSON();
-        } else {
-            JSONObject jo = new JSONObject();
-            for (String name : this.getNames()) {
-                String s = this.getString(name);
-                // if (!X.isEmpty(s)) {
-                jo.put(name, s);
-                // }
+        if (_json == null) {
+            if (req instanceof MDCHttpRequest) {
+                _json = ((MDCHttpRequest) req).getJSON();
+            } else {
+                _json = new JSONObject();
+                for (String name : this.getNames()) {
+                    String s = this.getString(name);
+                    _json.put(name, s);
+                }
             }
-            return jo;
+
+            // mix the password
+            // for (Object name : _json.keySet()) {
+            // if ("password".equals(name) || "pwd".equals(name) ||
+            // "passwd".equals(name)) {
+            // _json.put(name, "*******");
+            // }
+            // }
         }
+        return _json;
     }
 
     /**
-     * Gets the request string param.
+     * get the request as JSON, it will mix the password key
+     * 
+     * @deprecated
+     * @return JSONObject
+     */
+    final protected JSONObject getJSONNonPassword() {
+        if (_json == null) {
+            getJSON();
+        }
+
+        JSONObject jo = JSONObject.fromObject(_json);
+        // mix the password
+        for (Object name : jo.keySet()) {
+            if ("password".equals(name) || "pwd".equals(name) || "passwd".equals(name)) {
+                jo.put(name, "*******");
+            }
+        }
+        return jo;
+    }
+
+    /**
+     * Gets the value of request string parameter. it auto handle multiple-part,
+     * and convert "<" or ">" to html char and normal request
      * 
      * @param name
-     *            the name
-     * @return the string
+     *            the name of parameter
+     * @return string of requested value
      */
     final protected String getString(String name) {
         try {
@@ -1259,19 +1334,20 @@ public class Model {
 
             return null;
         } catch (Exception e) {
-            log.error("get request parameter " + name + " get exception.", e);
+            if (log.isErrorEnabled())
+                log.error("get request parameter " + name + " get exception.", e);
             return null;
         }
     }
 
     /**
-     * Gets the string.
+     * Gets the request value by name, and limited length.
      * 
      * @param name
-     *            the name
+     *            the parameter name
      * @param maxlength
      *            the maxlength
-     * @return the string
+     * @return string of value
      */
     final protected String getString(String name, int maxlength) {
         String s = getString(name);
@@ -1285,15 +1361,16 @@ public class Model {
     }
 
     /**
-     * Gets the string.
+     * Gets the request value by name, and limited length, if not presented,
+     * using the default value.
      * 
      * @param name
-     *            the name
+     *            the parameter name
      * @param maxlength
      *            the maxlength
      * @param defaultvalue
      *            the defaultvalue
-     * @return the string
+     * @return string of value
      */
     final protected String getString(String name, int maxlength, String defaultvalue) {
         String s = getString(name);
@@ -1308,6 +1385,14 @@ public class Model {
         return s;
     }
 
+    /**
+     * get the request value as html (original string), it maybe includes html
+     * format
+     * 
+     * @param name
+     *            the parameter name
+     * @return String of value
+     */
     final protected String getHtml(String name) {
         return getHtml(name, false);
     }
@@ -1349,13 +1434,14 @@ public class Model {
                 return null;
             }
         } catch (Exception e) {
-            log.error("get request parameter " + name + " get exception.", e);
+            if (log.isErrorEnabled())
+                log.error("get request parameter " + name + " get exception.", e);
             return null;
         }
     }
 
     /**
-     * Gets the html.
+     * Gets the html from the request, and cut by the maxlength
      * 
      * @param name
      *            the name
@@ -1374,15 +1460,15 @@ public class Model {
     }
 
     /**
-     * Gets the html.
+     * Gets the html from the request, it will not convert anything for the html
      * 
      * @param name
-     *            the name
+     *            the name of request parameter
      * @param maxlength
      *            the maxlength
      * @param defaultvalue
      *            the defaultvalue
-     * @return the html
+     * @return String of the html
      */
     final protected String getHtml(String name, int maxlength, String defaultvalue) {
         String html = getHtml(name);
@@ -1397,12 +1483,15 @@ public class Model {
     }
 
     /**
-     * Gets the strings.
+     * Gets the strings from the request,
+     * <p>
+     * and will convert the "<" to "&lt;", ">" to "&gt;"
      * 
      * @param name
-     *            the name
-     * @return the strings
+     *            the name of the request parameter
+     * @return String[] of request
      */
+    @SuppressWarnings("unchecked")
     final protected String[] getStrings(String name) {
         try {
             if (this._multipart) {
@@ -1436,7 +1525,8 @@ public class Model {
                 return ss;
             }
         } catch (Exception e) {
-            log.error(name, e);
+            if (log.isErrorEnabled())
+                log.error(name, e);
         }
         return null;
     }
@@ -1444,7 +1534,7 @@ public class Model {
     /**
      * get the parameters names
      * 
-     * @return List
+     * @return List of the request names
      */
     final protected List<String> getNames() {
         if (this._multipart) {
@@ -1484,6 +1574,9 @@ public class Model {
         return req.getSession(bfCreate);
     }
 
+    /**
+     * indicator of multipart request
+     */
     transient boolean _multipart = false;
 
     /**
@@ -1562,7 +1655,12 @@ public class Model {
         }
     }
 
-    final protected Map<String, Object> getFiles() {
+    /**
+     * get files or multiple-part request
+     * 
+     * @return
+     */
+    final private Map<String, Object> getFiles() {
         if (uploads == null) {
             uploads = new HashMap<String, Object>();
             DiskFileItemFactory factory = new DiskFileItemFactory();
@@ -1595,10 +1693,12 @@ public class Model {
                         }
                     }
                 } else {
-                    log.warn("nothing got!!!");
+                    if (log.isWarnEnabled())
+                        log.warn("nothing got!!!");
                 }
             } catch (FileUploadException e) {
-                log.error(e);
+                if (log.isErrorEnabled())
+                    log.error(e.getMessage(), e);
             }
         }
 
@@ -1606,11 +1706,11 @@ public class Model {
     }
 
     /**
-     * Gets the file.
+     * Gets the request file by name.
      * 
      * @param name
-     *            the name
-     * @return the file
+     *            the parameter name
+     * @return file of value, null if not presented
      */
     final protected FileItem getFile(String name) {
         if (isMDC()) {
@@ -1634,6 +1734,10 @@ public class Model {
      */
     private Map<String, Object> uploads = null;
 
+    /**
+     * the path of the uri, http://[host:port]/[class]/[path], usually the
+     * path=method name
+     */
     protected String path;
 
     /**
@@ -1649,7 +1753,7 @@ public class Model {
     /**
      * return the contentType
      * 
-     * @return String
+     * @return String of content-type
      */
     final protected String getContentType() {
         if (contentType == null) {
@@ -1660,10 +1764,12 @@ public class Model {
     }
 
     /**
-     * Gets the template.
+     * Gets the template by viewname, the viewname is relative path
      * 
      * @param viewname
+     *            the relative view path name
      * @param allowEmpty
+     *            if not presented, allow using a empty
      * @return Template
      */
     final protected Template getTemplate(String viewname, boolean allowEmpty) {
@@ -1682,7 +1788,7 @@ public class Model {
     }
 
     /**
-     * render and output the html page
+     * render and output the html page to end-user
      * 
      * @param viewname
      *            the viewname
@@ -1695,10 +1801,10 @@ public class Model {
     }
 
     /**
-     * output the json as "application/json"
+     * output the json as "application/json" to end-user
      * 
      * @param jo
-     *            the jo
+     *            the json that will be output
      */
     final protected void response(JSONObject jo) {
         if (jo == null) {
@@ -1709,10 +1815,10 @@ public class Model {
     }
 
     /**
-     * Response.
+     * output the jsonarr as "application/json" to end-user
      * 
      * @param arr
-     *            the arr
+     *            the array of json
      */
     final protected void response(JSONArray arr) {
         if (arr == null) {
@@ -1723,11 +1829,11 @@ public class Model {
     }
 
     /**
-     * Response json.
+     * output the string as "application/json" to end-userr.
      * 
      * @deprecated
      * @param jsonstr
-     *            the jsonstr
+     *            the jsonstr string
      */
     final protected void responseJson(String jsonstr) {
         this.setContentType(Model.MIME_JSON);
@@ -1735,11 +1841,11 @@ public class Model {
     }
 
     /**
-     * Render.
+     * Render the template with current model and return
      * 
      * @param viewname
-     *            the viewname
-     * @return the string
+     *            the template name of view
+     * @return string of rendered
      */
     final protected String render(String viewname) {
         StringBuilderWriter sb = null;
@@ -1757,7 +1863,8 @@ public class Model {
             }
 
         } catch (Exception e) {
-            log.error(viewname, e);
+            if (log.isErrorEnabled())
+                log.error(viewname, e);
         } finally {
             if (sb != null) {
                 sb.close();
@@ -1768,18 +1875,16 @@ public class Model {
     }
 
     /**
-     * Show.
+     * using current model to render the template, and show the result html page
+     * to end-user.
      * 
      * @param viewname
-     *            the viewname
+     *            the viewname template
      * @param allowOverride
-     *            the allow override
+     *            if true and not presented, will trying load the template from
+     *            parent module
      */
     final protected boolean show(String viewname, boolean allowOverride) {
-        // if (expired()) {
-        // log.warn("the request was expired");
-        // return false;
-        // }
 
         Writer writer = null;
         try {
@@ -1788,7 +1893,8 @@ public class Model {
 
             TimeStamp t1 = TimeStamp.create();
             Template template = getTemplate(viewname, allowOverride);
-            log.debug("finding template = " + viewname + ", cost: " + t1.past() + "ms, result=" + template);
+            if (log.isDebugEnabled())
+                log.debug("finding template = " + viewname + ", cost: " + t1.past() + "ms, result=" + template);
 
             // System.out.println(viewname + "=>" + template);
             if (template != null) {
@@ -1797,19 +1903,22 @@ public class Model {
                 TimeStamp t = TimeStamp.create();
                 template.merge(context, writer);
                 writer.flush();
-                log.debug("merge [" + viewname + "] cost: " + t.past() + "ms");
+                if (log.isDebugEnabled())
+                    log.debug("merge [" + viewname + "] cost: " + t.past() + "ms");
 
                 return true;
             }
 
         } catch (Exception e) {
-            log.error(viewname, e);
+            if (log.isErrorEnabled())
+                log.error(viewname, e);
         } finally {
             if (writer != null) {
                 try {
                     writer.close();
                 } catch (IOException e) {
-                    log.error(e);
+                    if (log.isErrorEnabled())
+                        log.error(e);
                 }
             }
         }
@@ -1817,6 +1926,14 @@ public class Model {
         return false;
     }
 
+    /**
+     * render the template with parameters and return the result
+     * 
+     * @param viewname
+     *            the relative path name of template
+     * @param params
+     * @return String of the render result
+     */
     final protected String parse(String viewname, Object[]... params) {
 
         StringWriter writer = null;
@@ -1826,7 +1943,8 @@ public class Model {
 
             TimeStamp t1 = TimeStamp.create();
             Template template = getTemplate(viewname, true);
-            log.debug("finding template = " + viewname + ", cost: " + t1.past() + "ms");
+            if (log.isDebugEnabled())
+                log.debug("finding template = " + viewname + ", cost: " + t1.past() + "ms");
 
             // System.out.println(viewname + "=>" + template);
             if (template != null) {
@@ -1844,19 +1962,22 @@ public class Model {
                 }
                 template.merge(context, writer);
                 writer.flush();
-                log.debug("merge [" + viewname + "] cost: " + t.past() + "ms");
+                if (log.isDebugEnabled())
+                    log.debug("merge [" + viewname + "] cost: " + t.past() + "ms");
 
                 return writer.toString();
             }
 
         } catch (Exception e) {
-            log.error(viewname, e);
+            if (log.isErrorEnabled())
+                log.error(viewname, e);
         } finally {
             if (writer != null) {
                 try {
                     writer.close();
                 } catch (IOException e) {
-                    log.error(e);
+                    if (log.isErrorEnabled())
+                        log.error(e);
                 }
             }
         }
@@ -1865,7 +1986,7 @@ public class Model {
     }
 
     /**
-     * On mdc.
+     * On mdc requested from MDC component
      */
     public void onMDC() {
         if (module != null) {
@@ -1883,14 +2004,14 @@ public class Model {
     }
 
     /**
-     * On get.
+     * On get requested from HTTP GET method
      */
     public void onGet() {
         onPost();
     }
 
     /**
-     * On post.
+     * On post requested from HTTP POST method
      */
     public void onPost() {
         if (module != null) {
@@ -1903,11 +2024,15 @@ public class Model {
                 }
             }
         }
-        log.warn("nosupport the POST" + this.path);
+        if (log.isWarnEnabled())
+            log.warn("nosupport the POST " + this.path);
         show("/nosupport.html");
     }
 
     /**
+     * set current path
+     * 
+     * @deprecated
      * @param path
      */
     final protected void setPath(String path) {
@@ -1915,8 +2040,10 @@ public class Model {
     }
 
     /**
-     * Merge.
+     * render the template with current model, and return the result, please
+     * refers to "render"
      * 
+     * @deprecated
      * @param uri
      *            the uri
      * @return the string
@@ -1935,70 +2062,103 @@ public class Model {
                 return writer.toString();
             }
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            if (log.isErrorEnabled())
+                log.error(e.getMessage(), e);
         } finally {
             try {
                 if (writer != null) {
                     writer.close();
                 }
             } catch (IOException e) {
-                log.error(e);
+                if (log.isErrorEnabled())
+                    log.error(e);
             }
         }
         return null;
     }
 
     /**
-     * Gets the mime type.
+     * Get the mime type.
      * 
      * @param uri
-     *            the uri
-     * @return the mime type
+     *            the type of uri
+     * @return String of mime type
      */
     final static protected String getMimeType(String uri) {
         return GiisooServlet.config.getServletContext().getMimeType(uri);
     }
 
     /**
-     * Error.
+     * Show error page to end user
      * 
      * @param e
-     *            the e
+     *            the throwable
      */
     final protected void error(Throwable e) {
-        this.set("me", this.getUser());
+        if (log.isErrorEnabled())
+            log.error(e.getMessage(), e);
 
-        StringWriter sw = new StringWriter();
-        PrintWriter out = new PrintWriter(sw);
-        e.printStackTrace(out);
-        this.set("error", sw.toString());
+        if (method.isMdc()) {
+            this.put(X.STATE, 202);
+            this.put(X.MESSAGE, "server error");
+            this.put(X.ERROR, e.getMessage());
+        } else {
+            if (resp != null) {
+                this.set("me", this.getUser());
 
-        this.show("/error.html", true);
+                StringWriter sw = new StringWriter();
+                PrintWriter out = new PrintWriter(sw);
+                e.printStackTrace(out);
+                String s = sw.toString();
+                String lineSeparator = java.security.AccessController.doPrivileged(new sun.security.action.GetPropertyAction("line.separator"));
+                s = s.replaceAll(lineSeparator, "<br/>");
+                s = s.replaceAll(" ", "&nbsp;");
+                s = s.replaceAll("\t", "&nbsp;&nbsp;&nbsp;&nbsp;");
+                this.set("error", s);
+
+                this.show("/error.html", true);
+            }
+        }
+        setStatus(HttpServletResponse.SC_EXPECTATION_FAILED);
+
     }
 
     /**
-     * Notfound.
+     * show notfound page to end-user
      */
     final protected void notfound() {
         this.set("me", this.getUser());
         this.show("/notfound.html", true);
+        this.setStatus(HttpServletResponse.SC_NOT_FOUND);
     }
 
     /**
-     * Deny.
+     * set the sponse status code
+     * 
+     * @param statuscode
+     */
+    final protected void setStatus(int statuscode) {
+        resp.setStatus(statuscode);
+        status = statuscode;
+    }
+
+    /**
+     * show deny page to end-user
      */
     final protected void deny() {
         deny(null);
+        setStatus(HttpServletResponse.SC_FORBIDDEN);
     }
 
     /**
-     * Deny.
+     * show deny page with error info to end-user
      * 
      * @param error
-     *            the error
+     *            the error that will be displaied
      */
     final protected void deny(String error) {
-        log.warn("deny ... " + error);
+        if (log.isWarnEnabled())
+            log.warn("deny ... " + error);
         String request = this.getHeader("X-Requested-With");
         if ("XMLHttpRequest".equals(request)) {
             JSONObject jo = new JSONObject();
@@ -2016,10 +2176,11 @@ public class Model {
     }
 
     /**
-     * Delete.
+     * Delete the file and files under the path
      * 
+     * @deprecated
      * @param f
-     *            the f
+     *            the file which deleted
      */
     final protected void delete(File f) {
         if (!f.exists()) {
@@ -2041,6 +2202,7 @@ public class Model {
     }
 
     /**
+     * get the request method, GET/POST/MDC
      * 
      * @return int
      */
@@ -2048,21 +2210,40 @@ public class Model {
         return method.method;
     }
 
+    /**
+     * HTTP GET
+     */
     final public static int METHOD_GET = 1;
+
+    /**
+     * HTTP POST
+     */
     final public static int METHOD_POST = 2;
+
+    /**
+     * MDC Request
+     */
     final public static int METHOD_MDC = 4;
 
+    /**
+     * MIME TYPE of JSON
+     */
     final public static String MIME_JSON = "application/json;charset=" + ENCODING;
+
+    /**
+     * MIME TYPE of HTML
+     */
     final protected static String MIME_HTML = "text/html;charset=" + ENCODING;
 
     /**
-     * Copy.
+     * the utility api of copying all data in "inputstream" to "outputstream"
      * 
+     * @deprecated
      * @param in
-     *            the in
+     *            the inputstream
      * @param out
-     *            the out
-     * @return the int
+     *            the outputstream
+     * @return int the size of copied
      * @throws IOException
      *             Signals that an I/O exception has occurred.
      */
@@ -2071,19 +2252,20 @@ public class Model {
     }
 
     /**
-     * Copy.
+     * copy the data in "inputstream" to "outputstream", from start to end
      * 
+     * @deprecated
      * @param in
-     *            the in
+     *            the inputstream
      * @param out
-     *            the out
+     *            the outputstream
      * @param start
-     *            the start
+     *            the start position of started
      * @param end
-     *            the end
+     *            the end position of ended
      * @param closeAfterDone
-     *            the close after done
-     * @return the int
+     *            close after done, true: close if done, false: not close
+     * @return int the size of copied
      * @throws IOException
      *             Signals that an I/O exception has occurred.
      */
@@ -2118,15 +2300,16 @@ public class Model {
     }
 
     /**
-     * Copy.
+     * Copy data in "inputstream" to "outputstream"
      * 
+     * @deprecated
      * @param in
-     *            the in
+     *            the inputstream
      * @param out
-     *            the out
+     *            the outputstream
      * @param closeAfterDone
-     *            the close after done
-     * @return the int
+     *            close after done, true: close if done, false: not close
+     * @return int the size of copied
      * @throws IOException
      *             Signals that an I/O exception has occurred.
      */
@@ -2158,10 +2341,10 @@ public class Model {
     }
 
     /**
-     * Copy.
+     * Copy all request params from the model
      * 
      * @param m
-     *            the m
+     *            the model of source
      */
     final public void copy(Model m) {
         this.req = m.req;
@@ -2188,20 +2371,20 @@ public class Model {
     protected Map<Integer, Map<String, PathMapping>> pathmapping;
 
     /**
-     * Println.
+     * println the object to end-user
      * 
      * @param o
-     *            the o
+     *            the object of printing
      */
     final protected void println(Object o) {
         print(o);
     }
 
     /**
-     * Prints the.
+     * Print the object to end-user
      * 
      * @param o
-     *            the o
+     *            the object of printing
      */
     final protected void print(Object o) {
         try {
@@ -2210,7 +2393,8 @@ public class Model {
             writer.write(o.toString());
             writer.flush();
         } catch (Exception e) {
-            log.error(o, e);
+            if (log.isErrorEnabled())
+                log.error(o, e);
         }
     }
 
@@ -2218,10 +2402,10 @@ public class Model {
      * Copy the request params to V
      * 
      * @param v
-     *            the v
+     *            the destination of v
      * @param names
-     *            the names
-     * @return the int
+     *            the names that request parameters will copied
+     * @return int of copied
      */
     final protected int copy(V v, String... names) {
         if (v == null || names == null || names.length == 0)
@@ -2237,13 +2421,13 @@ public class Model {
     }
 
     /**
-     * Copy the request int params to V.
+     * Copy the request "int" params to V.
      * 
      * @param v
-     *            the v
+     *            the destination of v
      * @param names
-     *            the names
-     * @return the int
+     *            the names that request parameters will copied
+     * @return int of copied
      */
     final protected int copyInt(V v, String... names) {
         if (v == null || names == null || names.length == 0)
@@ -2262,10 +2446,10 @@ public class Model {
      * Copy the request long params to V.
      * 
      * @param v
-     *            the v
+     *            the destination of v
      * @param names
-     *            the names
-     * @return the int
+     *            the names that request parameters will copied
+     * @return int of copied
      */
     final protected int copyLong(V v, String... names) {
         if (v == null || names == null || names.length == 0)
@@ -2284,12 +2468,12 @@ public class Model {
      * Copy the request date params to V.
      * 
      * @param v
-     *            the v
+     *            the destination of v
      * @param format
-     *            the format
+     *            the format of datetime
      * @param names
-     *            the names
-     * @return the int
+     *            the names that request parameters will copied
+     * @return int of copied
      */
     final protected int copyDate(V v, String format, String... names) {
         if (v == null || names == null || names.length == 0)
@@ -2307,11 +2491,11 @@ public class Model {
     }
 
     /**
-     * Rebound.
+     * Rebound the request parameters to response
      * 
      * @param names
-     *            the names
-     * @return the int
+     *            the names that request parameters will copied
+     * @return int of copied
      */
     final protected int rebound(String... names) {
         int count = 0;
@@ -2329,13 +2513,19 @@ public class Model {
         return count;
     }
 
-    public static class PathMapping {
+    /**
+     * PathMapping inner class
+     * 
+     * @author joe
+     *
+     */
+    protected static class PathMapping {
         Pattern pattern;
         Method method;
         Path path;
 
         /**
-         * Creates the.
+         * Creates the Pathmapping
          * 
          * @param pattern
          *            the pattern
@@ -2355,6 +2545,12 @@ public class Model {
 
     }
 
+    /**
+     * the {@code HTTPMethod} is request method class, GET, POST, MDC
+     * 
+     * @author joe
+     *
+     */
     public static class HTTPMethod {
         int method = Model.METHOD_GET;
 
@@ -2440,7 +2636,7 @@ public class Model {
      * @see java.lang.Object#toString()
      */
     @Override
-    public String toString() {
+    final public String toString() {
         if (tostring == null) {
             tostring = new StringBuilder(this.getClass().getName()).append("[").append(this.uri).append(", path=").append(this.path).append("]").toString();
         }
@@ -2448,13 +2644,14 @@ public class Model {
     }
 
     /**
-     * Random.
+     * Random the list
      * 
+     * @deprecated
      * @param <T>
      *            the generic type
      * @param list
-     *            the list
-     * @return the list
+     *            the source list
+     * @return list of random
      */
     public static <T> List<T> random(List<T> list) {
         if (list == null || list.size() == 0)
@@ -2499,12 +2696,21 @@ public class Model {
         return true;
     }
 
+    /**
+     * response not support page to user
+     */
     final public void notsupport() {
-        log.warn("nosupport, support.ua=" + module.get("browser.support") + ", actual.ua=" + this.browser() + ", params=" + this.getJSON());
+        if (log.isWarnEnabled())
+            log.warn("nosupport, support.ua=" + module.get("browser.support") + ", actual.ua=" + this.browser() + ", params=" + this.getJSON());
 
         this.show("/notsupport.html");
     }
 
+    /**
+     * get the name pair from the request query
+     * 
+     * @return NameValue[]
+     */
     @SuppressWarnings("unchecked")
     final public NameValue[] getQueries() {
         Enumeration<String> e = req.getParameterNames();
@@ -2521,14 +2727,20 @@ public class Model {
     }
 
     /**
-     * Node.
+     * get the name of this node in cluster
      * 
-     * @return the string
+     * @deprecated
+     * @return string of name
      */
     public static String node() {
         return Module._conf.getString("node", null);
     }
 
+    /**
+     * get the name pair from the request header
+     * 
+     * @return NameValue[]
+     */
     @SuppressWarnings("unchecked")
     final public NameValue[] getHeaders() {
         Enumeration<String> e = req.getHeaderNames();
@@ -2545,6 +2757,12 @@ public class Model {
         return null;
     }
 
+    /**
+     * the {@code NameValue} Class used to contain the name and value
+     * 
+     * @author joe
+     *
+     */
     public static class NameValue {
         String name;
         String value;
@@ -2575,10 +2793,21 @@ public class Model {
         }
     }
 
+    /**
+     * set the current module
+     * 
+     * @param e
+     *            the module
+     */
     public static void setCurrentModule(Module e) {
         _currentmodule.set(e);
     }
 
+    /**
+     * test the request is from mobile
+     * 
+     * @return boolean
+     */
     public final boolean isMobile() {
         String useragent = module.get("mobile", ".*");
         return Pattern.matches(useragent, this.browser());

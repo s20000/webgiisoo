@@ -11,29 +11,37 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
+ * the {@code GiisooContextListener} Class listen the life listener of tomcat
  * 
  * @author yjiang
  * 
  */
 public class GiisooContextListener implements ServletContextListener {
 
-  static Log log = LogFactory.getLog(GiisooContextListener.class);
+    static Log log = LogFactory.getLog(GiisooContextListener.class);
 
-  /* (non-Javadoc)
-   * @see javax.servlet.ServletContextListener#contextDestroyed(javax.servlet.ServletContextEvent)
-   */
-  public void contextDestroyed(ServletContextEvent arg) {
-    
-  }
+    /*
+     * (non-Javadoc)
+     * 
+     * @see javax.servlet.ServletContextListener#contextDestroyed(javax.servlet.
+     * ServletContextEvent)
+     */
+    public void contextDestroyed(ServletContextEvent arg) {
 
-  /* (non-Javadoc)
-   * @see javax.servlet.ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)
-   */
-  public void contextInitialized(ServletContextEvent event) {
-    String home = event.getServletContext().getRealPath("/");
+    }
 
-    GiisooServlet.init(home, event.getServletContext().getContextPath());
-    
-  }
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * javax.servlet.ServletContextListener#contextInitialized(javax.servlet
+     * .ServletContextEvent)
+     */
+    public void contextInitialized(ServletContextEvent event) {
+        String home = event.getServletContext().getRealPath("/");
+
+        GiisooServlet.init(home, event.getServletContext().getContextPath());
+
+    }
 
 }

@@ -1,19 +1,21 @@
 package com.giisoo.app.web.admin;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-
 import com.giisoo.core.bean.Beans;
 import com.giisoo.core.bean.X;
 import com.giisoo.core.bean.Bean.V;
 import com.giisoo.framework.common.Cluster;
-import com.giisoo.framework.mdc.utils.IP;
 import com.giisoo.framework.web.Model;
 import com.giisoo.framework.web.Path;
 import com.mongodb.BasicDBObject;
 
+/**
+ * web api: /admin/cluster
+ * <p>
+ * used to manage cluster info
+ * 
+ * @author joe
+ *
+ */
 public class cluster extends Model {
 
     @Path(login = true, access = "access.config.admin")
@@ -29,6 +31,7 @@ public class cluster extends Model {
 
         this.set(bs, s, n);
 
+        this.query.path("/admin/cluster");
         this.show("/admin/cluster.index.html");
     }
 

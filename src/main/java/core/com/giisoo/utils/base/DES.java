@@ -3,7 +3,6 @@ package com.giisoo.utils.base;
 import javax.crypto.*;
 import javax.crypto.spec.*;
 
-// TODO: Auto-generated Javadoc
 /**
  * 3DES encrypt/decrypt utility.
  *

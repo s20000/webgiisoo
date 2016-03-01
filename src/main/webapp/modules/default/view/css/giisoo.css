@@ -1063,6 +1063,7 @@ a.btn {
 	text-decoration: none;
 	border-color: #4cae4c;
 	padding: 0 12px;
+	line-height: 32px;
 }
 
 .btn-upload input {
@@ -1260,7 +1261,7 @@ div.error {
 }
 
 .search input {
-	width: 80px;
+	width: 120px;
 	background-color: #fafafa;
 	background-repeat: no-repeat;
 	background-position: right center;
@@ -1510,8 +1511,7 @@ tr.efile.type_zip span.icon {
 	border-bottom: 1px solid #ddd;
 }
 
-.content .chart .group .date, .content .chart .group .name
-	{
+.content .chart .group .date, .content .chart .group .name {
 	font-size: 26px;
 	color: #c77;
 }
@@ -1942,8 +1942,8 @@ div.fulline {
 	padding-right: 0;
 }
 
-tr.message_new .flag, tr.message_done .flag, tr.message_mark .flag,
-	tr.message_read .flag {
+tr.message_new .flag, tr.message_done .flag, tr.message_mark .flag, tr.message_read .flag
+	{
 	background-image: url(/images/new1.png);
 	background-size: 16px;
 	background-position: center;
@@ -1963,8 +1963,8 @@ tr.message_read .flag {
 	background-image: url(/images/read.png);
 }
 
-tr.message_new .flag span, tr.message_done .flag span,
-	tr.message_mark .flag span, tr.message_read .flag span {
+tr.message_new .flag span, tr.message_done .flag span, tr.message_mark .flag span,
+	tr.message_read .flag span {
 	display: inline-block;
 	width: 100%;
 	height: 100%;
@@ -2669,8 +2669,8 @@ td.more {
 }
 
 ::-webkit-scrollbar-button, .toolbar.full .left, button.beatpicker-clearButton,
-	form div.confirm, label i[dict-picker=true], #efile-like p,
-	#menu .loading i.icon, .fileuploader-file {
+	form div.confirm, label i[dict-picker=true], #efile-like p, #menu .loading i.icon,
+	.fileuploader-file {
 	display: none;
 }
 
@@ -2718,8 +2718,8 @@ label.nospace, label.nospace input, form div.accesses div.group .title,
 	margin-left: 5px;
 }
 
-.toolbar .right div, div.input-parent, .content .form label,
-	.fileupload {
+.toolbar .right div, div.input-parent, .content .form label, .fileupload
+	{
 	display: inline-block;
 }
 
@@ -2735,18 +2735,15 @@ label.nospace, label.nospace input, form div.accesses div.group .title,
 	position: relative;
 }
 
-table, form div.textarea, .content .chart .group iframe.full
-	{
+table, form div.textarea, .content .chart .group iframe.full {
 	width: 100%;
 }
 
-form div.accesses div.group, form div.accesses div.access_title
-	{
+form div.accesses div.group, form div.accesses div.access_title {
 	margin: 10px 0;
 }
 
-form div.fulline, form div.uploadphoto, .task .memo,
-	.task .report {
+form div.fulline, form div.uploadphoto, .task .memo, .task .report {
 	width: 100%;
 	display: inline-block;
 }
@@ -2778,8 +2775,7 @@ a.btn:hover, a.btn:hover {
 	margin-top: 20px;
 }
 
-.search input[softwareinfo-picker=true], .search input[name=certid]
-	{
+.search input[softwareinfo-picker=true], .search input[name=certid] {
 	width: 120px;
 }
 
@@ -2864,18 +2860,15 @@ table .state, table td.speed {
 	position: relative;
 }
 
-table .state_3 .state, table .state_3 .state, table .state_3 .state1
-	{
+table .state_3 .state, table .state_3 .state, table .state_3 .state1 {
 	color: #138009;
 }
 
-table .state_2 .state, table .state_2 .state, table .state_2 .state1
-	{
+table .state_2 .state, table .state_2 .state, table .state_2 .state1 {
 	color: #11A765;
 }
 
-table .state_1 .state, table .state_1 .state, table .state_1 .state1
-	{
+table .state_1 .state, table .state_1 .state, table .state_1 .state1 {
 	color: #940707;
 }
 
@@ -2907,8 +2900,7 @@ table .state_0 .state, table .state_0 .state, table .state_0 .state1,
 	width: 10%;
 }
 
-.content .chart iframe.cpu_gauge, .content .chart iframe.disk_usage
-	{
+.content .chart iframe.cpu_gauge, .content .chart iframe.disk_usage {
 	height: 300px;
 	float: left;
 	width: 30%;

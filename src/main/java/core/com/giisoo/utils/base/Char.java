@@ -1,6 +1,5 @@
 package com.giisoo.utils.base;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class Char.
  */

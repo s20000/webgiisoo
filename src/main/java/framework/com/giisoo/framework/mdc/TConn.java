@@ -5,7 +5,6 @@
  */
 package com.giisoo.framework.mdc;
 
-import java.sql.*;
 import java.util.*;
 
 import net.sf.json.JSONObject;
@@ -15,12 +14,11 @@ import org.apache.mina.core.session.IoSession;
 
 import com.giisoo.core.bean.*;
 import com.giisoo.core.worker.WorkerTask;
-import com.giisoo.framework.common.Stat;
 import com.giisoo.framework.common.User;
 import com.giisoo.framework.mdc.command.*;
-import com.giisoo.framework.web.Language;
 import com.giisoo.utils.base.*;
 import com.giisoo.utils.base.Base64;
+import com.mongodb.BasicDBObject;
 
 /**
  * MDC device which interact with mdc client in server side
@@ -28,7 +26,7 @@ import com.giisoo.utils.base.Base64;
  * @author yjiang
  * 
  */
-@DBMapping(table = "tblconn")
+@DBMapping(collection = "gi_conn")
 public class TConn extends Bean {
 
     private static final long serialVersionUID = 1L;
@@ -41,6 +39,11 @@ public class TConn extends Bean {
     public static final int STATE_ERROR = 5;
     public static final int STATE_PENDING = 6;
 
+    /**
+     * test is connected
+     * 
+     * @return boolean, true if connected
+     */
     public boolean isConnected() {
         return session != null;
     }
@@ -54,7 +57,7 @@ public class TConn extends Bean {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((id == null) ? 0 : id.hashCode());
+        result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
         result = prime * result + ((session == null) ? 0 : session.hashCode());
         return result;
     }
@@ -73,10 +76,10 @@ public class TConn extends Bean {
         if (getClass() != obj.getClass())
             return false;
         TConn other = (TConn) obj;
-        if (id == null) {
-            if (other.id != null)
+        if (getId() == null) {
+            if (other.getId() != null)
                 return false;
-        } else if (!id.equals(other.id))
+        } else if (!getId().equals(other.getId()))
             return false;
         if (session == null) {
             if (other.session != null)
@@ -101,104 +104,193 @@ public class TConn extends Bean {
      */
     public static String pri_key;
 
-    private Object id;
-    private String clientid;
-    String phone;
-    String alias;
-    String password;
-    String address;
-    String key;
-
-    int locked;
-    long uid;
-    long sent;
-    long received;
-
-    long created;
-    String ip;
-    long updated;
-
-    long lastio = 0;
+    //
+    // private Object id;
+    // private String clientid;
+    // String phone;
+    // String alias;
+    // String password;
+    // String address;
+    // String key;
+    //
+    // int locked;
+    // long uid;
+    // long sent;
+    // long received;
+    //
+    // long created;
+    // String ip;
+    // long updated;
+    //
+    transient long lastio = 0;
 
     boolean valid = false;
 
     transient IoSession session;
-
     public byte[] deskey;
-    private int capability = 0x30; // 0x30 (encode, zip)
 
+    transient private int capability = 0x30; // 0x30 (encode, zip)
+
+    //
     private IResponse resp;
 
+    /**
+     * get the "object id", if not logined, the id=clientid, if logined, the
+     * id=userid
+     * 
+     * @return
+     */
     public Object getId() {
-        return id;
+        return this.get("id");
     }
 
+    /**
+     * set the object id
+     * 
+     * @param id
+     */
     public void setId(Object id) {
-        this.id = id;
+        this.set("id", id);
     }
 
+    /**
+     * set the client id
+     * 
+     * @param clientid
+     */
     public void setClientid(String clientid) {
-        this.clientid = clientid;
+        this.set("clientid", clientid);
     }
 
+    /**
+     * get the capability
+     * 
+     * @return int
+     */
     public int getCapability() {
-        return capability;
+        return capability;// getInt("capability");
     }
 
+    /**
+     * set the capability for the connection
+     * 
+     * @param capability
+     */
     public void setCapability(int capability) {
         this.capability = capability;
+        this.set("capability", capability);
     }
 
+    /**
+     * test is support zip
+     * 
+     * @return boolean
+     */
     public boolean isSupportZip() {
         return (capability & 0x10) != 0;
     }
 
+    /**
+     * test is support encode, "RSA/3DES"
+     * 
+     * @return boolean
+     */
     public boolean isSupportEncode() {
         return (capability & 0x20) != 0;
     }
 
+    /**
+     * get the clientid
+     * 
+     * @return String
+     */
     public String getClientid() {
-        return clientid;
+        return getString("clientid");
     }
 
+    /**
+     * is locked
+     * 
+     * @return int, if locked, return 1
+     */
     public int getLocked() {
-        return locked;
+        return getInt("locked");
     }
 
+    /**
+     * get the created time
+     * 
+     * @return long
+     */
     public long getCreated() {
-        return created;
+        return getLong("created");
     }
 
+    /**
+     * get the ip of last time connected
+     * 
+     * @return String
+     */
     public String getIp() {
-        return ip;
+        return getString("ip");
     }
 
+    /**
+     * get the 3DES key
+     * 
+     * @return byte[]
+     */
     public byte[] getDeskey() {
         return deskey;
     }
 
     public String getKey() {
-        return key;
+        return getString("key");
     }
 
+    /**
+     * get the "password", or "uuid"
+     * 
+     * @return String
+     */
     public String getPassword() {
-        return password;
+        return getString("password");
     }
 
+    /**
+     * get the clientid
+     * 
+     * @return String
+     */
     public String getClientId() {
-        return clientid;
+        return getString("clientid");
     }
 
+    /**
+     * get the remote address
+     * 
+     * @return String
+     */
     public String getAddress() {
-        return address;
+        return getString("address");
     }
 
+    /**
+     * get the phone
+     * 
+     * @return String
+     */
     public String getPhone() {
-        return phone;
+        return getString("phone");
     }
 
+    /**
+     * get the alias
+     * 
+     * @return String
+     */
     public String getAlias() {
-        return alias;
+        return getString("alias");
     }
 
     /**
@@ -230,93 +322,84 @@ public class TConn extends Bean {
     }
 
     /**
-     * Load.
+     * Load the Conn by the query
      * 
-     * @param w
-     *            the w
+     * @param q
+     *            the query of the condition
      * @param s
-     *            the s
+     *            the start number
      * @param n
-     *            the n
-     * @return the beans
+     *            the number
+     * @return Beans<TConn>
      */
-    public static Beans<TConn> load(W w, int s, int n) {
-        if (w == null) {
-            w = W.create();
-        }
-        w.and("uid", 0, W.OP_GT);
-        return Bean.load(w.where(), w.args(), (w.orderby() == null) ? "order by password" : w.orderby(), s, n, TConn.class);
+    public static Beans<TConn> load(BasicDBObject q, int s, int n) {
+        return Bean.load(q, new BasicDBObject("clientid", 1), s, n, TConn.class);
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     * set the RSA public key for the client
      * 
-     * @see com.giisoo.bean.Bean#load(java.sql.ResultSet)
+     * @param key
      */
-    @Override
-    protected void load(ResultSet r) throws SQLException {
-        clientid = r.getString("clientid");
-        capability = r.getInt("capability");
-        phone = r.getString("phone");
-        alias = r.getString("alias");
-        password = r.getString("password");
-        created = r.getLong("created");
-        ip = r.getString("ip");
-        uid = r.getLong("uid");
-        updated = r.getLong("updated");
-        address = r.getString("address");
-        key = r.getString("pubkey");
-        locked = r.getInt("locked");
-        sent = r.getLong("sent");
-        received = r.getLong("received");
-
-        this.set("key", key);
-        this.set("clientid", clientid);
-    }
-
     public void setKey(String key) {
-        this.key = key;
         this.set("key", key);
     }
 
     transient User user;
 
+    /**
+     * get the associated user with the connection
+     * 
+     * @return User
+     */
     public User getUser() {
-        if (user == null && uid > 0) {
-            user = User.loadById(uid);
+        if (user == null && this.getLong("uid") > 0) {
+            user = User.loadById(this.getLong("uid"));
         }
         return user;
     }
 
+    /**
+     * get the "sent" bytes
+     * 
+     * @return long
+     */
     public long getSent() {
-        return sent;
-    }
-
-    public long getReceived() {
-        return received;
+        return this.getLong("sent");
     }
 
     /**
-     * Process.
+     * get the "received" bytes
+     * 
+     * @return long
+     */
+    public long getReceived() {
+        return this.getLong("received");
+    }
+
+    /**
+     * Process the received data
      * 
      * @param b
-     *            the b
+     *            the received data
      */
-    public void process(byte[] b) {
+    public synchronized void process(byte[] b) {
         lastio = System.currentTimeMillis();
 
-        received += b.length;
+        long received = this.getReceived() + b.length;
+        this.set("received", received);
+
         this.update(V.create("received", received));
 
         Command.process(b, this);
     }
 
     /**
-     * Close.
+     * Close the connection
      */
     public void close() {
 
-        log.debug("close the client: " + id, new Exception());
+        log.debug("close the client: " + getId(), new Exception());
 
         if (session != null) {
             session.removeAttribute("conn");
@@ -324,9 +407,9 @@ public class TConn extends Bean {
             session = null;
         }
 
-        if (clientid != null) {
-            update(clientid, V.create("uid", -1));
-            clientid = null;
+        if (getClientid() != null) {
+            update(getClientid(), V.create("uid", -1));
+            set("clientid", null);
 
             TConnCenter.remove(this);
 
@@ -346,17 +429,17 @@ public class TConn extends Bean {
     }
 
     /**
-     * Send.
+     * Send the response data to remote
      * 
      * @param out
-     *            the out
+     *            the response data
      */
     public void send(Response out) {
         send(out.getBytes(), out.isRequiredEncode());
     }
 
     /**
-     * Send.
+     * Send the bytes to remote
      * 
      * @param bb
      * @param requireEncode
@@ -393,7 +476,7 @@ public class TConn extends Bean {
                             log.debug(Bean.toString(b));
                         }
 
-                        sent += b.length;
+                        long sent = getSent() + b.length;
                         update(V.create("sent", sent));
 
                         IoBuffer buf = IoBuffer.allocate(b.length, false);
@@ -421,7 +504,7 @@ public class TConn extends Bean {
     }
 
     /**
-     * Send.
+     * Send the command, json, bytes to remote
      * 
      * @param cmd
      *            the cmd
@@ -433,7 +516,7 @@ public class TConn extends Bean {
      *            the require encode
      */
     public void send(byte cmd, JSONObject jo, byte[] bb, boolean requireEncode) {
-        log.debug("send:" + clientid + ", " + jo + ", bb:" + (bb == null ? 0 : bb.length));
+        log.debug("send:" + getClientid() + ", " + jo + ", bb:" + (bb == null ? 0 : bb.length));
 
         Response resp = new Response(requireEncode);
         /**
@@ -458,14 +541,19 @@ public class TConn extends Bean {
     }
 
     /**
-     * Valid.
+     * test is valid connection
      * 
-     * @return true, if successful
+     * @return true, if valid
      */
     public boolean valid() {
         return valid;
     }
 
+    /**
+     * get the remote ip address
+     * 
+     * @return String
+     */
     public String getRemoteIp() {
         String remote = session.getRemoteAddress().toString();
         // /180.109.27.240:17524
@@ -486,9 +574,11 @@ public class TConn extends Bean {
      */
     public boolean validate(String uid) {
         valid = false;
+        int locked = this.getInt("locked");
+        String password = this.getPassword();
 
-        if (locked == 0 && this.password != null && this.password.equals(uid)) {
-            if (Bean.update("clientid=?", new Object[] { clientid }, V.create("login", 1).set("logined", System.currentTimeMillis()), TConn.class) > 0) {
+        if (locked == 0 && password != null && password.equals(uid)) {
+            if (Bean.updateCollection(new BasicDBObject("clientid", this.getClientid()), V.create("login", 1).set("logined", System.currentTimeMillis()), TConn.class) > 0) {
                 valid = true;
 
                 // TConn d = online.get(clientid);
@@ -508,28 +598,22 @@ public class TConn extends Bean {
     }
 
     /**
-     * Bye.
+     * send Bye to remote
      */
     public void bye() {
         send(Command.BYE, null, null, false);
     }
 
     /**
-     * Update.
+     * Update the connection info in database
      * 
      * @param v
-     *            the v
+     *            the values
      * @return true, if successful
      */
     public boolean update(V v) {
-        return Bean.update("clientid=?", new Object[] { clientid }, v, TConn.class) > 0;
+        return Bean.updateCollection(new BasicDBObject("clientid", this.getClientid()), v, TConn.class) > 0;
     }
-
-    // public static TConn online(String clientid) {
-    // return online.get(clientid);
-    // }
-
-    // private static Map<String, TConn> online = new HashMap<String, TConn>();
 
     public static String ALLOW_IP = null;
 
@@ -538,42 +622,25 @@ public class TConn extends Bean {
     public static String ALLOW_UID = null;
 
     /**
-     * Find.
+     * get the updated time
      * 
-     * @param name
-     *            the name
-     * @return the beans
+     * @return long
      */
-    public static Beans<TConn> find(String name) {
-        name = "%" + name + "%";
-        return Bean.load("clientid like ? or phone like ? or alias like ?", new Object[] { name, name, name }, "order by phone", 0, 100, TConn.class);
-    }
-
     public long getUpdated() {
-        return updated;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#toString()
-     */
-    @Override
-    public String toString() {
-        return new StringBuilder("TConn-[").append(clientid).append(",uid=").append(uid).append(",alias=").append(alias).append(", session=").append(session).append("]").toString();
+        return this.getLong("updated");
     }
 
     /**
-     * Update.
+     * Update the connection by the clientid, and values
      * 
      * @param clientid
      *            the clientid
      * @param v
-     *            the v
+     *            the values
      * @return true, if successful
      */
     public static boolean update(String clientid, V v) {
-        return Bean.update("clientid=?", new Object[] { clientid }, v, TConn.class) > 0;
+        return Bean.updateCollection(new BasicDBObject("clientid", clientid), v, TConn.class) > 0;
     }
 
     /**
@@ -608,21 +675,22 @@ public class TConn extends Bean {
             Bean.delete("password=?", new Object[] { password }, TConn.class);
         }
 
-        Bean.insert(V.create("clientid", clientid).set("pubkey", key).set("password", password).set("capability", capability), TConn.class);
+        Bean.insertCollection(V.create(X._ID, clientid).set("clientid", clientid).set("pubkey", key).set("password", password).set("capability", getCapability()), TConn.class);
     }
 
     /**
-     * Exists.
+     * test is exists for the clientid
      * 
      * @param clientid
      *            the clientid
      * @return true, if successful
      */
     public static boolean exists(String clientid) {
-        return Bean.exists("clientid=?", new Object[] { clientid }, TConn.class);
+        return Bean.exists(new BasicDBObject("clientid", clientid), TConn.class);
     }
 
     /**
+     * connect to the remote
      * 
      * @param host
      * @param port
@@ -714,9 +782,9 @@ public class TConn extends Bean {
         jo.put(X.UID, password);
         jo.put(X.CAPABILITY, capability);
 
-        this.key = pubkey;
-        this.clientid = clientid;
-        this.password = password;
+        this.set("key", pubkey);
+        this.set("clientid", clientid);
+        this.set("password", password);
 
         send(Command.HELLO, jo, null, false);
     }
@@ -793,7 +861,7 @@ public class TConn extends Bean {
     }
 
     /**
-     * Send.
+     * Send the json and bytes to remote
      * 
      * @param jo
      *            the jo
@@ -805,7 +873,7 @@ public class TConn extends Bean {
     }
 
     /**
-     * Send.
+     * Send the string message and bytes to remote
      * 
      * @param message
      *            the message
@@ -942,7 +1010,7 @@ public class TConn extends Bean {
      * 
      * @param uid
      *            the uid
-     * @return the list
+     * @return List of connection
      */
     public static List<TConn> loadAll(long uid) {
         return Bean.load("tblconn", null, "uid=? and uid>0", new Object[] { uid }, TConn.class);
@@ -953,37 +1021,10 @@ public class TConn extends Bean {
      */
     public void update() {
         long t = System.currentTimeMillis();
-        if (updated < t - X.AMINUTE * 5) {
+        if (this.getLong("updated") < t - X.AMINUTE * 5) {
             this.update(V.create("updated", t));
         }
-        updated = t;
-    }
-
-    /**
-     * Stat.
-     */
-    public static void stat() {
-        long time = Bean.toLong(Language.getLanguage().format(System.currentTimeMillis(), "yyyyMMddHHmm00"));
-
-        Connection c = null;
-        PreparedStatement stat = null;
-        ResultSet r = null;
-
-        try {
-            c = Bean.getConnection();
-            stat = c.prepareStatement("select count(*) t from tblconn where uid>0 ");
-
-            r = stat.executeQuery();
-            if (r.next()) {
-                int count = r.getInt("t");
-                Stat.insertOrUpdate("mdc", time, -1, count, "total");
-            }
-
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-        } finally {
-            Bean.close(r, stat, c);
-        }
+        set("updated", t);
     }
 
 }

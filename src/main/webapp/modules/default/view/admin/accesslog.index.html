@@ -9,7 +9,19 @@
 <div class='search'>
 	<form action='/admin/accesslog' method='get' class='form'>
 		<span><label><h3>URI</h3>:<input type='text' name='guri' value="$!guri" /></label></span>
+		<span><label><h3>SID</h3>:<input type='text' name='gsid' value="$!gsid" /></label></span>
 		<span><label><h3>IP</h3>:<input type='text' name='ip' value="$!ip" /></label></span>
+	
+		<span class='line'></span>
+		<span><label><h3>$lang.get('sort.by'):</h3>
+			<select name='sortby'>
+				<option value='created' #if($sortby == 'created') selected #end>Created</option>
+				<option value='cost' #if($sortby == 'cost') selected #end>Cost</option>
+			</select>
+			<select name='sortby_type'>
+				<option value='-1' #if($sortby_type == -1) selected #end>Down</option>
+				<option value='1' #if($sortby_type == 1) selected #end>Up</option>
+			</select></label></span>
 	
 		<button class='btns1' type='submit'>$lang.get('a.search')</button>
 	</form>
@@ -23,12 +35,14 @@
 		<tr>
 			<th>URL</th>
 			<th>Method</th>
+			<th>Status</th>
 			<th>Cost(ms)</th>
 			<th>SID</th>
 			<th>UID</th>
 			<th>USERNAME</th>
 			<th>IP</th>
 			<th>Created</th>
+			<th style='width:300px'>Client</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -36,12 +50,14 @@
 	<tr>
 		<td>$!f.url</td>
 		<td>$!f.method</td>
+		<td>$!f.status</td>
 		<td>$!f.cost</td>
 		<td>$!f.sid</td>
 		<td>$!f.uid</td>
 		<td>$!f.username</td>
 		<td>$!f.ip</td>
 		<td>$lang.format($!f.created, 'yyyy-MM-dd HH:mm')</td>
+		<td>$!f.client</td>
 	</tr>
 #end
 	</tbody>

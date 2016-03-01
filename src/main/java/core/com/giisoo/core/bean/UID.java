@@ -1,161 +1,69 @@
 package com.giisoo.core.bean;
 
-import java.sql.*;
-import java.util.Calendar;
 import java.util.UUID;
 
 import com.giisoo.core.conf.SystemConfig;
 import com.giisoo.utils.base.*;
+import com.mongodb.BasicDBObject;
 
 /**
- * The Class UID that used to create unique id, or sequence no
+ * The {@code UID} Class used to create unique id, or sequence, random string
+ * 
+ * @author joe
+ *
  */
+@DBMapping(collection = "gi_config")
 public class UID extends Bean {
 
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
 
-    /** The seq. */
-    long seq;
-
-    public static int thisYear() {
-        Calendar c = Calendar.getInstance();
-        c.setTimeInMillis(System.currentTimeMillis());
-        return c.get(Calendar.YEAR);
-    }
-
     /**
-     * Next.
+     * increase and get the unique sequence number by key
      * 
      * @param key
      *            the key
-     * @return the long
+     * @return long of the unique sequence
      */
     public synchronized static long next(String key) {
 
         long prefix = SystemConfig.l("system.code", 1) * 10000000000000L;
 
-        Connection c = null;
-        PreparedStatement stat = null;
-        ResultSet r = null;
         try {
-            c = Bean.getConnection();
 
             long v = -1;
-            while (v == -1) {
-                if (stat != null) {
-                    stat.close();
-                }
-                stat = c.prepareStatement("select l from tblconfig where name=?");
-                stat.setString(1, key);
-                r = stat.executeQuery();
-                if (r.next()) {
-                    v = r.getLong("l");
-                }
-                r.close();
-                r = null;
-                stat.close();
+            UID u = Bean.load(new BasicDBObject(X._ID, key), UID.class);
+            if (u == null) {
+                v = 1;
 
-                if (v == -1) {
-                    stat = c.prepareStatement("insert into tblconfig(name, l) values(?, ?)");
-                    v = 1;
-                    stat.setString(1, key);
-                    stat.setLong(2, v + 1);
-                } else {
-                    stat = c.prepareStatement("update tblconfig set l=l+1 where name=? and l=?");
-                    stat.setString(1, key);
-                    stat.setLong(2, v);
+                String linkid = UID.random();
+                Bean.insertCollection(V.create(X._ID, key).set("var", v + 1L).set("linkid", linkid), UID.class);
+                u = Bean.load(new BasicDBObject(X._ID, key), UID.class);
+                if (u == null) {
+                    log.error("create unique sequence error");
+                    return -1;
+                } else if (!linkid.equals(u.getString("linkid"))) {
+                    // created by other node in cluster system
+                    return next(key);
                 }
-                if (stat.executeUpdate() > 0) {
-                    return prefix + v;
-                } else {
-                    v = -1;
+
+            } else {
+                v = Bean.toLong(u.get("var"), 1);
+                while (Bean.updateCollection(new BasicDBObject(X._ID, key).append("var", v), V.create("var", v + 1L), UID.class) < 0) {
+                    v++;
                 }
             }
+
+            return prefix + v;
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-        } finally {
-            Bean.close(r, stat, c);
         }
 
         return -1;
     }
 
     /**
-     * Gets the.
-     * 
-     * @param key
-     *            the key
-     * @return the long
-     */
-    public static long get(String key, long defaultValue) {
-        Connection c = null;
-        PreparedStatement stat = null;
-        ResultSet r = null;
-        try {
-            c = Bean.getConnection();
-            stat = c.prepareStatement("select l from tblconfig where name=?");
-            stat.setString(1, key);
-            r = stat.executeQuery();
-            if (r.next()) {
-                return r.getLong("l");
-            }
-
-            return defaultValue;
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-        } finally {
-            Bean.close(r, stat, c);
-        }
-
-        return defaultValue;
-    }
-
-    /**
-     * Sets the.
-     * 
-     * @param key
-     *            the key
-     * @param newvalue
-     *            the newvalue
-     * @return the long
-     */
-    public static long set(String key, long newvalue) {
-        Connection c = null;
-        PreparedStatement stat = null;
-        ResultSet r = null;
-        try {
-            c = Bean.getConnection();
-            stat = c.prepareStatement("select l from tblconfig where name=?");
-            stat.setString(1, key);
-            r = stat.executeQuery();
-            long v = -1;
-            if (r.next()) {
-                v = r.getLong("l");
-            }
-
-            if (v == -1) {
-                stat = c.prepareStatement("insert into tblconfig(l, name) values(?, ?)");
-            } else {
-                stat = c.prepareStatement("update tblconfig set l=? where name=?");
-            }
-            stat.setLong(1, newvalue);
-            stat.setString(2, key);
-
-            stat.executeUpdate();
-
-            return v;
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-        } finally {
-            Bean.close(r, stat, c);
-        }
-
-        return 0;
-    }
-
-    /**
-     * Random.
+     * generate a global random string.
      * 
      * @return the string
      */
@@ -164,7 +72,7 @@ public class UID extends Bean {
     }
 
     /**
-     * Id.
+     * convert the long data to a BASE32 string
      * 
      * @param hash
      *            the hash
@@ -180,11 +88,14 @@ public class UID extends Bean {
     }
 
     /**
-     * Id.
+     * generate the unique id by the parameter
+     * <p>
+     * if the parameter are same, the id will be same, the "id" is H32 of
+     * hash(64bit) of parameters
      * 
      * @param ss
-     *            the ss
-     * @return the string
+     *            the parameters
+     * @return string
      */
     public static String id(Object... ss) {
         StringBuilder sb = new StringBuilder();
@@ -206,10 +117,10 @@ public class UID extends Bean {
     }
 
     /**
-     * Hash.
+     * Hash (64bits) of string
      * 
      * @param s
-     *            the s
+     *            the parameter string
      * @return the long
      */
     public static long hash(String s) {
@@ -229,10 +140,10 @@ public class UID extends Bean {
     }
 
     /**
-     * Random.
+     * generate a random string with the length
      * 
      * @param length
-     *            the length
+     *            the length of the random string
      * @return the string
      */
     public static String random(int length) {
@@ -246,10 +157,10 @@ public class UID extends Bean {
     }
 
     /**
-     * Digital.
+     * generate a digital string with the length
      * 
      * @param length
-     *            the length
+     *            the length of the digital string
      * @return the string
      */
     public static String digital(int length) {

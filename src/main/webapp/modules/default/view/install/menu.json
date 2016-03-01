@@ -1,9 +1,10 @@
 [{
 			'name' : 'admin',
 			seq : 10,
-			'childs' : [	{
+			'childs' : [{
 						name : 'menu.system',
 						classes : 'icon-settings',
+						access : 'access.config.admin',
 						seq : 10,
 						childs : [{
 									name : 'menu.setting',
@@ -51,34 +52,52 @@
 									seq : 1020,
 									classes : 'icon-list3'
 								}, {
+									name : 'menu.repo',
+									load : '/admin/repo',
+									seq : 1025,
+									classes : 'icon-cloud3'
+								}, {
 									name : 'menu.data',
 									load : '/admin/data',
 									seq : 1030,
-									classes : 'icon-database2'
+									classes : 'icon-search2'
+								}, {
+									name : 'menu.backup',
+									load : '/admin/backup',
+									seq : 1035,
+									access:'access.config.admin',
+									classes : 'icon-floppy-disk2'
 								}, {
 									name : 'menu.keypair',
 									load : '/admin/keypair',
 									seq : 1040,
 									classes : 'icon-key6'
 								}, {
+									name : 'menu.stat',
+									load : '/admin/stat',
+									seq : 1050,
+									classes : 'icon-stats-dots3'
+								}, {
 									name : 'menu.keyfield',
 									load : '/admin/keyfield',
-									seq : 1050,
+									seq : 1060,
 									classes : 'icon-wrench'
 								},]
 					}, {
 						name : 'menu.usermgr',
 						classes : 'icon-users2',
-						content : '',
+						access : 'access.user.admin|access.role.admin',
 						seq : 20,
 						childs : [{
 									name : 'menu.user',
 									load : '/admin/user',
+									access : 'access.user.admin',
 									seq : 10,
 									classes : 'icon-user2'
 								}, {
 									name : 'menu.role',
 									load : '/admin/role',
+									access : 'access.role.admin',
 									seq : 20,
 									classes : 'icon-shield2'
 								},]

@@ -25,7 +25,6 @@ import org.apache.commons.logging.LogFactory;
 import com.giisoo.core.bean.Bean;
 import com.giisoo.core.bean.X;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class Host.
  */

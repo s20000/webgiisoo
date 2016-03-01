@@ -2,21 +2,19 @@ package com.giisoo.utils.url;
 
 import java.io.*;
 import java.net.URL;
-import java.sql.*;
 import java.util.*;
 
 import org.apache.commons.configuration.Configuration;
 
 import com.giisoo.core.bean.*;
 import com.giisoo.utils.base.*;
-import com.mongodb.*;
 
 /**
  * The Class Url.
  * 
  * @author yjiang
  */
-public class Url extends Bean implements Externalizable, Comparable<Url> {
+public class Url extends Bean implements Serializable, Comparable<Url> {
 
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
@@ -933,47 +931,6 @@ public class Url extends Bean implements Externalizable, Comparable<Url> {
      */
     public String getCharset() {
         return charset;
-    }
-
-    /**
-     * this only for unit test.
-     * 
-     * @param out
-     *            the out
-     * @throws IOException
-     *             Signals that an I/O exception has occurred.
-     */
-    public void writeExternal(ObjectOutput out) throws IOException {
-        IoStream.writeString(out, url);// out.writeObject(url);
-        IoStream.writeString(out, referer);// out.writeObject(referer);
-        IoStream.writeString(out, cookie);// out.writeObject(cookie);
-        IoStream.writeString(out, domain);// out.writeObject(domain);
-        out.writeLong(url_date);
-        out.writeLong(numofparent);
-        out.writeInt(depth);
-        IoStream.writeString(out, charset);// out.writeObject(charset);
-        IoStream.writeString(out, type);// out.writeObject(type);
-        IoStream.writeString(out, tableName);// out.writeObject(tableName);
-        out.writeBoolean(isProduct);
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.io.Externalizable#readExternal(java.io.ObjectInput)
-     */
-    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-        url = IoStream.readString(in);// (String) in.readObject();
-        referer = IoStream.readString(in);// (String) in.readObject();
-        cookie = IoStream.readString(in);// (String) in.readObject();
-        domain = IoStream.readString(in);// (String) in.readObject();
-        url_date = in.readLong();
-        numofparent = in.readLong();
-        depth = in.readInt();
-        charset = IoStream.readString(in);// (String) in.readObject();
-        type = IoStream.readString(in);// (String) in.readObject();
-        tableName = IoStream.readString(in);// (String) in.readObject();
-        isProduct = in.readBoolean();
     }
 
     /**

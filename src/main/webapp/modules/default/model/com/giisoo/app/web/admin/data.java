@@ -23,12 +23,21 @@ import com.giisoo.framework.web.Model;
 import com.giisoo.framework.web.Path;
 import com.mongodb.BasicDBObject;
 
+/**
+ * web api: /admin/data
+ * <p>
+ * used to manage custom data in mongo
+ * 
+ * @author joe
+ *
+ */
 public class data extends Model {
 
     @Path(login = true, path = "addbatch", access = "access.config.admin", log = Model.METHOD_GET)
     public void addbatch() {
 
         String url = this.getString("url");
+        JSONObject jo1 = new JSONObject();
 
         Entity e = Repo.loadByUri(url);
         if (e != null) {
@@ -61,18 +70,24 @@ public class data extends Model {
 
                     line = reader.readLine();
                 }
-                this.set(X.MESSAGE, "导入成功，导入：" + lines + "；错误：" + errors);
+                jo1.put(X.MESSAGE, "导入成功，导入：" + lines + "；错误：" + errors);
+                jo1.put(X.STATE, 200);
+
                 reader.close();
 
             } catch (Exception e1) {
                 log.error(e1.getMessage(), e1);
-                this.set(X.ERROR, "导入失败，请查看日志！");
+                jo1.put(X.MESSAGE, "导入失败，请查看日志, error=" + e1.getMessage());
+                jo1.put(X.STATE, 201);
             } finally {
                 e.delete();
             }
+        } else {
+            jo1.put(X.MESSAGE, "无法读取文件，请重试");
+            jo1.put(X.STATE, 201);
         }
 
-        onGet();
+        this.response(jo1);
     }
 
     @Path(login = true, access = "access.config.admin")
@@ -93,7 +108,7 @@ public class data extends Model {
         }
 
         int s = this.getInt("s");
-        int n = this.getInt("n", 20, "number.per.page");
+        int n = this.getInt("n", 10, "number.per.page");
 
         if (!X.isEmpty(collection)) {
             Beans<Data> bs = Data.load(collection, q, new BasicDBObject().append(X._ID, 1), s, n);
@@ -246,7 +261,7 @@ public class data extends Model {
                 if (!X.isEmpty(query)) {
                     JSONObject jo = JSONObject.fromObject(query);
                     for (Object s1 : jo.keySet()) {
-                        q.append(s1.toString(), jo.get(name));
+                        q.append(s1.toString(), jo.get(s1));
                     }
                 }
 

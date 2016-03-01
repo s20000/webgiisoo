@@ -21,6 +21,14 @@ import com.giisoo.framework.web.Path;
 import com.giisoo.utils.base.DES;
 import com.mongodb.BasicDBObject;
 
+/**
+ * web api: /data
+ * <p>
+ * used the sync data
+ * 
+ * @author joe
+ *
+ */
 public class data extends Model {
 
     @Path(log = Model.METHOD_POST)
@@ -236,7 +244,7 @@ public class data extends Model {
         } else {
             login = this.getUser();
             if (login != null) {
-                
+
             }
         }
     }

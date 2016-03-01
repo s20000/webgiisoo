@@ -1,7 +1,10 @@
 package com.giisoo.core.bean;
 
 /**
- * The Class TimeStamp that timer utility class.
+ * The {@code TimeStamp} Class used to create a time stamp
+ * 
+ * @author joe
+ *
  */
 public class TimeStamp {
 

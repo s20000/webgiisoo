@@ -8,7 +8,6 @@ import com.giisoo.core.bean.Bean;
 import com.giisoo.core.bean.Bean.V;
 import com.giisoo.core.bean.Beans;
 import com.giisoo.core.bean.X;
-import com.giisoo.core.mq.MQ;
 import com.giisoo.core.worker.WorkerTask;
 import com.giisoo.framework.common.MyData;
 import com.giisoo.framework.mdc.TConn;
@@ -16,6 +15,14 @@ import com.giisoo.framework.web.Model;
 import com.giisoo.framework.web.Path;
 import com.mongodb.BasicDBObject;
 
+/**
+ * web api: /mydata
+ * <p>
+ * used to store or get user data
+ * 
+ * @author joe
+ *
+ */
 public class mydata extends Model {
 
     @Path(path = "get", login = true)

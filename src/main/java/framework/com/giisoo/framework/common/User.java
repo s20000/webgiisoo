@@ -6,7 +6,6 @@
  */
 package com.giisoo.framework.common;
 
-import java.sql.*;
 import java.util.*;
 
 import net.sf.json.JSONObject;
@@ -14,17 +13,31 @@ import net.sf.json.JSONObject;
 import com.giisoo.core.bean.*;
 import com.giisoo.core.cache.Cache;
 import com.giisoo.core.conf.SystemConfig;
-import com.giisoo.framework.common.Company.Department;
 import com.giisoo.framework.web.Module;
+import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 
 /**
- * User
+ * The {@code User} Class is base user class, all the login/access controlled in
+ * webgiisoo was depended on the user, it contains all the user-info, and is
+ * expandable.
+ * <p>
+ * MOST important field
+ * 
+ * <pre>
+ * id: long, global unique,
+ * name: login name, global unique
+ * password: string of hashed
+ * nickname: string of nickname
+ * title: title of the user
+ * roles: the roles of the user, user can has multiple roles
+ * hasAccess: test whether has the access token for the user
+ * </pre>
  * 
  * @author yjiang
  * 
  */
-@DBMapping(table = "tbluser")
+@DBMapping(collection = "gi_user")
 public class User extends Bean {
 
     /**
@@ -39,22 +52,6 @@ public class User extends Bean {
 
     }
 
-    public Company getCompany_obj() {
-        if (!this.containsKey("company_obj")) {
-            Company c = Company.load(this.getInt("company"));
-            this.set("company_obj", c);
-        }
-        return (Company) this.get("company_obj");
-    }
-
-    public Department getDepartment_obj() {
-        if (!this.containsKey("department_obj")) {
-            Department c = Department.load(this.getLong("department"));
-            this.set("department_obj", c);
-        }
-        return (Department) this.get("department_obj");
-    }
-
     /**
      * Checks if is role.
      * 
@@ -62,49 +59,39 @@ public class User extends Bean {
      *            the r
      * @return true, if is role
      */
+    @SuppressWarnings("unchecked")
     public boolean isRole(Role r) {
-        getRoles();
-
-        return roles.contains(r.getId());
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#toString()
-     */
-    public String toString() {
-        return new StringBuilder("User:[").append(getId()).append(",").append(get("name")).append("]").toString();
+        List<Long> roles = (List<Long>) this.get("roles");
+        return roles != null && roles.contains(r.getId());
     }
 
     /**
-     * Creates the.
+     * Creates a user with the values
      * 
      * @param v
-     *            the v
-     * @return the int
+     *            the values
+     * @return long of the user id, if failed, return -1
      */
     public static long create(V v) {
 
-        for (int i = 0; i < v.size(); i++) {
-            if ("password".equals(v.name(i))) {
-                String password = (String) v.value(i);
-                v.set(i, encrypt(password));
+        String s = (String) v.value("password");
+        if (s != null) {
+            v.set("password", encrypt(s), true);
+        }
+
+        Long id = (Long) v.value("id");
+        if (id == null) {
+            id = UID.next("user.id");
+            while (Bean.exists(new BasicDBObject(X._ID, id), User.class)) {
+                id = UID.next("user.id");
             }
         }
+        if (log.isDebugEnabled())
+            log.debug("v=" + v);
 
-        long id = UID.next("user.id");
+        Bean.insertCollection(v.set(X._ID, id).set("created", System.currentTimeMillis()).set("updated", System.currentTimeMillis()), User.class);
 
-        while (Bean.exists("id=?", new Object[] { id }, User.class)) {
-            id = UID.next("user.id");
-        }
-
-        if (Bean.insert(v.set("id", id).set("created", System.currentTimeMillis()).set("updated", System.currentTimeMillis()), User.class) > 0) {
-
-            return id;
-        }
-
-        return -1;
+        return id;
     }
 
     /**
@@ -114,36 +101,15 @@ public class User extends Bean {
      * @param jo
      * @return int
      */
-    public static int copy(JSONObject jo) {
+    public static long copy(JSONObject jo) {
 
-        Connection c = null;
-        PreparedStatement stat = null;
-        ResultSet r = null;
-        try {
-            c = Bean.getConnection();
-
-            stat = c.prepareStatement("select * from tbluser limit 1");
-
-            r = stat.executeQuery();
-            ResultSetMetaData m = r.getMetaData();
-
-            V v = V.create();
-            for (int i = 0; i < m.getColumnCount(); i++) {
-                String name = m.getColumnName(i + 1);
-                if (jo.containsKey(name)) {
-                    v.set(name, jo.get(name));
-                }
-            }
-
-            return Bean.insert(v, User.class);
-
-        } catch (Exception e) {
-            log.error(jo.toString(), e);
-        } finally {
-            Bean.close(r, stat, c);
+        V v = V.create();
+        for (Object name : jo.keySet()) {
+            v.set(name.toString(), jo.get(name));
         }
 
-        return 0;
+        return User.create(v);
+
     }
 
     /**
@@ -172,38 +138,31 @@ public class User extends Bean {
             throw new giException(-2, "the name format is not correct, or password is none");
         }
 
-        if (Bean.exists("name=? and locked=0 and remote=0", new String[] { name }, User.class)) {
+        if (Bean.exists(new BasicDBObject("name", name).append("locked", new BasicDBObject("$ne", 1)).append("remote", new BasicDBObject("$ne", 1)), User.class)) {
             /**
-             * exists, create failded
+             * exists, create failed
              */
             throw new giException(-1, "the name exists");
         }
 
-        long id = UID.next("user.id");
-        while (Bean.exists("id=?", new Object[] { id }, User.class)) {
-            id = UID.next("user.id");
+        V v = V.create();
+        for (Object n : jo.keySet()) {
+            v.set(n.toString(), jo.get(n));
         }
 
-        password = encrypt(password);
-        V v = V.create("id", id).set("name", name).set("password", password, true).set("created", System.currentTimeMillis()).set("updated", System.currentTimeMillis());
-        v.copy(jo, "company", "title", "department", "address", "email", "nickname", "description", "special", "certid").copyLong(jo, "total");
+        v.set("name", name).set("password", password);
+        return User.create(v);
 
-        if (Bean.insert(v, User.class) > 0) {
-
-            return id;
-        }
-
-        throw new giException(-1, "unknown error");
     }
 
     /**
-     * Load.
+     * Load user by name and password
      * 
      * @param name
-     *            the name
+     *            the name of the user
      * @param password
      *            the password
-     * @return the user
+     * @return User, if not match anyoone, return null
      */
     public static User load(String name, String password) {
 
@@ -212,7 +171,7 @@ public class User extends Bean {
         log.debug("name=" + name + ", passwd=" + password);
         // System.out.println("name=" + name + ", passwd=" + password);
 
-        return Bean.load("tbluser", "name=? and password=? and deleted=0 and remote=0", new String[] { name, password }, User.class);
+        return Bean.load(new BasicDBObject("name", name).append("password", password).append("deleted", new BasicDBObject("$ne", 1)).append("remote", new BasicDBObject("$ne", 1)), User.class);
 
     }
 
@@ -221,15 +180,15 @@ public class User extends Bean {
     }
 
     public long getId() {
-        return this.getLong("id");
+        return this.getLong(X._ID);
     }
 
     /**
-     * Load.
+     * Load user by name
      * 
      * @param name
-     *            the name
-     * @return the user
+     *            the name of the name
+     * @return User
      */
     public static User load(String name) {
         String uid = "user://name/" + name;
@@ -238,29 +197,16 @@ public class User extends Bean {
             return u1;
         }
 
-        List<User> list = Bean.load("tbluser", null, "name=?", new String[] { name }, User.class);
+        Beans<User> list = Bean.load(new BasicDBObject("name", name), new BasicDBObject("name", 1), 0, 100, User.class);
 
-        if (list != null && list.size() > 0) {
-            for (User u : list) {
+        if (list != null && list.getList() != null && list.getList().size() > 0) {
+            for (User u : list.getList()) {
 
                 /**
                  * if the user has been locked, then not allow to login
                  */
                 if (u.isLocked() || u.isDeleted())
                     continue;
-
-                /**
-                 * id == 0: admin; across.login ==0, not allow across login
-                 */
-                if (SystemConfig.i("across.login", 0) == 0 && u.getId() > 0) {
-                    int prefix = Bean.toInt(Module.home.get("user_prefix"));
-                    if ((u.getId() & prefix) != prefix) {
-                        /**
-                         * the prefix is different, do not allow to login
-                         */
-                        continue;
-                    }
-                }
 
                 u.setExpired(60);
                 Cache.set(uid, u);
@@ -272,11 +218,11 @@ public class User extends Bean {
     }
 
     /**
-     * Load by id.
+     * Load user by id.
      * 
      * @param id
-     *            the id
-     * @return the user
+     *            the user id
+     * @return User
      */
     public static User loadById(long id) {
         String uid = "user://id/" + id;
@@ -285,7 +231,7 @@ public class User extends Bean {
             return u;
         }
 
-        u = Bean.load("id=?", new Object[] { id }, User.class);
+        u = Bean.load(new BasicDBObject(X._ID, id), User.class);
         if (u != null) {
             u.setExpired(60);
             u.recache();
@@ -299,37 +245,42 @@ public class User extends Bean {
         Cache.set(uid, this);
     }
 
-    private void cleanup() {
-        String uid = "user://id/" + getId();
-        Cache.remove(uid);
-    }
-
     /**
-     * Load by access.
+     * Load users by access token name
      * 
      * @param access
-     *            the access
-     * @return the list
+     *            the access token name
+     * @return list of user who has the access token
      */
     public static List<User> loadByAccess(String access) {
-        return Bean.load("tbluser", null, "id in (select uid from tbluserrole where rid in (select rid from tblroleaccess where name=?)) and deleted=0 and locked=0", new Object[] { access },
-                User.class);
-    }
 
-    public static List<User> loadByAccess(String access, W w) {
-        if (w == null) {
-            w = W.create();
+        Beans<Role> bs = Role.loadByAccess(access, 0, 1000);
+        BasicDBObject q = new BasicDBObject();
+        if (bs != null && bs.getList() != null) {
+            if (bs.getList().size() > 1) {
+                BasicDBList list = new BasicDBList();
+                for (Role a : bs.getList()) {
+                    list.add(new BasicDBObject("role", a.getId()));
+                }
+                q.append("$or", list);
+            } else if (bs.getList().size() == 1) {
+                q.append("role", bs.getList().get(0).getId());
+            }
         }
-        w.set("id in (select uid from tbluserrole where rid in (select rid from tblroleaccess where name=?)) and deleted=0 and locked=0", access);
-        return Bean.load("tbluser", null, w.where(), w.args(), User.class);
+
+        q.append("deleted", new BasicDBObject("$ne", 1));
+
+        Beans<User> us = Bean.load(q, new BasicDBObject("name", 1), 0, Integer.MAX_VALUE, User.class);
+        return us == null ? null : us.getList();
+
     }
 
     /**
-     * Validate.
+     * Validate the user with the password
      * 
      * @param password
      *            the password
-     * @return true, if successful
+     * @return true, if the password was match
      */
     public boolean validate(String password) {
 
@@ -366,20 +317,19 @@ public class User extends Bean {
     }
 
     /**
-     * Checks for access.
+     * Checks whether has the access token.
      * 
      * @param name
-     *            the name
-     * @return true, if successful
+     *            the name of the access token
+     * @return true, if has anyone
      */
     public boolean hasAccess(String... name) {
-        if (this.getId() == 0) {
+        if (this.getId() == 0L) {
             return true;
         }
 
         if (role == null) {
-            getRoles();
-            role = new Roles(roles);
+            getRole();
         }
 
         return role.hasAccess(name);
@@ -387,26 +337,18 @@ public class User extends Bean {
 
     transient Roles role = null;
 
+    /**
+     * get the roles for the user
+     * 
+     * @return Roles
+     */
+    @SuppressWarnings("unchecked")
     public Roles getRole() {
         if (role == null) {
-            getRoles();
+            List<Long> roles = (List<Long>) this.get("roles");
             role = new Roles(roles);
         }
         return role;
-    }
-
-    transient List<Integer> roles = null;
-
-    public List<Integer> getRoles() {
-        if (roles == null) {
-            roles = Bean.loadList("tbluserrole", "rid", "uid=?", new Long[] { getId() }, Integer.class, null);
-
-            if (roles == null) {
-                roles = new ArrayList<Integer>();
-            }
-        }
-
-        return roles;
     }
 
     /**
@@ -414,17 +356,17 @@ public class User extends Bean {
      * 
      * @param rid
      */
-    public void setRole(int rid) {
-        getRoles();
+    @SuppressWarnings("unchecked")
+    public void setRole(long rid) {
+        List<Long> roles = (List<Long>) this.get("roles");
 
         if (!roles.contains(rid)) {
             // add
-            Bean.insert("tbluserrole", V.create("uid", getId()).set("rid", rid), null);
             roles.add(rid);
 
             role = null;
 
-            Bean.update("id=?", new Object[] { getId() }, V.create("updated", System.currentTimeMillis()), User.class);
+            Bean.updateCollection(getId(), V.create("roles", roles).set("updated", System.currentTimeMillis()), User.class);
         }
     }
 
@@ -434,15 +376,15 @@ public class User extends Bean {
      * @param rid
      *            the rid
      */
+    @SuppressWarnings("unchecked")
     public void removeRole(String rid) {
-        getRoles();
+        List<Long> roles = (List<Long>) this.get("roles");
 
         if (roles.contains(rid)) {
             // remove it
-            Bean.delete("tbluserrole", "uid=? and rid=?", new Object[] { getId(), rid }, null);
             roles.remove(rid);
-
-            Bean.update("id=?", new Object[] { getId() }, V.create("updated", System.currentTimeMillis()), User.class);
+            role = null;
+            Bean.updateCollection(getId(), V.create("roles", roles).set("updated", System.currentTimeMillis()), User.class);
         }
     }
 
@@ -450,23 +392,22 @@ public class User extends Bean {
      * Removes the all roles.
      */
     public void removeAllRoles() {
-        getRoles();
+        List<Long> roles = (List<Long>) this.get("roles");
         roles.clear();
-        Bean.delete("tbluserrole", "uid=?", new Object[] { getId() }, null);
 
-        Bean.update("id=?", new Object[] { getId() }, V.create("updated", System.currentTimeMillis()), User.class);
+        Bean.updateCollection(getId(), V.create("roles", roles).set("updated", System.currentTimeMillis()), User.class);
     }
 
     public void setSid(String sid) {
         set("sid", sid);
 
-        Bean.update("id=?", new Object[] { getId() }, V.create("sid", sid).set("updated", System.currentTimeMillis()), User.class);
+        Bean.updateCollection(getId(), V.create("sid", sid).set("updated", System.currentTimeMillis()), User.class);
     }
 
     public void setIp(String ip) {
         set("ip", ip);
 
-        Bean.update("id=?", new Object[] { getId() }, V.create("ip", ip).set("updated", System.currentTimeMillis()), User.class);
+        Bean.updateCollection(getId(), V.create("ip", ip).set("updated", System.currentTimeMillis()), User.class);
     }
 
     private static String encrypt(String passwd) {
@@ -477,215 +418,67 @@ public class User extends Bean {
     }
 
     /**
-     * Load by id.
+     * Load the users by the query
      * 
-     * @param certid
-     *            the certid
-     * @return the user
-     */
-    public static User loadById(String certid) {
-        return Bean.load("certid=?", new Object[] { certid }, User.class);
-    }
-
-    /**
-     * Load by refer.
-     * 
-     * @param refer
-     *            the refer
-     * @return true, if successful
-     */
-    public boolean loadByRefer(JSONObject refer) {
-        return Bean.load("tbluser", "id=?", new Object[] { getId() }, this);
-    }
-
-    /**
-     * To refer.
-     * 
-     * @param refer
-     *            the refer
-     * @return true, if successful
-     */
-    public boolean toRefer(JSONObject refer) {
-        if (getId() > 0) {
-            refer.put("id", getId());
-
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Load.
-     * 
-     * @param w
-     *            the w
-     * @param rank
-     *            the rank
+     * @param q
+     *            the query of the condition
      * @param offset
-     *            the offset
+     *            the start number
      * @param limit
-     *            the limit
-     * @return the beans
+     *            the number
+     * @return Beans<User>
      */
-    public static Beans<User> load(W w, int rank, int offset, int limit) {
-        if (w == null) {
-            w = W.create();
-        }
-
-        if (rank >= 0) {
-            w.and("id", 0, W.OP_GT).and("rank", rank);
-            return Bean.load(w.where(), w.args(), w == null || X.isEmpty(w.orderby()) ? "order by created desc" : w.orderby(), offset, limit, User.class);
-        } else {
-            w.and("id", 0, W.OP_GT);
-            return Bean.load(w.where(), w.args(), X.isEmpty(w.orderby()) ? "order by name" : w.orderby(), offset, limit, User.class);
-        }
+    public static Beans<User> load(BasicDBObject q, int offset, int limit) {
+        return Bean.load(q.append(X._ID, new BasicDBObject("$gt", 0)), new BasicDBObject("name", 1), offset, limit, User.class);
     }
 
     /**
-     * Exists.
-     * 
-     * @param w
-     *            the w
-     * @return true, if successful
-     */
-    public static boolean exists(W w) {
-        return Bean.exists(w.where(), w.args(), User.class);
-    }
-
-    /**
-     * Load.
-     * 
-     * @param w
-     *            the w
-     * @param offset
-     *            the offset
-     * @param limit
-     *            the limit
-     * @return the beans
-     */
-    public static Beans<User> load(W w, int offset, int limit) {
-        if (w == null) {
-            w = W.create();
-        }
-
-        w.and("id", 0, W.OP_GT);
-
-        return Bean.load(w.where(), w.args(), X.isEmpty(w.orderby()) ? "order by name" : w.orderby(), offset, limit, User.class);
-    }
-
-    /**
-     * Update.
+     * Update the user with the V
      * 
      * @param v
-     *            the v
-     * @return the int
+     *            the values
+     * @return int
      */
     public int update(V v) {
-        int len = v.size();
-        for (int i = 0; i < len; i++) {
-            String name = v.name(i);
-            if ("password".equals(name)) {
-                String passwd = (String) v.value(i);
-                if (!"".equals(passwd)) {
-                    passwd = encrypt(passwd);
-                    v.set("password", passwd, true);
-                } else {
-                    v.remove(i);
-                }
-                break;
-            }
-        }
-        int i = Bean.update("id=?", new Object[] { getId() }, v.set("updated", System.currentTimeMillis()), User.class);
-        if (i > 0) {
-            cleanup();
-        }
-        return i;
-    }
-
-    public static int update(long id, V v) {
-        int len = v.size();
-        for (int i = 0; i < len; i++) {
-            String name = v.name(i);
-            if ("password".equals(name)) {
-                String passwd = (String) v.value(i);
-                if (!"".equals(passwd)) {
-                    passwd = encrypt(passwd);
-                    v.set("password", passwd, true);
-                } else {
-                    v.remove(i);
-                }
-                break;
-            }
-        }
-        return Bean.update("id=?", new Object[] { id }, v.set("updated", System.currentTimeMillis()), User.class);
-    }
-
-    public void setRoles(String[] roles) {
-        /**
-         * remove all
-         */
-        if (roles != null) {
-            Bean.delete("tbluserrole", "uid=?", new Object[] { getId() }, null);
-
-            for (String r : roles) {
-                int rid = Bean.toInt(r, -1);
-                if (rid >= 0) {
-                    Bean.insert("tbluserrole", V.create("uid", getId()).set("rid", rid), null);
-                }
-            }
-
-            Bean.update("id=?", new Object[] { getId() }, V.create("updated", System.currentTimeMillis()), User.class);
-        }
+        return update(this.getId(), v);
     }
 
     /**
-     * Check free.
+     * update the user by the values
      * 
-     * @param uid
-     *            the uid
-     * @return the long
+     * @param id
+     *            the user id
+     * @param v
+     *            the values
+     * @return int, 0 no user updated
      */
-    public static long checkFree(long uid) {
+    public static int update(long id, V v) {
 
-        Connection c = null;
-        PreparedStatement stat = null;
-        ResultSet r = null;
-        try {
-            c = Bean.getConnection();
-            stat = c.prepareStatement("select total from tbluser where id=?");
-            stat.setLong(1, uid);
-            r = stat.executeQuery();
-            long total = -1;
-            if (r.next()) {
-                total = r.getLong("total");
-            }
-            if (total < 0)
-                return 0;
-            r.close();
-            stat.close();
-
-            stat = c.prepareStatement("select sum(total) total from tblrepo where uid=?");
-            stat.setLong(1, uid);
-            r = stat.executeQuery();
-            if (r.next()) {
-                long t = r.getLong("total");
-                return total - t;
-            }
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-        } finally {
-            Bean.close(r, stat, c);
+        String passwd = (String) v.value("password");
+        if (!X.isEmpty(passwd)) {
+            passwd = encrypt(passwd);
+            v.set("password", passwd, true);
+        } else {
+            v.remove("password");
         }
+        return Bean.updateCollection(id, v.set("updated", System.currentTimeMillis()), User.class);
+    }
 
-        return 0;
+    /***
+     * replace all the roles for the user
+     * 
+     * @param roles
+     */
+    public void setRoles(List<Long> roles) {
+        Bean.updateCollection(getId(), V.create("roles", roles).set("updated", System.currentTimeMillis()), User.class);
     }
 
     /**
-     * Failed.
+     * record the login failure in database
      * 
      * @param ip
-     *            the ip
-     * @return the int
+     *            the ip that the user come from
+     * @return int the impacted of the data
      */
     public int failed(String ip) {
         set("failtimes", getInt("failtimes") + 1);
@@ -697,6 +490,17 @@ public class User extends Bean {
                 System.currentTimeMillis()), User.class);
     }
 
+    /**
+     * record the login failure, and record the user lock info
+     * 
+     * @param ip
+     *            the ip that login come from
+     * @param sid
+     *            the session id
+     * @param useragent
+     *            the browser agent
+     * @return int of the locked times
+     */
     public int failed(String ip, String sid, String useragent) {
         set("failtimes", getInt("failtimes") + 1);
 
@@ -704,21 +508,21 @@ public class User extends Bean {
     }
 
     /**
-     * Logout.
+     * record the logout info in database for the user
      * 
      * @return the int
      */
     public int logout() {
-        return Bean.update("id=?", new Object[] { getId() }, V.create("sid", X.EMPTY).set("updated", System.currentTimeMillis()), User.class);
+        return Bean.updateCollection(getId(), V.create("sid", X.EMPTY).set("updated", System.currentTimeMillis()), User.class);
     }
 
     /**
-     * Logined.
+     * record login info in database for the user
      * 
      * @param sid
-     *            the sid
+     *            the session id
      * @param ip
-     *            the ip
+     *            the ip that the user come fram
      * @return the int
      */
     public int logined(String sid, String ip) {
@@ -731,13 +535,20 @@ public class User extends Bean {
         /**
          * cleanup the old sid for the old logined user
          */
-        Bean.update("sid=?", new Object[] { sid }, V.create("sid", X.EMPTY), User.class);
+        Bean.updateCollection(new BasicDBObject("sid", sid), V.create("sid", X.EMPTY), User.class);
 
-        return Bean.update("id=?", new Object[] { getId() }, V.create("lastlogintime", System.currentTimeMillis()).set("logintimes", getInt("logintimes")).set("ip", ip).set("failtimes", 0).set(
-                "locked", 0).set("lockexpired", 0).set("sid", sid).set("updated", System.currentTimeMillis()), User.class);
+        return Bean.updateCollection(getId(), V.create("lastlogintime", System.currentTimeMillis()).set("logintimes", getInt("logintimes")).set("ip", ip).set("failtimes", 0).set("locked", 0).set(
+                "lockexpired", 0).set("sid", sid).set("updated", System.currentTimeMillis()), User.class);
 
     }
 
+    /**
+     * The {@code Lock} Class used to record login failure log, was used by
+     * webgiisoo framework
+     * 
+     * @author joe
+     *
+     */
     @DBMapping(collection = "gi_userlock")
     public static class Lock extends Bean {
 
@@ -795,41 +606,51 @@ public class User extends Bean {
             return getString("useragent");
         }
 
-        // long uid;
-        // long created;
-        // String sid;
-        // String host;
-        // String useragent;
-
     }
 
     /**
-     * List company.
-     * 
-     * @return the list
-     */
-    public static List<String> listCompany() {
-        return Bean.loadList("tbluser", "distinct company", "id>0", null, String.class, null);
-    }
-
-    /**
-     * Updated.
-     * 
-     * @return the long
-     */
-    public static long updated() {
-        return Bean.getOne("max(updated)", null, null, null, 0, User.class);
-    }
-
-    /**
-     * Delete.
+     * Delete the user by ID
      * 
      * @param id
-     *            the id
-     * @return the int
+     *            the id of the user
+     * @return int how many was deleted
      */
     public static int delete(long id) {
-        return Bean.delete("id=?", new Object[] { id }, User.class);
+        return Bean.delete(new BasicDBObject(X._ID, id), User.class);
+    }
+
+    /**
+     * check the database, if there is no "config.admin" user, then create the
+     * "admin" user, with "admin" as password
+     */
+    public static void checkAndInit() {
+        if (Bean.isConfigured()) {
+            List<User> list = User.loadByAccess("access.config.admin");
+            if (list == null || list.size() == 0) {
+                User.create(V.create("id", 0L).set("name", "admin").set("password", "admin").set("title", "Admin"));
+            }
+        }
+    }
+
+    /**
+     * test the user exists for the query
+     * 
+     * @param q
+     *            the query
+     * @return boolean
+     */
+    public static boolean exists(BasicDBObject q) {
+        return Bean.exists(q, User.class);
+    }
+
+    /**
+     * test the user exists for the id
+     * 
+     * @param id
+     * @return boolean
+     */
+    public static boolean exists(long id) {
+        return Bean.exists(new BasicDBObject(X._ID, id), User.class);
     }
 
 }

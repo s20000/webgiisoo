@@ -27,6 +27,14 @@ import com.giisoo.framework.web.Model;
 import com.giisoo.framework.web.Module;
 import com.giisoo.framework.web.Path;
 
+/**
+ * web api: /admin/upgrade
+ * <p>
+ * used to manage auto-upgrade
+ * 
+ * @author joe
+ *
+ */
 public class upgrade extends Model {
 
     /**

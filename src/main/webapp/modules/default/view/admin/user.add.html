@@ -12,8 +12,6 @@
 	<div><label><h3>$lang.get('user.name')<r>*</r></h3>:<input type='text' onblur="verify(this, '/user/verify');" name='name' value=#if($name) '$name' #else '' bad="1"  #end/><g>$lang.get("user.name.note")</g></label></div>
 	<div><label><h3>$lang.get('user.nickname')</h3>:<input type='text' name='nickname' value=#if($nickname) '$nickname' #else '' #end/></label></div>
 	<div><label><h3>$lang.get('user.password')</h3>:<input type='text' onblur="verify(this, '/user/verify')" name='password' value=#if($password)'$password' #else '111111' #end /><g>$lang.get("user.password.note")</g></label></div>
-	<div><label><h3>$lang.get('user.company')<r>*</r></h3>:<input type='text' onblur="verify(this, '/user/verify');" name='company' value= #if($company)'$company' #else '' bad="1"  #end /></label></div>
-	<div><label><h3>$lang.get('user.department')<r>*</r></h3>:<input type='text' onblur="verify(this, '/user/verify');" name='department' value= #if($u.department) '$u.department' #else '' bad="1" #end /></label></div>
 	<div><label><h3>$lang.get('user.title')</h3>:<input type='text' name='title' value=#if($title) '$title' #else '' #end /></label></div>
 	<div><label><h3>$lang.get('user.phone')</h3>:<input type='text' name='phone' value= #if($phone)'$phone' #else '' #end /></label></div>
 

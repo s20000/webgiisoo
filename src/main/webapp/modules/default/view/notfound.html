@@ -1,2 +1,99 @@
-$lang.get('message.notfound')
-	
+<html>
+<style>
+body {
+    color: #3c4043;
+    font-size: 1.4rem;
+    -webkit-font-feature-settings: "kern" 1;
+    -moz-font-feature-settings: "kern" 1;
+    font-feature-settings: "kern" 1;
+    height: 100%;
+    width: 100%;
+    overflow: auto;
+    overflow-x: hidden;
+}
+.error-content {
+    max-width: 530px;
+    margin: 0 auto;
+    padding: 0;
+    display: table;
+    height: 100%;
+}
+.error-details {
+	display: table-cell;
+	vertical-align: middle;
+}
+
+.error-image {
+	display: inline-block;
+	vertical-align: middle;
+	width: 96px;
+	height: 150px;
+}
+
+figure {
+	margin: 1em 40px;
+}
+
+.error-image img {
+	width: 100%;
+	height: 100%;
+}
+
+.error-message {
+	position: relative;
+	top: -5px;
+	display: inline-block;
+	vertical-align: middle;
+	margin-left: 10px;
+}
+
+.error-code {
+	margin: 0;
+	font-size: 7.8em;
+	line-height: .9em;
+	color: #979797;
+}
+
+h1 {
+	font-size: 5rem;
+	letter-spacing: -2px;
+	text-indent: -3px;
+}
+
+.error-description {
+	margin: 0;
+	padding: 0;
+	font-weight: 300;
+	font-size: 1.9em;
+	color: #979797;
+	border: none;
+}
+
+h2 {
+	font-size: 4.2rem;
+	letter-spacing: -1px;
+}
+
+a {
+	color: #5BA4E5;
+	text-decoration: none;
+	-webkit-transition: background .3s, color .3s;
+	transition: background .3s, color .3s;
+	background-color: transparent;
+}
+</style>
+<body>
+<section class="error-content">
+	<section class="error-details">
+		<figure class="error-image">
+			<img class="error-ghost" src="/images/404.png">
+		</figure>
+		<section class="error-message">
+			<h1 class="error-code">404</h1>
+			<h2 class="error-description">File Not Found</h2>
+			<a class="error-link" href="/">Go to the front page →</a>
+		</section>
+	</section>
+</section>
+</body>
+</html>

@@ -92,6 +92,7 @@ public class KeyField extends Bean {
                         } else if (v instanceof List) {
                             general((List) v, r);
                         }
+
                     }
                 }
 
@@ -100,7 +101,7 @@ public class KeyField extends Bean {
                     if (!exists(id)) {
                         log.debug("r=" + r);
 
-                        Bean.insertCollection(V.create(X._ID, id).set("collection", collection).set("q", r).set("created", System.currentTimeMillis()), KeyField.class);
+                        Bean.insertCollection(V.create(X._ID, id).set("collection", collection).set("q", r.toString()).set("created", System.currentTimeMillis()), KeyField.class);
                     }
                 }
             }

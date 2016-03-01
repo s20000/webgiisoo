@@ -8,45 +8,46 @@ package com.giisoo.framework.web;
 import org.apache.commons.configuration.Configuration;
 
 /**
+ * the life listener which will be invoked when the system "start", "stop"
  * 
  * @author yjiang
  * 
  */
 public interface LifeListener {
 
-  /**
-	 * Upgrade.
-	 * 
-	 * @param conf
-	 *            the conf
-	 * @param module
-	 *            the module
-	 */
-  void upgrade(Configuration conf, Module module);
+    /**
+     * Upgrade.
+     * 
+     * @param conf
+     *            the conf
+     * @param module
+     *            the module
+     */
+    void upgrade(Configuration conf, Module module);
 
-  /**
-	 * Uninstall.
-	 * 
-	 * @param conf
-	 *            the conf
-	 * @param module
-	 *            the module
-	 */
-  void uninstall(Configuration conf, Module module);
+    /**
+     * Uninstall.
+     * 
+     * @param conf
+     *            the conf
+     * @param module
+     *            the module
+     */
+    void uninstall(Configuration conf, Module module);
 
-  /**
-	 * On start.
-	 * 
-	 * @param conf
-	 *            the conf
-	 * @param module
-	 *            the module
-	 */
-  void onStart(Configuration conf, Module module);
+    /**
+     * On start.
+     * 
+     * @param conf
+     *            the conf
+     * @param module
+     *            the module
+     */
+    void onStart(Configuration conf, Module module);
 
-  /**
-	 * On stop.
-	 */
-  void onStop();
-  
+    /**
+     * On stop.
+     */
+    void onStop();
+
 }

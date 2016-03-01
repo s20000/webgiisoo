@@ -5,11 +5,16 @@
  */
 package com.giisoo.framework.common;
 
+import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
+
 import com.giisoo.core.bean.Bean;
 import com.giisoo.core.bean.Beans;
 import com.giisoo.core.bean.DBMapping;
 import com.giisoo.core.bean.UID;
 import com.giisoo.core.bean.X;
+import com.giisoo.core.conf.Config;
+import com.giisoo.core.worker.WorkerTask;
 import com.mongodb.BasicDBObject;
 
 /**
@@ -26,20 +31,34 @@ public class AccessLog extends Bean {
 	 */
     private static final long serialVersionUID = 1L;
 
+    static AtomicLong seq = new AtomicLong(0);
+    static String node = Config.getConfig().getString("node");
+
+    public String getUrl() {
+        return this.getString("url");
+    }
+
     /**
      * Creates the AccessLog.
      * 
      * @param ip
-     *            the ip
+     *            the ip address
      * @param url
      *            the url
      * @param v
-     *            the v
+     *            the values
      */
-    public static void create(String ip, String url, V v) {
-        long created = System.currentTimeMillis();
-        String id = UID.id(ip, url, created);
-        Bean.insert(v.set("id", id).set("ip", ip).set("url", url).set("created", created), AccessLog.class);
+    public static void create(final String ip, final String url, final V v) {
+        new WorkerTask() {
+
+            @Override
+            public void onExecute() {
+                long created = System.currentTimeMillis();
+                String id = UID.id(ip, url, created, node, seq.incrementAndGet());
+                Bean.insert(v.set(X._ID, id).set("ip", ip).set("url", url).set("created", created), AccessLog.class);
+            }
+
+        }.schedule(0);
     }
 
     public static Beans<AccessLog> load(BasicDBObject q, BasicDBObject order, int s, int n) {
@@ -52,6 +71,10 @@ public class AccessLog extends Bean {
 
     public static void deleteAll() {
         Bean.delete(new BasicDBObject(), AccessLog.class);
+    }
+
+    public static List<Object> distinct() {
+        return Bean.distinct("url", new BasicDBObject("status", 200), AccessLog.class);
     }
 
 }

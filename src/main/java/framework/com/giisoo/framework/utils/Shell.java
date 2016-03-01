@@ -12,13 +12,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.giisoo.core.bean.X;
-import com.giisoo.core.worker.WorkerTask;
 import com.giisoo.framework.web.Language;
 import com.giisoo.framework.web.Module;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class Shell.
+ * The {@code Shell} Class lets run shell command
+ * 
+ * @author joe
+ *
  */
 public class Shell {
 
@@ -53,6 +54,9 @@ public class Shell {
         StringBuilder sb = new StringBuilder();
         BufferedReader input = null;
         BufferedReader err = null;
+        if (log.isDebugEnabled())
+            log.debug("shell.run: " + command);
+
         try {
             Process p = Runtime.getRuntime().exec(new String[] { "/bin/bash", "-c", command });
 
@@ -91,6 +95,9 @@ public class Shell {
 
             p.destroy();
 
+            if (log.isDebugEnabled()) {
+                log.debug("result: " + sb.toString());
+            }
             return sb.toString();
         } catch (Exception e) {
             log.error(e.getMessage(), e);

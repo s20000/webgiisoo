@@ -678,7 +678,7 @@ public class Module {
              * loading the module's lifelistener, to initialize the install
              * script
              */
-            if (lifelistener != null) {
+            if (!X.isEmpty(lifelistener)) {
                 String name = lifelistener;
                 if (name != null) {
 
@@ -701,6 +701,11 @@ public class Module {
         }
     }
 
+    /**
+     * get all modules
+     * 
+     * @return List
+     */
     public static List<Module> getAll() {
         String home = _conf.getString("home");
         File troot = new File(home + "/modules/");
@@ -725,7 +730,7 @@ public class Module {
      * 
      * @param uri
      *            the uri
-     * @return the model
+     * @return Model
      */
     public Model loadModelFromCache(String uri) {
         try {

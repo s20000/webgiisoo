@@ -16,7 +16,10 @@ import com.giisoo.framework.common.*;
 import com.giisoo.framework.web.*;
 
 /**
- * Web接口：/upload, 上传文件，并返回在文件仓库中的ID; 支持Content-Range的断点续传
+ * web api：/upload
+ * <p>
+ * used to upload file and return the file id in file repository, it support
+ * "resume“ file upload, the "Content-Range: bytes 0-1024/2048"
  * 
  * @author joe
  * 

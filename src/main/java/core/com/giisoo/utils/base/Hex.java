@@ -8,7 +8,6 @@
 
 package com.giisoo.utils.base;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class Hex.
  *
@@ -16,24 +15,26 @@ package com.giisoo.utils.base;
  */
 public class Hex {
 
-	/**
-	 * Encode.
-	 *
-	 * @param data the data
-	 * @return the string
-	 */
-	public static String encode(byte[] data) {
-		return Base32.encode(data);
-	}
+    /**
+     * Encode.
+     *
+     * @param data
+     *            the data
+     * @return the string
+     */
+    public static String encode(byte[] data) {
+        return Base32.encode(data);
+    }
 
-	/**
-	 * Decode.
-	 *
-	 * @param s the s
-	 * @return the byte[]
-	 */
-	public static byte[] decode(String s) {
-		return Base32.decode(s);
-	}
+    /**
+     * Decode.
+     *
+     * @param s
+     *            the s
+     * @return the byte[]
+     */
+    public static byte[] decode(String s) {
+        return Base32.decode(s);
+    }
 
 }

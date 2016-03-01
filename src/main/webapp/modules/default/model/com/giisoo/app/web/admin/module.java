@@ -20,6 +20,14 @@ import com.giisoo.framework.common.*;
 import com.giisoo.framework.common.Repo.Entity;
 import com.giisoo.framework.web.*;
 
+/**
+ * web api: /admin/module
+ * <p>
+ * used to manage modules
+ * 
+ * @author joe
+ *
+ */
 public class module extends Model {
 
     private static String ROOT = "/tmp/modules/";
@@ -459,7 +467,7 @@ public class module extends Model {
      * Index.
      */
     @Path(login = true, access = "access.config.admin")
-    public void index() {
+    public void onGet() {
 
         List<Module> actives = new ArrayList<Module>();
         Module m = Module.home;
@@ -471,6 +479,8 @@ public class module extends Model {
         this.set("actives", actives);
 
         this.set("list", Module.getAll());
+
+        this.query.path("/admin/module");
 
         this.show("/admin/module.index.html");
 
@@ -498,7 +508,7 @@ public class module extends Model {
             return;
         } else {
             this.set(X.MESSAGE, lang.get("message.fail"));
-            index();
+            onGet();
         }
     }
 
@@ -512,7 +522,7 @@ public class module extends Model {
         Module m = Module.load(name);
         m.setEnabled(false);
 
-        index();
+        onGet();
     }
 
     /**
@@ -525,7 +535,7 @@ public class module extends Model {
         Module m = Module.load(name);
         m.setEnabled(true);
 
-        index();
+        onGet();
     }
 
     /**
@@ -544,7 +554,7 @@ public class module extends Model {
         }
         m.delete();
 
-        index();
+        onGet();
     }
 
     @SuppressWarnings("unused")

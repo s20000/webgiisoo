@@ -9,8 +9,8 @@
 
 <div class='search'>
 	<form action='/admin/data' method='get' class='form'>
-		<span><label><h3>Collection</h3>:<input type='text' name='collection' value="$!collection" /></label></span>
-		<span><label><h3>Query</h3>:<input type='text' name='_query' value="$!_query" /></label></span>
+		<span><label><h3>Collection</h3>:<input type='text' name='collection' value="$!collection" placeholer="collection"/></label></span>
+		<span><label><h3>Query</h3>:<input type='text' name='_query' value="$!_query" placeholder="json, using ' instead of \" "/></label></span>
 	
 		<button class='btns1' type='submit'>$lang.get('a.search')</button>
 	</form>
@@ -48,15 +48,17 @@
 
  #parse('/widget/goto.page.html')
 
+
 <div class='btns'>
 	<a href='javascript:;' onclick='_export();'>$lang.get('a.export')</a>
 	<a href='javascript:;' onclick='_export_excel();'>$lang.get('a.export.excel')</a>
-	<a href='javascript:;' onclick="var e = $('#addbatch'); if(e.hasClass('opened')){e.slideUp();e.removeClass('opened');}else{e.slideDown();e.addClass('opened')}">$lang.get('a.import')</a>
+	<a href='javascript:;' onclick="$('#addbatch').dialog({width:400});">$lang.get('a.import')</a>
 </div>
+
 
 <iframe id='download' style='display:none'></iframe>
 
-<div id='addbatch' style='display: none'>
+<div id='addbatch' style='display: none' title='导入数据'>
 	<input type='file' name='file' resume='true'/>
 	<div class='notes'>
 		请选择数据数据文件(json)，并上传。
@@ -72,10 +74,12 @@ $(function(){
 		hint : '请选择数据文件',
 		done : function(url) {
 			$.message('正在导入，请等待...');
-			$.post('/admin/data/addbatch', {
-				url : url
-			}, function(d) {
-				show(d);
+			$.post('/admin/data/addbatch', {url : url}, function(d) {
+				if(d.state == 200) {
+					$.message(d.message);
+				} else {
+					$.error(d.message);
+				}
 			});
 		}
 	});

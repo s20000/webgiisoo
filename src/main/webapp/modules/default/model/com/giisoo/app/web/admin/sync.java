@@ -5,6 +5,14 @@ import com.giisoo.core.bean.X;
 import com.giisoo.core.conf.SystemConfig;
 import com.giisoo.framework.utils.SyncTask;
 
+/**
+ * web api: /admin/setting/[method]/sync
+ * <p>
+ * used to set syncing configuration
+ * 
+ * @author joe
+ *
+ */
 public class sync extends setting {
 
     @Override

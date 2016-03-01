@@ -1,4 +1,24 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" style='width:100%;height:100%;margin:0'>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+<meta name="viewport"  content="width=device-width, height=device-height,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=no">
+<link rel="shortcut icon" href="/favicon.ico"
+	type="image/vnd.microsoft.icon" />
+<title>#if($browser_title) $browser_title | #end
+	$lang.get('browser.title')</title>
+<meta name="description" content="$!browser.description"/>
+
+</head>
+<body  style='width:100%;height:100%;margin:0'>
+<div style='display:none;'><img src='/images/giisoo_300x300.png' /></div>
+<div style='text-align:left;width:100%;height:100%;margin:0'>
 Just for Testing, browser was recorded<br>
-IP: $!ip<br>
-user-agent: $!agent <br>
+IP=$!ip<br>
+#foreach($s in $headers)
+$s <br>
+#end
 <a href='/'>返回首页</a>
+</div>
+</body>
+</html>

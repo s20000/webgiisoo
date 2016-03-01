@@ -6,7 +6,18 @@ import org.apache.commons.logging.*;
 import com.danga.MemCached.*;
 
 /**
- * The Class Cache.
+ * The {@code Cache} Class Cache used for cache object, the cache was grouped by
+ * cluster
+ * <p>
+ * configuration in giisoo.properties
+ * 
+ * <pre>
+ * cache.url=memcached://host:port
+ * cache.group=demo
+ * </pre>
+ * 
+ * @author joe
+ *
  */
 public class Cache {
 
@@ -14,18 +25,17 @@ public class Cache {
     private static Log log = LogFactory.getLog(Cache.class);
 
     final static private String MEMCACHED = "memcached://";
+    private static String GROUP = "g://";
 
-    /** The mem cached client. */
     private static MemCachedClient memCachedClient;
 
-    /** The _conf. */
     private static Configuration _conf;
 
     /**
-     * Inits the.
+     * initialize the cache with configuration
      * 
      * @param conf
-     *            the conf
+     *            the configuration that includes cache configure ("cache.url")
      */
     public static synchronized void init(Configuration conf) {
         if (_conf != null)
@@ -53,14 +63,18 @@ public class Cache {
         } else {
             FileCache.init(conf);
         }
+
+        if (conf.containsKey("cache.group")) {
+            GROUP = conf.getString("cache.group", "demo") + "://";
+        }
     }
 
     /**
-     * Gets the.
+     * Gets the object by id, if the object was expired, null return
      * 
      * @param id
-     *            the id
-     * @return the cachable
+     *            the id of object in cache system
+     * @return cachable if the object not presented or expired, will return null
      */
     public static Cachable get(String id) {
 
@@ -77,6 +91,8 @@ public class Cache {
 
             // log.debug("contextclassloader.cache="
             // + Thread.currentThread().getContextClassLoader());
+
+            id = GROUP + id;
 
             Cachable r = null;
             if (memCachedClient != null) {
@@ -109,13 +125,14 @@ public class Cache {
     }
 
     /**
-     * Removes the.
+     * Removes the cached object by id
      * 
      * @param id
-     *            the id
+     *            the object id in cache
      * @return true, if successful
      */
     public static boolean remove(String id) {
+        id = GROUP + id;
         if (memCachedClient != null) {
             return memCachedClient.delete(id);
         } else {
@@ -124,15 +141,18 @@ public class Cache {
     }
 
     /**
-     * Sets the.
+     * cache the object with the id, if exists, then update it, otherwise create
+     * new in cache
      * 
      * @param id
-     *            the id
+     *            the id of the object
      * @param data
-     *            the data
+     *            the object
      * @return true, if successful
      */
     public static boolean set(String id, Cachable data) {
+
+        id = GROUP + id;
 
         if (memCachedClient != null) {
             if (data == null) {

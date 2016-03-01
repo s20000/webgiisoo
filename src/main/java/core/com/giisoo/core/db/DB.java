@@ -21,16 +21,31 @@ import com.giisoo.core.bean.X;
 import com.giisoo.core.conf.Config;
 
 /**
- * The Class DB.
+ * The {@code DB} Class used to for RDBMS database layer operation.
+ * 
+ * @author joe
+ *
  */
 public class DB {
 
-    static Log log = LogFactory.getLog(DB.class);
+    final private static Log log = LogFactory.getLog(DB.class);
 
+    /**
+     * test is configured
+     * 
+     * @return boolean, true if configured
+     */
     public static boolean isConfigured() {
         return ds != null;
     }
 
+    /**
+     * drop all tables for the "db", the "db" name was configured in
+     * "giisoo.properties", such as: db[ttt].url=....
+     * 
+     * @param db
+     * @return int of how many table was dropped
+     */
     public static int dropAll(String db) {
         Connection c = null;
         PreparedStatement stat = null;
@@ -95,7 +110,7 @@ public class DB {
     private static Configuration conf;
 
     /**
-     * Inits the.
+     * initialize the DB object from the "giisoo.properties"
      */
     public static void init() {
         conf = Config.getConfig();
@@ -159,7 +174,7 @@ public class DB {
     }
 
     /**
-     * Gets the driver.
+     * Gets the driver by the db name
      * 
      * @param name
      *            the name
@@ -198,7 +213,7 @@ public class DB {
     }
 
     /**
-     * Inits the.
+     * initialize the DB object by the configuration
      * 
      * @param conf
      *            the conf
@@ -482,19 +497,4 @@ public class DB {
     /** The mysql. */
     private static Boolean mysql = null;
 
-    /**
-     * Checks if is mysql.
-     * 
-     * @return true, if is mysql
-     */
-    // public static boolean isMysql() {
-    // if (mysql == null) {
-    // if ("mysql".equals(getDriver())) {
-    // mysql = Boolean.TRUE;
-    // } else {
-    // mysql = Boolean.FALSE;
-    // }
-    // }
-    // return mysql;
-    // }
 }

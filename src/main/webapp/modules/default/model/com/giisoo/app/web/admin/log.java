@@ -18,9 +18,7 @@ import net.sf.json.JSONObject;
 import com.giisoo.core.bean.Bean;
 import com.giisoo.core.bean.Beans;
 import com.giisoo.core.bean.UID;
-import com.giisoo.core.bean.Bean.W;
 import com.giisoo.core.bean.X;
-import com.giisoo.core.conf.SystemConfig;
 import com.giisoo.core.worker.WorkerTask;
 import com.giisoo.framework.common.OpLog;
 import com.giisoo.framework.common.Session;
@@ -28,6 +26,14 @@ import com.giisoo.framework.common.Temp;
 import com.giisoo.framework.web.*;
 import com.mongodb.BasicDBObject;
 
+/**
+ * web api: /admin/log
+ * <p>
+ * used to manage oplog
+ * 
+ * @author joe
+ *
+ */
 public class log extends Model {
 
     /**
@@ -128,6 +134,7 @@ public class log extends Model {
         Beans<OpLog> bs = OpLog.load(w, s, n);
         this.set(bs, s, n);
 
+        this.query.path("/admin/log");
         this.show("/admin/oplog.index.html");
     }
 

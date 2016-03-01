@@ -176,6 +176,42 @@ public class Repo extends Bean {
         return null;
     }
 
+    public static Entity load(String folder, String id, File f) {
+        if (f.exists()) {
+            Entity e = null;
+            if (!X.isEmpty(id)) {
+                if (folder != null) {
+                    e = Bean.load(new BasicDBObject("folder", folder).append(X._ID, id), Entity.class);
+                } else {
+                    e = Bean.load(new BasicDBObject(X._ID, id), Entity.class);
+                }
+            }
+
+            if (e == null) {
+                try {
+                    InputStream in = new FileInputStream(f);
+
+                    /**
+                     * will not close the inputstream
+                     */
+                    return Entity.create(in);
+
+                } catch (Exception e1) {
+                    log.error("load: id=" + id, e1);
+                }
+            }
+
+            return e;
+        } else {
+            try {
+                log.warn("not find the file: " + f.getCanonicalPath() + ", id=" + id);
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+            }
+        }
+        return null;
+    }
+
     /**
      * Load.
      * 
@@ -205,33 +241,8 @@ public class Repo extends Bean {
      * @return the entity
      */
     public static Entity load(String folder, String id) {
-        File f = new File(path(folder, id));
-
-        if (f.exists()) {
-            Entity e = null;
-            if (folder != null) {
-                e = Bean.load(new BasicDBObject("folder", folder).append(X._ID, id), Entity.class);
-            } else {
-                e = Bean.load(new BasicDBObject(X._ID, id), Entity.class);
-            }
-
-            if (e == null) {
-                try {
-                    InputStream in = new FileInputStream(f);
-
-                    /**
-                     * will not close the inputstream
-                     */
-                    return Entity.create(in);
-
-                } catch (Exception e1) {
-                    log.error("load: id=" + id, e1);
-                }
-            }
-
-            return e;
-        }
-        return null;
+        String path = path(folder, id);
+        return load(folder, id, new File(path));
     }
 
     /**
@@ -243,7 +254,7 @@ public class Repo extends Bean {
      *            the uid
      * @return the int
      */
-    public static int delete(String id, long uid) {
+    public static int delete(String id) {
         /**
          * delete the file in the repo
          */
@@ -252,24 +263,9 @@ public class Repo extends Bean {
         /**
          * delete the info in table
          */
-        if (uid > 0) {
-            Bean.delete(new BasicDBObject(X._ID, id).append("uid", uid), Entity.class);
-        } else {
-            Bean.delete(new BasicDBObject(X._ID, id), Entity.class);
-        }
+        Bean.delete(new BasicDBObject(X._ID, id), Entity.class);
 
         return 1;
-    }
-
-    /**
-     * Delete.
-     * 
-     * @param id
-     *            the id
-     * @return the int
-     */
-    public static int delete(String id) {
-        return delete(id, -1);
     }
 
     /**
@@ -305,8 +301,6 @@ public class Repo extends Bean {
         public String getMemo() {
             return getString("memo");
         }
-
-        transient User user;
 
         public String getUrl() {
             return "/repo/" + getId() + "/" + getName();
@@ -359,12 +353,14 @@ public class Repo extends Bean {
             return getLong("created");
         }
 
-        // public User getUser() {
-        // if (user == null) {
-        // user = User.loadById(this.getLong("uid"));
-        // }
-        // return user;
-        // }
+        transient User user;
+
+        public User getUser() {
+            if (user == null) {
+                user = User.loadById(this.getLong("uid"));
+            }
+            return user;
+        }
 
         /*
          * (non-Javadoc)
@@ -675,6 +671,16 @@ public class Repo extends Bean {
             Bean.updateCollection(getId(), V.create("folder", folder), Entity.class);
 
         }
+
+        public void reset() {
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException e) {
+                }
+            }
+            in = null;
+        }
     }
 
     static private String path(String folder, String path) {
@@ -694,4 +700,47 @@ public class Repo extends Bean {
         return sb.toString();
     }
 
+    public static void cleanup() {
+        File f = new File(ROOT);
+
+        File[] fs = f.listFiles();
+        if (fs != null) {
+            for (File f1 : fs) {
+                delete(f1);
+            }
+        }
+
+    }
+
+    private static void delete(File f) {
+        if (f.isFile()) {
+            if (System.currentTimeMillis() - f.lastModified() > X.ADAY) {
+                // check the file is fine?
+                Entity e = Repo.load(null, null, f);
+                if (e.getTotal() > e.getPos()) {
+                    e.delete();
+                }
+            }
+        } else if (f.isDirectory()) {
+            File[] fs = f.listFiles();
+            if (fs != null) {
+                for (File f1 : fs) {
+                    delete(f1);
+                }
+            }
+
+            /**
+             * delete the empty directory
+             */
+            fs = f.listFiles();
+            if (fs == null || fs.length == 0) {
+                f.delete();
+            }
+
+        }
+    }
+
+    public static Beans<Entity> load(BasicDBObject q, BasicDBObject order, int s, int n) {
+        return Bean.load(q, order, s, n, Entity.class);
+    }
 }

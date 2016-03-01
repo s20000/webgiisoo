@@ -12,7 +12,12 @@ import com.giisoo.framework.web.Model;
 import com.giisoo.framework.web.Path;
 
 /**
- * 系统状态仪表盘
+ * web api: /admin/gauge
+ * <p>
+ * used to get "computer" status
+ * 
+ * @author joe
+ *
  */
 public class gauge extends Model {
 

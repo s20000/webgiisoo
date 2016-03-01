@@ -17,7 +17,8 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 
 /**
- * Access, name will used to load language
+ * access token class, it's Bean and mapping "gi_access" collection, it mapping
+ * the "access" method in @Path interface
  * 
  * @author yjiang
  * 

@@ -17,7 +17,9 @@ import com.giisoo.framework.common.*;
 import com.giisoo.framework.web.*;
 
 /**
- * Web接口： /menu
+ * web api： /menu
+ * <p>
+ * used to get menu
  * 
  * @author joe
  * 
@@ -44,12 +46,12 @@ public class menu extends Model {
     public void onPost() {
         User me = this.getUser();
 
-        int id = this.getInt("root");
+        long id = this.getLong("root");
         String name = this.getString("name");
 
         Beans<Menu> bs = null;
         Menu m = null;
-        if (name != null) {
+        if (!X.isEmpty(name)) {
             /**
              * load the menu by id and name
              */

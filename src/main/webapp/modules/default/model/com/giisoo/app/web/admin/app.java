@@ -13,14 +13,22 @@ import com.giisoo.core.bean.Bean;
 import com.giisoo.core.bean.Beans;
 import com.giisoo.core.bean.UID;
 import com.giisoo.core.bean.Bean.V;
-import com.giisoo.core.bean.Bean.W;
 import com.giisoo.core.bean.X;
 import com.giisoo.framework.common.App;
 import com.giisoo.framework.common.OpLog;
 import com.giisoo.framework.web.Model;
 import com.giisoo.framework.web.Path;
+import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 
+/**
+ * web api: /admin/app
+ * <p>
+ * used to manage the app token
+ * 
+ * @author joe
+ *
+ */
 public class app extends Model {
 
     /**
@@ -200,10 +208,23 @@ public class app extends Model {
         int n = this.getInt("n", 10, "number.per.page");
 
         BasicDBObject q = new BasicDBObject();
-        BasicDBObject order = new BasicDBObject(X._ID, 1);
+        String name = this.getString("name");
+        if (X.isEmpty(this.path) && !X.isEmpty(name)) {
+            BasicDBList list = new BasicDBList();
+            Pattern pattern = Pattern.compile(name, Pattern.CASE_INSENSITIVE);
+
+            list.add(new BasicDBObject().append("appid", pattern));
+            list.add(new BasicDBObject().append("key", pattern));
+            list.add(new BasicDBObject().append("company", pattern));
+            list.add(new BasicDBObject().append("contact", pattern));
+            list.add(new BasicDBObject().append("phone", pattern));
+            q.append("$or", list);
+        }
+        BasicDBObject order = new BasicDBObject("appid", 1);
         Beans<App> bs = App.load(q, order, s, 10);
         this.set(bs, s, n);
 
+        this.query.parse("/admin/app");
         show("/admin/app.index.html");
     }
 

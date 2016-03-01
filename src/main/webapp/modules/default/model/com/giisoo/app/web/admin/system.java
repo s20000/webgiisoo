@@ -35,6 +35,14 @@ import com.jcraft.jsch.Session;
 import com.jcraft.jsch.UserInfo;
 import com.mongodb.DB;
 
+/**
+ * web api: /admin/system
+ * <p>
+ * used to control the "system"
+ * 
+ * @author joe
+ *
+ */
 public class system extends Model {
 
     /**

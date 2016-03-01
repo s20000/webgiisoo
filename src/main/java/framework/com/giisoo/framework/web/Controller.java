@@ -82,7 +82,7 @@ public class Controller implements IStub {
         OS = System.getProperty("os.name").toLowerCase() + "_" + System.getProperty("os.version") + "_" + System.getProperty("os.arch");
 
         Model.HOME = conf.getString("home");
-        
+
         /**
          * initialize the module
          */
@@ -96,7 +96,8 @@ public class Controller implements IStub {
                 try {
                     MQ.bind("web", owner);
                 } catch (JMSException e) {
-                    log.error(e.getMessage(), e);
+                    if (log.isErrorEnabled())
+                        log.error(e.getMessage(), e);
                 }
             }
 
@@ -107,7 +108,8 @@ public class Controller implements IStub {
                 try {
                     MQ.bind("webadmin", owner, MQ.Mode.TOPIC);
                 } catch (JMSException e) {
-                    log.error(e.getMessage(), e);
+                    if (log.isErrorEnabled())
+                        log.error(e.getMessage(), e);
                 }
             }
 
@@ -161,7 +163,8 @@ public class Controller implements IStub {
                 MQ.response(seq, src, from, r1, bb, null, null, header2);
             }
         } catch (Exception e) {
-            log.error(msg.toString(), e);
+            if (log.isErrorEnabled())
+                log.error(msg.toString(), e);
         }
 
     }
@@ -251,13 +254,19 @@ public class Controller implements IStub {
             Path p = mo.dispatch(uri, req, resp, method);
 
             if (p == null || p.accesslog()) {
-                log.info(method + " " + uri + " - " + t.past() + "ms -" + mo.getRemoteHost() + " " + mo);
+                if (log.isInfoEnabled())
+                    log.info(method + " " + uri + " - " + mo.getStatus() + " - " + t.past() + "ms -" + mo.getRemoteHost() + " " + mo);
                 V v = V.create("method", method.toString()).set("cost", t.past()).set("sid", mo.sid());
                 User u1 = mo.getUser();
                 if (u1 != null) {
                     v.set("uid", u1.getId()).set("username", u1.get("name"));
                 }
-                AccessLog.create(mo.getRemoteHost(), uri, v);
+                // if (method.isMdc()) {
+                // v.set("request",
+                // mo.getJSONNonPassword().toString()).set("response",
+                // mo.getOutput());
+                // }
+                AccessLog.create(mo.getRemoteHost(), uri, v.set("status", mo.getStatus()).set("client", mo.browser()));
             }
 
             // Counter.max("web.request.max", t.past(), uri);
@@ -270,7 +279,8 @@ public class Controller implements IStub {
         if (transparenturls == null) {
             String s = Module.home.getTransparent();
 
-            log.debug("transparenturls:" + s);
+            if (log.isDebugEnabled())
+                log.debug("transparenturls:" + s);
 
             if (X.isEmpty(s)) {
                 transparenturls = Pattern.compile("^/(css|js|images)/.*$", Pattern.CASE_INSENSITIVE);
@@ -302,7 +312,8 @@ public class Controller implements IStub {
                             f = f1;
                         }
                     } catch (Exception e) {
-                        log.error(e.getMessage(), e);
+                        if (log.isErrorEnabled())
+                            log.error(e.getMessage(), e);
                     }
                 }
 
@@ -322,7 +333,8 @@ public class Controller implements IStub {
                             if (date != null && date.equals(date2)) {
                                 resp.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
 
-                                log.info(method + " " + uri + " - " + t.past() + "ms " + getRemoteHost(req));
+                                if (log.isInfoEnabled())
+                                    log.info(method + " " + uri + " - 304 - " + t.past() + "ms " + getRemoteHost(req));
 
                                 return;
                             }
@@ -360,13 +372,15 @@ public class Controller implements IStub {
 
                         out.flush();
                     } catch (Exception e) {
-                        log.error(uri, e);
+                        if (log.isErrorEnabled())
+                            log.error(uri, e);
                     } finally {
                         if (in != null) {
                             try {
                                 in.close();
                             } catch (IOException e) {
-                                log.error(e);
+                                if (log.isErrorEnabled())
+                                    log.error(e);
                             }
                         }
                     }
@@ -374,7 +388,8 @@ public class Controller implements IStub {
                     log.warn("not found the file = " + uri);
                 }
                 // TODO
-                log.info(method + " " + uri + " - " + t.past() + "ms " + getRemoteHost(req));
+                if (log.isInfoEnabled())
+                    log.info(method + " " + uri + " - 200 -" + t.past() + "ms " + getRemoteHost(req));
 
                 return;
             } // end of matches
@@ -396,13 +411,19 @@ public class Controller implements IStub {
                 Path p = mo.dispatch(uri, req, resp, method);
 
                 if (p == null || p.accesslog()) {
-                    log.info(method + " " + uri + " - " + t.past() + "ms -" + mo.getRemoteHost() + " " + mo);
+                    if (log.isInfoEnabled())
+                        log.info(method + " " + uri + " - " + mo.getStatus() + " - " + t.past() + "ms -" + mo.getRemoteHost() + " " + mo);
                     V v = V.create("method", method.toString()).set("cost", t.past()).set("sid", mo.sid());
                     User u1 = mo.getUser();
                     if (u1 != null) {
                         v.set("uid", u1.getId()).set("username", u1.get("name"));
                     }
-                    AccessLog.create(mo.getRemoteHost(), uri, v);
+                    // if (method.isMdc()) {
+                    // v.set("request",
+                    // mo.getJSONNonPassword().toString()).set("response",
+                    // mo.getOutput());
+                    // }
+                    AccessLog.create(mo.getRemoteHost(), uri, v.set("status", mo.getStatus()).set("client", mo.browser()));
                 }
 
                 // Counter.max("web.request.max", t.past(), uri);
@@ -416,13 +437,19 @@ public class Controller implements IStub {
                     Path p = mo.dispatch(uri, req, resp, method);
 
                     if (p == null || p.accesslog()) {
-                        log.info(method + " " + uri + " - " + t.past() + "ms -" + mo.getRemoteHost() + " " + mo);
+                        if (log.isInfoEnabled())
+                            log.info(method + " " + uri + " - " + mo.getStatus() + " - " + t.past() + "ms -" + mo.getRemoteHost() + " " + mo);
                         V v = V.create("method", method.toString()).set("cost", t.past()).set("sid", mo.sid());
                         User u1 = mo.getUser();
                         if (u1 != null) {
                             v.set("uid", u1.getId()).set("username", u1.get("name"));
                         }
-                        AccessLog.create(mo.getRemoteHost(), uri, v);
+                        // if (method.isMdc()) {
+                        // v.set("request",
+                        // mo.getJSONNonPassword().toString()).set("response",
+                        // mo.getOutput());
+                        // }
+                        AccessLog.create(mo.getRemoteHost(), uri, v.set("status", mo.getStatus()).set("client", mo.browser()));
                     }
 
                     // Counter.max("web.request.max", t.past(), uri);
@@ -442,13 +469,19 @@ public class Controller implements IStub {
                             Path p = mo.dispatch(u, req, resp, method);
 
                             if (p == null || p.accesslog()) {
-                                log.info(method + " " + uri + " - " + t.past() + "ms -" + mo.getRemoteHost() + " " + mo);
+                                if (log.isInfoEnabled())
+                                    log.info(method + " " + uri + " - " + mo.getStatus() + " - " + t.past() + "ms -" + mo.getRemoteHost() + " " + mo);
                                 V v = V.create("method", method.toString()).set("cost", t.past()).set("sid", mo.sid());
                                 User u1 = mo.getUser();
                                 if (u1 != null) {
                                     v.set("uid", u1.getId()).set("username", u1.get("name"));
                                 }
-                                AccessLog.create(mo.getRemoteHost(), uri, v);
+                                // if (method.isMdc()) {
+                                // v.set("request",
+                                // mo.getJSONNonPassword().toString()).set("response",
+                                // mo.getOutput());
+                                // }
+                                AccessLog.create(mo.getRemoteHost(), uri, v.set("status", mo.getStatus()).set("client", mo.browser()));
                             }
 
                             // Counter.max("web.request.max", t.past(), uri);
@@ -468,23 +501,24 @@ public class Controller implements IStub {
                      */
                     // Module.home.modelMap.put(uri, (Class<Model>)
                     // mo.getClass());
-                    Path p = mo.dispatch(uri, req, resp, method);
-                    if (p == null || p.accesslog()) {
-                        log.info(method + " " + uri + " - " + t.past() + "ms -" + mo.getRemoteHost() + " " + mo);
-                        V v = V.create("method", method.toString()).set("cost", t.past()).set("sid", mo.sid());
-                        User u1 = mo.getUser();
-                        if (u1 != null) {
-                            v.set("uid", u1.getId()).set("username", u1.get("name"));
-                        }
-                        AccessLog.create(mo.getRemoteHost(), uri, v);
+                    mo.dispatch(uri, req, resp, method);
+
+                    if (log.isInfoEnabled())
+                        log.info(method + " " + uri + " - " + mo.getStatus() + " - " + t.past() + "ms -" + mo.getRemoteHost() + " " + mo);
+                    V v = V.create("method", method.toString()).set("cost", t.past()).set("sid", mo.sid());
+                    User u1 = mo.getUser();
+                    if (u1 != null) {
+                        v.set("uid", u1.getId()).set("username", u1.get("name"));
                     }
+                    AccessLog.create(mo.getRemoteHost(), uri, v.set("status", mo.getStatus()).set("client", mo.browser()));
 
                     // Counter.max("web.request.max", t.past(), uri);
                 }
             }
 
         } catch (Exception e) {
-            log.error(uri, e);
+            if (log.isErrorEnabled())
+                log.error(uri, e);
         }
     }
 }

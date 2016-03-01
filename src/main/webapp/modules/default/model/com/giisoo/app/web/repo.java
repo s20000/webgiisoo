@@ -20,7 +20,9 @@ import com.giisoo.framework.web.*;
 import com.giisoo.utils.image.GImage;
 
 /**
- * Web接口： /repo/[id]/[filename], /repo/download/[id]/[filename]
+ * web api： /repo
+ * <p>
+ * used to access the file in file repository
  * 
  * @author yjiang
  * 
@@ -81,6 +83,7 @@ public class repo extends Model {
                                 String[] ss = size.split("x");
 
                                 if (ss.length == 2) {
+                                    boolean failed = false;
                                     File f = Temp.get(id, size);
                                     if (!f.exists()) {
                                         f.getParentFile().mkdirs();
@@ -93,10 +96,13 @@ public class repo extends Model {
                                         Model.copy(e.getInputStream(), out, false);
                                         out.close();
 
-                                        GImage.scale3(src.getAbsolutePath(), f.getAbsolutePath(), Bean.toInt(ss[0]), Bean.toInt(ss[1]));
+                                        if (GImage.scale3(src.getAbsolutePath(), f.getAbsolutePath(), Bean.toInt(ss[0]), Bean.toInt(ss[1])) < 0) {
+                                            failed = true;
+                                            e.reset();
+                                        }
                                     }
 
-                                    if (f.exists()) {
+                                    if (f.exists() && !failed) {
                                         InputStream in = new FileInputStream(f);
                                         OutputStream out = this.getOutputStream();
 
@@ -209,7 +215,7 @@ public class repo extends Model {
             Entity e = null;
             // log.debug("e:" + e);
 
-            User me = this.getUser();
+            // User me = this.getUser();
 
             try {
 
@@ -239,6 +245,7 @@ public class repo extends Model {
 
                             if (ss.length == 2) {
                                 File f = Temp.get(id, "s_" + size);
+                                boolean failed = false;
 
                                 if (!f.exists()) {
                                     f.getParentFile().mkdirs();
@@ -257,10 +264,18 @@ public class repo extends Model {
                                      * using scale3 to cut the middle of the
                                      * image
                                      */
-                                    GImage.scale3(src.getAbsolutePath(), f.getAbsolutePath(), Bean.toInt(ss[0]), Bean.toInt(ss[1]));
+                                    if (GImage.scale3(src.getAbsolutePath(), f.getAbsolutePath(), Bean.toInt(ss[0]), Bean.toInt(ss[1])) < 0) {
+                                        failed = true;
+                                        log.warn("scale3 image failed");
+                                        e.reset();
+                                    }
+                                } else {
+                                    log.debug("load the image from the temp cache, file=" + f.getCanonicalPath());
                                 }
 
-                                if (f.exists()) {
+                                if (f.exists() && !failed) {
+                                    log.debug("load the scaled image from " + f.getCanonicalPath());
+
                                     InputStream in = new FileInputStream(f);
                                     OutputStream out = this.getOutputStream();
 
@@ -281,6 +296,7 @@ public class repo extends Model {
                             String[] ss = size.split("x");
 
                             if (ss.length == 2) {
+                                boolean failed = false;
                                 File f = Temp.get(id, "s1_" + size);
                                 if (!f.exists()) {
                                     f.getParentFile().mkdirs();
@@ -298,10 +314,18 @@ public class repo extends Model {
                                     /**
                                      * using scale to smooth the original image
                                      */
-                                    GImage.scale(src.getAbsolutePath(), f.getAbsolutePath(), Bean.toInt(ss[0]), Bean.toInt(ss[1]));
+                                    if (GImage.scale(src.getAbsolutePath(), f.getAbsolutePath(), Bean.toInt(ss[0]), Bean.toInt(ss[1])) < 0) {
+                                        log.warn("scale3 image failed");
+                                        failed = true;
+                                        e.reset();
+                                    }
+                                } else {
+                                    log.debug("load the image from the temp cache, file=" + f.getCanonicalPath());
                                 }
 
-                                if (f.exists()) {
+                                if (f.exists() && !failed) {
+                                    log.debug("load scaled image from " + f.getCanonicalPath());
+
                                     InputStream in = new FileInputStream(f);
                                     OutputStream out = this.getOutputStream();
 
@@ -320,7 +344,7 @@ public class repo extends Model {
                         if (X.isEmpty(range)) {
                             String date = this.getHeader("If-Modified-Since");
                             if (date != null && date.equals(date2)) {
-                                resp.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+                                this.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
                                 return;
                             }
                         }

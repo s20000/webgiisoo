@@ -13,6 +13,12 @@ import com.giisoo.utils.base.RSA;
 import com.giisoo.utils.base.RSA.Key;
 import com.mongodb.BasicDBObject;
 
+/**
+ * RSA key pair
+ * 
+ * @author joe
+ *
+ */
 @DBMapping(collection = "gi_keypair")
 public class Keypair extends Bean {
 

@@ -14,10 +14,11 @@ import org.apache.commons.logging.LogFactory;
 
 import com.giisoo.core.cache.DefaultCachable;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class Bean.
- *
+ * The {@code Beans} Class used to contains the Bean in query.
+ * <p>
+ * it's includes the total count for the query
+ * 
  * @param <T>
  *            the generic type
  */

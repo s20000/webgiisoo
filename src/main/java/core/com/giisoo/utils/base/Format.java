@@ -9,9 +9,7 @@ package com.giisoo.utils.base;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Vector;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class Format.
  */

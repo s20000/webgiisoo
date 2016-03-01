@@ -40,7 +40,7 @@ public class Language {
     private static Map<String, Language> locales = new HashMap<String, Language>();
 
     public static Language getLanguage() {
-        return getLanguage(Module.home.getLanguage());
+        return getLanguage(Module.home == null ? X.EMPTY : Module.home.getLanguage());
     }
 
     /**
@@ -162,7 +162,7 @@ public class Language {
 
     private Language(String locale) {
         this.locale = locale;
-        if (!Module.home.supportLocale(locale)) {
+        if (Module.home != null && !Module.home.supportLocale(locale)) {
             this.locale = Module.home.getLanguage();
         }
 
@@ -235,7 +235,9 @@ public class Language {
      */
     public void load() {
         data = new HashMap<String, String>();
-        Module.home.loadLang(data, locale);
+        if (Module.home != null) {
+            Module.home.loadLang(data, locale);
+        }
 
         if (data.isEmpty()) {
             // log.error("doesnt support the locale: " + locale);

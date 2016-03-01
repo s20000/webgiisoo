@@ -10,8 +10,22 @@ import java.lang.annotation.*;
 import com.giisoo.core.bean.X;
 
 /**
- * used to define a Web api, for each commented api, the framework will pass
- * "login", "method" Object as "default" parameters
+ * the {@code Path} annotation interface used to define a Web api, for each
+ * annotated method, the framework will auto generate the web api mapping for
+ * the method,
+ * 
+ * <p>
+ * the whole web api uri should be=
+ * <tt>http://[host]/[classname]/[method path]</tt>, method including:
+ * <p>
+ * 
+ * <pre>
+ * path=X.NONE (no path defined)
+ * method=Model.METHOD_GET|MOdel.METHOD_POST|Model.METHOD_MDC (handle all request method)
+ * login=false (no required login)
+ * access=X.NONE (not required access token)
+ * accesslog=true (record the accesslog)
+ * </pre>
  * 
  * @author joe
  * 
@@ -51,6 +65,7 @@ public @interface Path {
     /**
      * Log the data of request and response, default is "none"
      * 
+     * @deprecated
      * @return int
      */
     int log() default 0;
@@ -58,6 +73,7 @@ public @interface Path {
     /**
      * the support device, default is for all
      * 
+     * @deprecated
      * @return String
      */
     String device() default X.NONE;

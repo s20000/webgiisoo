@@ -16,7 +16,9 @@ import java.io.PrintStream;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -43,19 +45,26 @@ import com.giisoo.core.db.DB;
 import com.giisoo.core.worker.WorkerTask;
 import com.giisoo.framework.common.AccessLog;
 import com.giisoo.framework.common.Cluster;
+import com.giisoo.framework.common.Host;
 import com.giisoo.framework.common.Menu;
 import com.giisoo.framework.common.OpLog;
+import com.giisoo.framework.common.Repo;
+import com.giisoo.framework.common.Stat;
 import com.giisoo.framework.common.Temp;
+import com.giisoo.framework.common.User;
+import com.giisoo.framework.mdc.MDCServer;
+import com.giisoo.framework.mdc.TConn;
 import com.giisoo.framework.mdc.utils.IP;
 import com.giisoo.framework.utils.FileUtil;
 import com.giisoo.framework.utils.Shell;
+import com.giisoo.framework.web.Language;
 import com.giisoo.framework.web.LifeListener;
 import com.giisoo.framework.web.Model;
 import com.giisoo.framework.web.Module;
 import com.mongodb.BasicDBObject;
 
 /**
- * 启动监听器，当系统启动时，初始化数据库、资源、服务等
+ * startup life listener
  * 
  * @author joe
  * 
@@ -63,6 +72,89 @@ import com.mongodb.BasicDBObject;
 public class DefaultListener implements LifeListener {
 
     public static final DefaultListener owner = new DefaultListener();
+
+    MDCServer mdc = null;
+    MDCServer udc = null;
+
+    /**
+     * backup
+     * 
+     * @author joe
+     *
+     */
+    public static class BackupTask extends WorkerTask {
+
+        public static String path() {
+            return SystemConfig.s("backup.path", "/opt/backup");
+        }
+
+        @Override
+        public String getName() {
+            return "backup.task";
+        }
+
+        @Override
+        public void onExecute() {
+            Module m = Module.home;
+            try {
+
+                String out = path() + "/" + Language.getLanguage().format(System.currentTimeMillis(), "yyyyMMddHHmm");
+                new File(out).mkdirs();
+
+                File f = m.getFile("/admin/clone/backup_db.sh");
+                Shell.run("chmod ugo+x " + f.getParent() + "/*.sh");
+
+                /**
+                 * 1, backup postgresql
+                 */
+                String url = conf.getString("db.url", null);
+                if (!X.isEmpty(url)) {
+                    int i = url.indexOf("?");
+                    if (i > 0) {
+                        url = url.substring(0, i);
+                    }
+                    i = url.lastIndexOf("/");
+                    if (i > 0) {
+                        url = url.substring(i + 1);
+                    }
+
+                    String r = Shell.run(f.getCanonicalPath() + " " + url + " " + out + "/" + url + ".dmp");
+                    log.debug("result: " + r);
+                }
+
+                /**
+                 * 2, backup mongo
+                 */
+                f = m.getFile("/admin/clone/backup_mongo.sh");
+                url = conf.getString("mongo[prod].url", null);
+                if (!X.isEmpty(url)) {
+                    String db = conf.getString("mongo[prod].db", "demo");
+
+                    url = url.split(";")[0];
+                    int i = url.indexOf(":");
+                    if (i > 0) {
+                        String host = url.substring(0, i);
+                        String port = url.substring(i + 1);
+
+                        Shell.run(f.getCanonicalPath() + " " + host + " " + port + " " + db + " " + out);
+                    }
+                }
+
+                /**
+                 * 3, backup repo
+                 */
+                f = m.getFile("/admin/clone/backup_tar.sh");
+                url = conf.getString("repo.path", null);
+                if (!X.isEmpty(url)) {
+                    Shell.run(f.getCanonicalPath() + " " + out + "/repo.tar.gz " + url);
+                }
+
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+            }
+        }
+
+    };
 
     private static class NtpTask extends WorkerTask {
 
@@ -108,7 +200,9 @@ public class DefaultListener implements LifeListener {
             return;
         }
 
-        log.debug("upgrade.enabled=" + SystemConfig.s(conf.getString("node") + ".upgrade.framework.enabled", "false"));
+        if (log.isDebugEnabled()) {
+            log.debug("upgrade.enabled=" + SystemConfig.s(conf.getString("node") + ".upgrade.framework.enabled", "false"));
+        }
 
         if ("true".equals(SystemConfig.s(conf.getString("node") + ".upgrade.framework.enabled", "false"))) {
             UpgradeTask.owner.schedule(X.AMINUTE + (long) (2 * X.AMINUTE * Math.random()));
@@ -136,6 +230,57 @@ public class DefaultListener implements LifeListener {
 
         HeartbeatTask.owner.schedule(X.AMINUTE);
         new CleanupTask(conf).schedule(X.AMINUTE);
+        new StatTask().schedule(X.AMINUTE);
+        new SitemapTask().schedule(X.AMINUTE);
+        new RestartTask().schedule(X.AMINUTE);
+
+        /**
+         * initialize the MDCServer
+         */
+        String e = SystemConfig.s("mdc.tcp.enabled", "false");
+        if ("true".equals(e)) {
+            String mdchost = SystemConfig.s("mdc.tcp.host", "0.0.0.0");
+            int mdcport = Bean.toInt(SystemConfig.s("mdc.tcp.port", "-1"), -1);
+
+            if (mdcport > 0) {
+                if (log.isWarnEnabled()) {
+                    log.warn("mdc is starting on [" + mdchost + ":" + mdcport + "]");
+                }
+
+                mdc = MDCServer.createTcpServer(mdchost, mdcport);
+                mdc.start();
+
+                log.warn("mdc is starting on [" + mdchost + ":" + mdcport + "]");
+
+                udc = MDCServer.createUdpServer(mdchost, mdcport);
+                udc.start();
+
+                Host.update(conf.getString("node", X.EMPTY), SystemConfig.s(Model.node() + ".mdc.tcp.domain", null), mdcport);
+
+            } else {
+                if (log.isWarnEnabled()) {
+                    log.warn("mdc is enabled, but the port is wrong: [" + mdchost + ":" + mdcport + "]");
+                }
+            }
+        } else {
+            if (log.isWarnEnabled()) {
+                log.warn("mdc.tcp is diabled!");
+            }
+        }
+
+        /**
+         * check and initialize
+         */
+        User.checkAndInit();
+
+        new WorkerTask() {
+
+            @Override
+            public void onExecute() {
+                Bean.repair();
+            }
+
+        }.schedule(10);
     }
 
     /*
@@ -186,10 +331,14 @@ public class DefaultListener implements LifeListener {
                         s.executeUpdate(sql);
                     }
                 } catch (Exception e) {
-                    log.error(sb.toString(), e);
+                    if (log.isErrorEnabled()) {
+                        log.error(sb.toString(), e);
+                    }
                 }
             } else {
-                log.warn("database not configured !!");
+                if (log.isWarnEnabled()) {
+                    log.warn("database not configured !");
+                }
             }
         } finally {
             if (in != null) {
@@ -207,7 +356,9 @@ public class DefaultListener implements LifeListener {
      * configuration.Configuration, com.giisoo.framework.web.Module)
      */
     public void upgrade(Configuration conf, Module module) {
-        log.debug(module + " upgrading...");
+        if (log.isDebugEnabled()) {
+            log.debug(module + " upgrading...");
+        }
 
         /**
          * test database connection has configured?
@@ -218,92 +369,122 @@ public class DefaultListener implements LifeListener {
              */
             String dbname = DB.getDriver();
 
-            if (X.isEmpty(dbname) || !DB.isConfigured()) {
-                log.error("DB was miss configured, please congiure it in [" + Model.GIISOO_HOME + "/webgiisoo/giisoo.properties]");
-                return;
-            }
-            /**
-             * initial the database
-             */
-            File f = module.loadResource("/install/" + dbname + "/initial.sql", false);
-            if (f != null && f.exists()) {
-                String key = module.getName() + ".db.initial." + dbname + "." + f.lastModified();
-                int b = SystemConfig.i(key, 0);
-                if (b == 0) {
-                    log.warn("db[" + key + "] has not been initialized! initializing...");
+            if (!X.isEmpty(dbname) && DB.isConfigured()) {
+                /**
+                 * initial the database
+                 */
+                File f = module.loadResource("/install/" + dbname + "/initial.sql", false);
+                if (f != null && f.exists()) {
+                    String key = module.getName() + ".db.initial." + dbname + "." + f.lastModified();
+                    int b = SystemConfig.i(key, 0);
+                    if (b == 0) {
+                        if (log.isWarnEnabled()) {
+                            log.warn("db[" + key + "] has not been initialized! initializing...");
+                        }
 
-                    try {
-                        runDBScript(f);
-                        SystemConfig.setConfig(key, (int) 1);
-                        log.warn("db[" + key + "] has been initialized! ");
-                    } catch (Exception e) {
-                        log.error(f.getAbsolutePath(), e);
+                        try {
+                            runDBScript(f);
+                            SystemConfig.setConfig(key, (int) 1);
+                            if (log.isWarnEnabled()) {
+                                log.warn("db[" + key + "] has been initialized! ");
+                            }
+                        } catch (Exception e) {
+                            if (log.isErrorEnabled()) {
+                                log.error(f.getAbsolutePath(), e);
+                            }
+                        }
+
                     }
+                } else {
+                    if (log.isWarnEnabled()) {
+                        log.warn("db[" + module.getName() + "." + dbname + "] not exists ! ");
+                    }
+                }
 
+                f = module.loadResource("/install/" + dbname + "/upgrade.sql", false);
+                if (f != null && f.exists()) {
+                    String key = module.getName() + ".db.upgrade." + dbname + "." + f.lastModified();
+                    int b = SystemConfig.i(key, 0);
+
+                    if (b == 0) {
+
+                        try {
+                            runDBScript(f);
+
+                            SystemConfig.setConfig(key, (int) 1);
+
+                            if (log.isWarnEnabled()) {
+                                log.warn("db[" + key + "] has been upgraded! ");
+                            }
+                        } catch (Exception e) {
+                            if (log.isErrorEnabled()) {
+                                log.error(f.getAbsolutePath(), e);
+                            }
+                        } finally {
+                        }
+
+                    }
                 }
             } else {
-                log.warn("db[" + module.getName() + "." + dbname + "] not exists ! ");
-            }
-
-            f = module.loadResource("/install/" + dbname + "/upgrade.sql", false);
-            if (f != null && f.exists()) {
-                String key = module.getName() + ".db.upgrade." + dbname + "." + f.lastModified();
-                int b = SystemConfig.i(key, 0);
-
-                if (b == 0) {
-
-                    try {
-                        runDBScript(f);
-
-                        SystemConfig.setConfig(key, (int) 1);
-
-                        log.warn("db[" + key + "] has been upgraded! ");
-                    } catch (Exception e) {
-                        log.error(f.getAbsolutePath(), e);
-                    } finally {
-                    }
-
+                if (log.isErrorEnabled()) {
+                    log.error("DB was miss configured, please congiure it in [" + Model.GIISOO_HOME + "/webgiisoo/giisoo.properties]");
                 }
             }
-
         } catch (Exception e) {
-            log.error("database is not configured!", e);
+            if (log.isErrorEnabled()) {
+                log.error("database is not configured!", e);
+            }
             return;
         }
 
-        /**
-         * check the menus
-         * 
-         */
-        File f = module.getFile("/install/menu.json");
-        if (f != null && f.exists()) {
-            BufferedReader reader = null;
-            try {
-                reader = new BufferedReader(new InputStreamReader(new FileInputStream(f), "UTF-8"));
-                StringBuilder sb = new StringBuilder();
-                String line = reader.readLine();
-                while (line != null) {
-                    sb.append(line).append("\r\n");
-                    line = reader.readLine();
-                }
+        if (Bean.isConfigured()) {
+            /**
+             * check the menus
+             * 
+             */
+            File f = module.getFile("/install/menu.json");
+            if (f != null && f.exists()) {
+                BufferedReader reader = null;
+                try {
+                    if (log.isDebugEnabled()) {
+                        log.debug("initialize [" + f.getCanonicalPath() + "]");
+                    }
 
-                /**
-                 * convert the string to json array
-                 */
-                JSONArray arr = JSONArray.fromObject(sb.toString());
-                Menu.insertOrUpdate(arr, module.getName());
+                    reader = new BufferedReader(new InputStreamReader(new FileInputStream(f), "UTF-8"));
+                    StringBuilder sb = new StringBuilder();
+                    String line = reader.readLine();
+                    while (line != null) {
+                        sb.append(line).append("\r\n");
+                        line = reader.readLine();
+                    }
 
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-            } finally {
-                if (reader != null) {
-                    try {
-                        reader.close();
-                    } catch (IOException e) {
-                        log.error(e);
+                    /**
+                     * convert the string to json array
+                     */
+                    JSONArray arr = JSONArray.fromObject(sb.toString());
+                    Menu.insertOrUpdate(arr, module.getName());
+
+                } catch (Exception e) {
+                    if (log.isErrorEnabled()) {
+                        log.error(e.getMessage(), e);
+                    }
+                } finally {
+                    if (reader != null) {
+                        try {
+                            reader.close();
+                        } catch (IOException e) {
+                            if (log.isErrorEnabled()) {
+                                log.error(e);
+                            }
+                        }
                     }
                 }
             }
+        } else {
+            if (log.isErrorEnabled()) {
+                log.error("Mongo was miss configured, please congiure it in [" + Model.GIISOO_HOME + "/webgiisoo/giisoo.properties]");
+            }
+            return;
         }
     }
 
@@ -346,12 +527,16 @@ public class DefaultListener implements LifeListener {
                 FileUtil.R r = f1.compareTo(f2);
                 if (r == FileUtil.R.HIGH || r == FileUtil.R.SAME) {
                     // remove f2
-                    log.warn("delete duplicated jar file, but low version:" + f2.getFile().getAbsolutePath() + ", keep: " + f2.getFile().getAbsolutePath());
+                    if (log.isWarnEnabled()) {
+                        log.warn("delete duplicated jar file, but low version:" + f2.getFile().getAbsolutePath() + ", keep: " + f2.getFile().getAbsolutePath());
+                    }
                     f2.getFile().delete();
                     map.put(name, f1);
                 } else if (r == FileUtil.R.LOW) {
                     // remove f1;
-                    log.warn("delete duplicated jar file, but low version:" + f1.getFile().getAbsolutePath() + ", keep: " + f1.getFile().getAbsolutePath());
+                    if (log.isWarnEnabled()) {
+                        log.warn("delete duplicated jar file, but low version:" + f1.getFile().getAbsolutePath() + ", keep: " + f1.getFile().getAbsolutePath());
+                    }
                     f1.getFile().delete();
                 }
             }
@@ -374,7 +559,6 @@ public class DefaultListener implements LifeListener {
     }
 
     /**
-     * @deprecated
      * @author joe
      *
      */
@@ -397,13 +581,38 @@ public class DefaultListener implements LifeListener {
 
     }
 
+    private static class RestartTask extends WorkerTask {
+
+        @Override
+        public String getName() {
+            return "restart.task";
+        }
+
+        @Override
+        public void onExecute() {
+            if (System.currentTimeMillis() - Model.UPTIME > X.AHOUR) {
+                Calendar c = Calendar.getInstance();
+                c.setTimeInMillis(System.currentTimeMillis());
+                int h = c.get(Calendar.HOUR_OF_DAY);
+                int point = Bean.toInt(Module.home.get("restart.point"), 2);
+                if (h == point) {
+                    if (log.isWarnEnabled()) {
+                        log.warn("restarting by restart.task");
+                    }
+                    System.exit(0);
+                }
+            }
+        }
+
+    }
+
     /**
      * 自动升级类，根據節點配置，支持并行中的单一节点、多模块升级。
      * 
      * @author joe
      * 
      */
-    public static class UpgradeTask extends WorkerTask {
+    private static class UpgradeTask extends WorkerTask {
 
         private static UpgradeTask owner = new UpgradeTask();
         private static String USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.130 Safari/537.36";
@@ -559,7 +768,9 @@ public class DefaultListener implements LifeListener {
                 // OpLog.log("autoupgrade", "upgrade failed");
 
                 interval = X.AMINUTE;
-                log.error(e.getMessage(), e);
+                if (log.isErrorEnabled()) {
+                    log.error(e.getMessage(), e);
+                }
             }
         }
 
@@ -618,29 +829,75 @@ public class DefaultListener implements LifeListener {
         }
     }
 
+    private static class StatTask extends WorkerTask {
+
+        @Override
+        public String getName() {
+            return "stat.task";
+        }
+
+        @Override
+        public void onExecute() {
+
+            /**
+             * stat all user
+             */
+            Language lang = Language.getLanguage();
+
+            String date = lang.format(System.currentTimeMillis(), "yyyyMMdd");
+            float count = User.count(new BasicDBObject("deleted", new BasicDBObject("$ne", 1)).append(X._ID, new BasicDBObject("$gt", 0L)), User.class);
+            Stat.insertOrUpdate("user", date, 0L, count);
+
+            /**
+             * stat all mdc
+             */
+            date = lang.format(System.currentTimeMillis(), "yyyyMMddHHmm");
+            count = TConn.count(new BasicDBObject("uid", new BasicDBObject("$gt", 0)), TConn.class);
+            Stat.insertOrUpdate("mdc", date, 0L, count);
+        }
+
+        @Override
+        public void onFinish() {
+            this.schedule(X.AMINUTE);
+        }
+
+    }
+
     @SuppressWarnings("unused")
     private static class SitemapTask extends WorkerTask {
 
         @Override
         public void onExecute() {
-            String name = "sitemap.txt";
 
-            File f = Module.load("default").getFile(name);
-            if (f.exists()) {
-                f.delete();
-            }
+            // get all url
+            List<Object> list = AccessLog.distinct();
 
-            PrintStream out = null;
+            if (list != null && list.size() > 0) {
+                String name = "sitemap.txt";
 
-            try {
-                out = new PrintStream(new FileOutputStream(f));
-                out.println();
+                File f = Module.load("default").getFile(name);
+                if (f.exists()) {
+                    f.delete();
+                }
 
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-            } finally {
-                if (out != null) {
-                    out.close();
+                PrintStream out = null;
+
+                try {
+                    out = new PrintStream(new FileOutputStream(f));
+                    out.println("/");
+                    for (Object u : list) {
+                        out.println(u);
+                    }
+                    out.println();
+
+                } catch (Exception e) {
+                    if (log.isErrorEnabled()) {
+                        log.error(e.getMessage(), e);
+                    }
+                } finally {
+                    if (out != null) {
+                        out.close();
+                    }
                 }
             }
         }
@@ -711,11 +968,18 @@ public class DefaultListener implements LifeListener {
                     count += cleanup(Model.GIISOO_HOME + "/work", X.ADAY);
                     count += cleanup(Model.GIISOO_HOME + "/logs", X.ADAY * 3);
                 }
-                log.info("cleanup temp files: " + count);
+                if (log.isInfoEnabled()) {
+                    log.info("cleanup temp files: " + count);
+                }
 
                 OpLog.cleanup();
 
                 AccessLog.cleanup();
+
+                /**
+                 * cleanup repo
+                 */
+                Repo.cleanup();
 
             } catch (Exception e) {
                 // eat the exception
@@ -732,7 +996,9 @@ public class DefaultListener implements LifeListener {
                  */
                 if (f.isFile() && System.currentTimeMillis() - f.lastModified() > expired) {
                     f.delete();
-                    log.info("delete file: " + f.getCanonicalPath());
+                    if (log.isInfoEnabled()) {
+                        log.info("delete file: " + f.getCanonicalPath());
+                    }
                     count++;
                 } else if (f.isDirectory()) {
                     File[] list = f.listFiles();
@@ -746,7 +1012,9 @@ public class DefaultListener implements LifeListener {
                     }
                 }
             } catch (Exception e) {
-                log.error(e.getMessage(), e);
+                if (log.isErrorEnabled()) {
+                    log.error(e.getMessage(), e);
+                }
             }
 
             return count;

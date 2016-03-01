@@ -28,6 +28,10 @@ import com.giisoo.framework.mdc.command.Command;
 
 /**
  * 
+ * The {@code TConnCenter} Class used to caches all the connection from the MDC
+ * <p>
+ * it handle the message from the MQ, and dispatch the message to remote
+ * 
  * @author joe
  * 
  */
@@ -44,7 +48,7 @@ public class TConnCenter implements IStub {
     static private Receiver receiver;
 
     /**
-     * Inits the.
+     * initialize the the tconncenter
      * 
      * @param conf
      *            the conf
@@ -187,10 +191,10 @@ public class TConnCenter implements IStub {
     }
 
     /**
-     * Removes the.
+     * Removes the connection by the object id
      * 
      * @param o
-     *            the o
+     *            the object
      * @return the t conn
      */
     public static TConn remove(Object o) {
@@ -208,7 +212,7 @@ public class TConnCenter implements IStub {
     }
 
     /**
-     * Gets the.
+     * Gets the connection by the object id
      * 
      * @param id
      *            the id
@@ -219,7 +223,7 @@ public class TConnCenter implements IStub {
     }
 
     /**
-     * Adds the.
+     * Adds the connection to center
      * 
      * @param c
      *            the c
@@ -247,6 +251,12 @@ public class TConnCenter implements IStub {
         return name;
     }
 
+    /**
+     * send NOP to remote to keep the connection alive
+     * 
+     * @author joe
+     *
+     */
     private static class NOPTask extends WorkerTask {
 
         private final static int INTERVAL = 10 * 1000;

@@ -10,6 +10,8 @@ import org.apache.mina.core.session.*;
 import org.apache.mina.transport.socket.SocketSessionConfig;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 
+import com.giisoo.core.conf.SystemConfig;
+
 /**
  * TDC server
  * 
@@ -70,12 +72,16 @@ class TDCServer extends MDCServer {
                 log.info("stub server started");
 
                 isRunning = true;
+
+                SystemConfig.setConfig("mdc.error", null);
             } else {
                 log.error("bad pubkey and prikey, pubkey=" + TConn.pub_key + ", prikey=" + TConn.pri_key);
+                SystemConfig.setConfig("mdc.error", "bad pubkey and prikey");
             }
         } catch (Exception e) {
-            log.error("stub server quit. due to exception:", e);
+            log.error("stub server quit. due to exception:" + e.getMessage(), e);
             // System.exit(0);
+            SystemConfig.setConfig("mdc.error", "stuc server error: " + e.getMessage());
         }
 
         return this;

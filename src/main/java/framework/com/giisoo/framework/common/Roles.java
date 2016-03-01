@@ -17,78 +17,78 @@ import com.giisoo.core.bean.*;
  */
 public class Roles extends Bean {
 
-	/**
+    /**
    * 
    */
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private Set<String> access;
+    private Set<String> access;
 
-	List<Role> list;
+    List<Role> list;
 
-	public List<Role> getList() {
-		return list;
-	}
+    public List<Role> getList() {
+        return list;
+    }
 
-	public Set<String> getAccesses() {
-		return access;
-	}
+    public Set<String> getAccesses() {
+        return access;
+    }
 
-	/**
-	 * Instantiates a new roles.
-	 * 
-	 * @param roles
-	 *            the roles
-	 */
-	public Roles(List<Integer> roles) {
-		if (access == null) {
-			access = new HashSet<String>();
-			list = Role.loadAll(roles);
+    /**
+     * Instantiates a new roles.
+     * 
+     * @param roles
+     *            the roles
+     */
+    public Roles(List<Long> roles) {
+        if (access == null) {
+            access = new HashSet<String>();
+            list = Role.loadAll(roles);
 
-			for (Role r : list) {
-				List<String> names = r.getAccesses();
-				access.addAll(names);
-			}
-		}
-	}
+            for (Role r : list) {
+                List<String> names = r.getAccesses();
+                access.addAll(names);
+            }
+        }
+    }
 
-	/**
-	 * Checks for access.
-	 * 
-	 * @param name
-	 *            the name
-	 * @return true, if successful
-	 */
-	public boolean hasAccess(String... name) {
-		if (name == null) {
-			return true;
-		}
+    /**
+     * Checks for access.
+     * 
+     * @param name
+     *            the name
+     * @return true, if successful
+     */
+    public boolean hasAccess(String... name) {
+        if (name == null) {
+            return true;
+        }
 
-		for (String s : name) {
-			if (access.contains(s)) {
-				return true;
-			}
+        for (String s : name) {
+            if (access.contains(s)) {
+                return true;
+            }
 
-			/**
-			 * test the name exists in while access? if not then add it in DB
-			 */
-			if (!X.isEmpty(s)) {
-				Access.set(s);
-			}
+            /**
+             * test the name exists in while access? if not then add it in DB
+             */
+            if (!X.isEmpty(s)) {
+                Access.set(s);
+            }
 
-			/**
-			 * check if has admin ?
-			 */
-			int i = s.lastIndexOf(".");
-			if (i > 0) {
-				String s1 = s.substring(0, i) + ".admin";
-				if (access.contains(s1)) {
-					return true;
-				}
-			}
-		}
+            /**
+             * check if has admin ?
+             */
+            int i = s.lastIndexOf(".");
+            if (i > 0) {
+                String s1 = s.substring(0, i) + ".admin";
+                if (access.contains(s1)) {
+                    return true;
+                }
+            }
+        }
 
-		return access.contains("access.admin");
-	}
+        return access.contains("access.admin");
+    }
 
 }

@@ -25,6 +25,19 @@ import com.giisoo.framework.utils.Http.Response;
 import com.giisoo.utils.base.DES;
 import com.mongodb.BasicDBObject;
 
+/**
+ * the {@code SyncTask} Class lets sync the data from/to remote
+ * 
+ * the most important APIs:
+ * 
+ * <pre>
+ * register(String name, String order), register the sync data
+ * 
+ * </pre>
+ * 
+ * @author joe
+ *
+ */
 public class SyncTask extends WorkerTask {
 
     static Log log = LogFactory.getLog(SyncTask.class);
@@ -87,6 +100,8 @@ public class SyncTask extends WorkerTask {
     }
 
     /**
+     * register the collection that can be sync, with the order:
+     * "{update_time:1}"
      * 
      * @param collection
      * @param order
@@ -96,6 +111,7 @@ public class SyncTask extends WorkerTask {
     }
 
     /**
+     * register a collection under the "parent" setting, with the "order"
      * 
      * @param parent
      * @param collection

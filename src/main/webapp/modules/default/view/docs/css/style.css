@@ -1,7 +1,6 @@
 html, body {
 	width: 100%;
 	font: 16px 微软雅黑, 宋体, Arial, sans-serif;
-	background: url(/docs/images/bg.jpg);
 	text-align: center;
 	padding: 0;
 	margin: 0;
@@ -10,7 +9,7 @@ html, body {
 
 .center {
 	position: relative;
-	width: 90%;
+	width: 900px;
 	margin: auto;
 	padding: 0 10px 0 10px;
 	text-align: left;
@@ -20,6 +19,7 @@ h1 {
 	color: #3254a0;
 	font-size: 32px;
 	line-height: 40px;
+    margin-bottom: 20px;	
 }
 
 menu, ol, ul {
@@ -47,7 +47,7 @@ a:hover {
 #head .center {
 	height: 100%;
 	display: inline-block;
-	width: 90%;
+	width: 900px;
 }
 
 #head ul.navigation a {
@@ -76,7 +76,7 @@ a:hover {
 }
 
 #content .center {
-	width: 90%;
+	width: 900px;
 	line-height: 32px;
 }
 
@@ -102,29 +102,18 @@ ul.navigation a {
 }
 
 #foot {
-	width: 100%;
-	background: #e8e8e8;
-	height: 50px;
-	margin: 60px 0 0 0;
-	padding: 10px 0 0 0;
-	position: fixed;
-}
+    width: 100%;
+    background: RGBA(0,0,0,0.1);
+    height: 32px;
+    padding: 0;
+    position: fixed;
+    line-height: 32px;}
 
 #logo {
 	width: 239px;
 	height: 85px;
 	float: left;
 	margin: 10px 0 0 0;
-}
-
-.foot-shield {
-	background: url(/images/giisoo_g.png) no-repeat;
-	width: 206px;
-	height: 70px;
-	position: absolute;
-	right: 0;
-	top: -42px;
-	display: inline-block;
 }
 
 #logo img:hover {

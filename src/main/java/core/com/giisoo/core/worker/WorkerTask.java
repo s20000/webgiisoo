@@ -10,9 +10,25 @@ import org.apache.commons.logging.*;
 
 import com.giisoo.core.bean.*;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class WorkerTask.
+ * The {@code WorkerTask} Class use for create a runnable Task, and includes
+ * schedule method.
+ * <p>
+ * the sub task class can override getName, onExecute, onFinish;
+ * 
+ * <pre>
+ * getName: default increase number, only can be scheduled one time for same name, 
+ *              the later schedule will cancel the previous schedule if not running
+ * onExecute: the main entry of the task
+ * onFinish: will be invoked when finished the task
+ * </pre>
+ * <p>
+ * all the task that scheduled by workertask, will be queued and executed by a
+ * thread pool, the thread number was configured in giisoo.properties
+ * "thread.number";
+ * 
+ * @author joe
+ *
  */
 public abstract class WorkerTask implements Runnable {
 
@@ -88,6 +104,12 @@ public abstract class WorkerTask implements Runnable {
      */
     private transient String _name;
 
+    /**
+     * the name of the task, default is "worker." + seq, only can be scheduled
+     * one time for same name
+     * 
+     * @return String of the name
+     */
     public String getName() {
         if (_name == null) {
             _name = "worker." + seq.incrementAndGet();
@@ -105,7 +127,7 @@ public abstract class WorkerTask implements Runnable {
     }
 
     /**
-     * On execute.
+     * the main entry of the task
      */
     public abstract void onExecute();
 
@@ -115,10 +137,6 @@ public abstract class WorkerTask implements Runnable {
     public void onFinish() {
         // do nothing, it will be die
     }
-
-    // protected void onExcuteFinished(TimeStat timeStat) {
-    // // timeStat.print();
-    // }
 
     /**
      * On stop.
@@ -137,7 +155,7 @@ public abstract class WorkerTask implements Runnable {
     };
 
     /**
-     * Priority.
+     * Priority of the task, default is normal
      * 
      * @return the int
      */
@@ -166,7 +184,7 @@ public abstract class WorkerTask implements Runnable {
      * 
      * @see java.lang.Runnable#run()
      */
-    public void run() {
+    final public void run() {
         int old = Thread.NORM_PRIORITY;
 
         synchronized (lock) {
@@ -244,7 +262,7 @@ public abstract class WorkerTask implements Runnable {
     }
 
     /**
-     * Inits the.
+     * initialize the workertask
      * 
      * @param threadNum
      *            the thread num
@@ -269,12 +287,12 @@ public abstract class WorkerTask implements Runnable {
     }
 
     /**
-     * Stop.
+     * Stop all tasks
      * 
      * @param fast
      *            the fast
      */
-    public void stop(boolean fast) {
+    final public void stop(boolean fast) {
         stop = true;
         this.fast = fast;
         synchronized (t) {
@@ -298,21 +316,25 @@ public abstract class WorkerTask implements Runnable {
      * @param msec
      * @return WrokerTask
      */
-    public WorkerTask reschedule(long msec) {
+    final public WorkerTask reschedule(long msec) {
         return schedule(msec);
     }
 
     /**
-     * schedule the task by absolute time <br>
-     * the time can be: <br>
-     * 1, hh:mm<br>
-     * 2, *:00 each hour <br>
+     * schedule the task by absolute time
+     * <p>
+     * the time can be:
+     * 
+     * <pre>
+     * 1, hh:mm
+     * 2, *:00 each hour
+     * </pre>
      * 
      * @param time
      *            , hh:mm
      * @return WorkerTask
      */
-    public WorkerTask schedule(String time) {
+    final public WorkerTask schedule(String time) {
         if (time.startsWith("*")) {
             String[] ss = time.split(":");
             Calendar c = Calendar.getInstance();
@@ -345,10 +367,10 @@ public abstract class WorkerTask implements Runnable {
      * Schedule the worker task
      * 
      * @param msec
-     *            the msec
+     *            the milliseconds
      * @return the worker task
      */
-    public WorkerTask schedule(long msec) {
+    final public WorkerTask schedule(long msec) {
         if (stop) {
             onStop(fast);
         } else {

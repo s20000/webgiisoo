@@ -11,32 +11,34 @@ import com.giisoo.core.conf.Config;
 import com.giisoo.framework.web.*;
 
 /**
- * setting menu
+ * web api: /admin/dashboard
+ * <p>
+ * used to show dashboard
  * 
  * @author yjiang
  * 
  */
 public class dashboard extends Model {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.giisoo.framework.web.Model#onGet()
-	 */
-	@Override
-	@Path(login = true, access = "access.config.admin")
-	public void onGet() {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.giisoo.framework.web.Model#onGet()
+     */
+    @Override
+    @Path(login = true, access = "access.config.admin")
+    public void onGet() {
 
-		Configuration conf = Config.getConfig();
+        Configuration conf = Config.getConfig();
 
-		this.set("me", this.getUser());
-		this.set("uptime", lang.format(Model.UPTIME, "yy-MM-dd"));
-		this.set("past", lang.past(Model.UPTIME));
-		this.set("node", conf.getString("node", ""));
-		this.set("release", Module.load("default").getVersion());
-		this.set("build", Module.load("default").getBuild());
+        this.set("me", this.getUser());
+        this.set("uptime", lang.format(Model.UPTIME, "yy-MM-dd"));
+        this.set("past", lang.past(Model.UPTIME));
+        this.set("node", conf.getString("node", ""));
+        this.set("release", Module.load("default").getVersion());
+        this.set("build", Module.load("default").getBuild());
 
-		show("admin/dashboard.html");
-	}
+        show("admin/dashboard.html");
+    }
 
 }

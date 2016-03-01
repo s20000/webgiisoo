@@ -1,3 +1,5 @@
 <div class='tabs'>
-	<a href='/admin/mdc' class='selected'>$lang.get('a.mdc')</a>
+	<a href='/admin/mdc' #if(!$path) class='selected' #end>$lang.get('a.mdc')</a>
+	<a href='/admin/mdc/all' #if($path=='all') class='selected' #end >$lang.get('a.mdc.all')</a>
+	<!-- a href='/admin/mdc/stat' #if($path=='stat') class='selected' #end>$lang.get('a.mdc.stat')</a-->
 </div>

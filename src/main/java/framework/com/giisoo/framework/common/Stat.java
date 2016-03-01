@@ -5,19 +5,19 @@
  */
 package com.giisoo.framework.common;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
-import net.sf.json.JSONObject;
-
 import com.giisoo.core.bean.Bean;
+import com.giisoo.core.bean.Beans;
 import com.giisoo.core.bean.DBMapping;
 import com.giisoo.core.bean.UID;
 import com.giisoo.core.bean.X;
+import com.mongodb.BasicDBObject;
 
-@DBMapping(table = "tblstat")
+@DBMapping(collection = "gi_stat")
 public class Stat extends Bean implements Comparable<Stat> {
 
     /**
@@ -25,22 +25,23 @@ public class Stat extends Bean implements Comparable<Stat> {
 	 */
     private static final long serialVersionUID = 1L;
 
-    protected String id;
+    // protected String id;
+    //
+    // protected String date; // 日期
+    // protected String module; // 统计模块
+    //
+    // protected String[] f;
+    //
+    // protected long uid; // 访问权限或用户名
+    // protected float count; // 统计值， 总数或完成时间
 
-    protected String date; // 日期
-    protected String module; // 统计模块
-
-    protected String[] f;
-
-    protected long uid; // 访问权限或用户名
-    protected float count; // 统计值， 总数或完成时间
-    protected long updated; // 统计时间
-
-    transient String fullname;
-    transient String name;
+    // protected long updated; // 统计时间
+    //
+    // transient String fullname;
+    // transient String name;
 
     public long getUid() {
-        return uid;
+        return this.getLong("uid");
     }
 
     /**
@@ -50,11 +51,11 @@ public class Stat extends Bean implements Comparable<Stat> {
      *            the count
      */
     public void add(float count) {
-        this.count += count;
+        this.set("count", count + this.getInt("count"));
     }
 
     public void setDate(String date) {
-        this.date = date;
+        this.set("date", date);
     }
 
     /**
@@ -66,12 +67,16 @@ public class Stat extends Bean implements Comparable<Stat> {
      *            the count
      */
     public void set(String name, float count) {
-        this.name = name;
-        this.count = count;
+        this.set("name", name);
+        this.set("count", count);
     }
 
     public String getName() {
-        return name;
+        return this.getString("name");
+    }
+
+    public List<String> getF() {
+        return (List<String>) this.get("f");
     }
 
     /**
@@ -82,8 +87,9 @@ public class Stat extends Bean implements Comparable<Stat> {
      * @return the f
      */
     public String getF(int i) {
-        if (f != null && i < f.length) {
-            return f[i];
+        List<String> f = (List<String>) this.get("f");
+        if (f != null && i < f.size()) {
+            return f.get(i);
         }
         return X.EMPTY;
     }
@@ -96,14 +102,16 @@ public class Stat extends Bean implements Comparable<Stat> {
      * @return the fullname
      */
     public String getFullname(List<Integer> fs) {
+        String fullname = this.getString("fullname");
         if (fullname == null) {
             StringBuilder sb = new StringBuilder();
             for (int i : fs) {
                 if (sb.length() > 0)
                     sb.append("_");
-                sb.append(f[i]);
+                sb.append(getF(i));
             }
             fullname = sb.toString();
+            this.set("fullname", fullname);
         }
         return fullname;
     }
@@ -116,19 +124,20 @@ public class Stat extends Bean implements Comparable<Stat> {
      * @return the name
      */
     public String getName(List<Integer> fs) {
+        String name = this.getString("name");
         if (name == null) {
             StringBuilder sb = new StringBuilder();
             for (int i : fs) {
                 if (sb.length() > 0)
                     sb.append("_");
-                sb.append(f[i]);
+                sb.append(getF(i));
             }
             name = sb.toString();
         }
 
         if (name == null) {
             if (fs.size() > 0) {
-                name = f[fs.get(fs.size() - 1)];
+                name = getF(fs.get(fs.size() - 1));
                 // if (fs.size() > 1) {
                 // String parent = f[fs.get(fs.size() - 2)];
                 // String n = Stats.get(module, parent);
@@ -137,7 +146,7 @@ public class Stat extends Bean implements Comparable<Stat> {
                 // }
                 // }
             } else {
-                name = f[0];
+                name = getF(0);
             }
 
         }
@@ -145,60 +154,16 @@ public class Stat extends Bean implements Comparable<Stat> {
         return this.getDisplayname();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#toString()
-     */
-    @Override
-    public String toString() {
-        return new StringBuilder("Stat(").append(date).append(",").append(Bean.toString(f)).append(",").append(count).append(")").toString();
-    }
-
     public String getDate() {
-        return date;
+        return this.getString("date");
     }
 
     public float getCount() {
-        return count;
+        return this.getFloat("count");
     }
 
     public long getUpdated() {
-        return updated;
-    }
-
-    /**
-     * Load.
-     * 
-     * @param w
-     *            the w
-     * @return the list
-     */
-    public final static List<Stat> load(W w) {
-        // log.debug(w.where() + ", " + Bean.toString(w.args()));
-
-        return Bean.load((String[]) null, w.where(), w.args(), w.orderby() == null ? "order by count desc" : w.orderby(), 0, -1, Stat.class);
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.giisoo.bean.Bean#load(java.sql.ResultSet)
-     */
-    @Override
-    protected void load(ResultSet r) throws SQLException {
-        id = r.getString("id");
-        date = Long.toString(r.getLong("date"));
-        module = r.getString("module");
-        f = new String[5];
-        for (int i = 0; i < f.length; i++) {
-            f[i] = r.getString("f" + i);
-        }
-
-        uid = r.getLong("uid");
-        count = r.getFloat("count");
-        updated = r.getLong("updated");
-
+        return this.getLong("updated");
     }
 
     /**
@@ -213,11 +178,15 @@ public class Stat extends Bean implements Comparable<Stat> {
      */
     public static Stat create(String module, String date, long uid, float count, String... f) {
         Stat s = new Stat();
-        s.module = module;
-        s.date = date;
-        s.uid = uid;
-        s.count = count;
-        s.f = f;
+        s.set("module", module);
+        s.set("date", date);
+        s.set("uid", uid);
+        s.set("count", count);
+
+        List<String> list = new ArrayList<String>();
+        Collections.addAll(list, f);
+        s.set("f", list);
+
         return s;
     }
 
@@ -236,23 +205,23 @@ public class Stat extends Bean implements Comparable<Stat> {
      *            the f
      * @return the int
      */
-    public static int insertOrUpdate(String module, long date, long uid, float count, String... f) {
+    public static int insertOrUpdate(String module, String date, long uid, float count, String... f) {
         String id = UID.id(date, module, uid, Bean.toString(f));
 
-        if (!Bean.exists("date=? and id=?", new Object[] { date, id }, Stat.class)) {
-            V v = V.create("date", date).set("id", id).set("module", module).set("uid", uid).set("count", count).set("updated", System.currentTimeMillis());
+        if (!Bean.exists(new BasicDBObject("date", date).append("id", id), Stat.class)) {
+            V v = V.create("date", date).set(X._ID, id).set("id", id).set("module", module).set("uid", uid).set("count", count).set("updated", System.currentTimeMillis());
 
-            for (int i = 0; i < 5 && i < f.length; i++) {
-                v.set("f" + i, f[i]);
-            }
-
-            return Bean.insert(v, Stat.class);
+            List<String> list = new ArrayList<String>();
+            Collections.addAll(list, f);
+            v.set("f", list);
+            return Bean.insertCollection(v, Stat.class);
 
         } else {
             /**
              * only update if count > original
              */
-            return Bean.update("date=? and id=? and count<?", new Object[] { date, id, count }, V.create("count", count).set("updated", System.currentTimeMillis()), Stat.class);
+            return Bean.updateCollection(new BasicDBObject("date", date).append("id", id).append("count", new BasicDBObject("$lt", count)), V.create("count", count).set("updated",
+                    System.currentTimeMillis()), Stat.class);
         }
     }
 
@@ -265,35 +234,16 @@ public class Stat extends Bean implements Comparable<Stat> {
         if (this == o)
             return 0;
 
-        int c = date.compareTo(o.date);
+        int c = getDate().compareTo(o.getDate());
         if (c == 0) {
-            if (count > o.count) {
+            if (getCount() > o.getCount()) {
                 return 1;
-            } else if (count < o.count) {
+            } else if (getCount() < o.getCount()) {
                 return -1;
             }
             return 0;
         }
-
         return c;
-
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#hashCode()
-     */
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + date.hashCode();
-        result = prime * result + Arrays.hashCode(f);
-        result = prime * result + ((id == null) ? 0 : id.hashCode());
-        result = prime * result + ((module == null) ? 0 : module.hashCode());
-        result = (int) (prime * result + uid);
-        return result;
     }
 
     /*
@@ -310,58 +260,38 @@ public class Stat extends Bean implements Comparable<Stat> {
         if (getClass() != obj.getClass())
             return false;
         Stat other = (Stat) obj;
-        if (date != other.date)
+        if (getDate() != other.getDate())
             return false;
-        if (!Arrays.equals(f, other.f))
+        if (!Arrays.equals(getF().toArray(), other.getF().toArray()))
             return false;
-        if (id == null) {
-            if (other.id != null)
+        if (getId() == null) {
+            if (other.getId() != null)
                 return false;
-        } else if (!id.equals(other.id))
+        } else if (!getId().equals(other.getId()))
             return false;
-        if (module == null) {
-            if (other.module != null)
+        if (getModule() == null) {
+            if (other.getModule() != null)
                 return false;
-        } else if (!module.equals(other.module))
+        } else if (!getModule().equals(other.getModule()))
             return false;
-        if (uid != other.uid)
+        if (this.getUid() != other.getUid())
             return false;
         return true;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.giisoo.bean.Bean#toJSON(net.sf.json.JSONObject)
-     */
-    @Override
-    public boolean toJSON(JSONObject jo) {
-        jo.put("id", id);
-        jo.put("date", date);
-        jo.put("module", module);
+    public String getId() {
+        return this.getString("id");
+    }
 
-        jo.put("f.length", f == null ? 0 : f.length);
-        if (f != null && f.length > 0) {
-            for (int i = 0; i < f.length; i++) {
-                jo.put("f" + i, f[i]);
-            }
-        }
-
-        jo.put("uid", uid);
-        jo.put("count", count);
-        jo.put("updated", updated);
-
-        jo.put("fullname", fullname);
-        jo.put("name", name);
-
-        return true;
+    private Object getModule() {
+        return this.getString("module");
     }
 
     public String getDisplayname() {
         if (convertor == null) {
-            return fullname;
+            return this.getString("fullname");
         } else {
-            return convertor.displayName(f, fullname);
+            return convertor.displayName(this.getF().toArray(new String[this.getF().size()]), this.getString("fullname"));
         }
     }
 
@@ -374,4 +304,25 @@ public class Stat extends Bean implements Comparable<Stat> {
     public static interface IConvertor {
         public String displayName(String[] f, String name);
     }
+
+    /**
+     * 
+     * @param count
+     */
+    public void setCount(float count) {
+        this.set("count", count);
+    }
+
+    /**
+     * 
+     * @param q
+     * @param order
+     * @param s
+     * @param n
+     * @return Beans<Stat>
+     */
+    public static Beans<Stat> load(BasicDBObject q, BasicDBObject order, int s, int n) {
+        return Bean.load(q, order, s, n, Stat.class);
+    }
+
 }

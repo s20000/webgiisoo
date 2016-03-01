@@ -7,4 +7,4 @@ then
 #	/opt/mongo/bin/mongod --dbpath /opt/data/db --repair --replSet doogoo --oplogSize=4000
 fi
 
-/opt/mongo/bin/mongod --dbpath /opt/data/db --port 27018 --bind_ip 0.0.0.0 &
+/opt/mongodb/bin/mongod --dbpath /opt/data/db --port 27018 --bind_ip 0.0.0.0 &

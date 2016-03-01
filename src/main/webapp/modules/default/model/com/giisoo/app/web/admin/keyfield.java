@@ -7,13 +7,22 @@ import com.giisoo.framework.web.Model;
 import com.giisoo.framework.web.Path;
 import com.mongodb.BasicDBObject;
 
+/**
+ * web api: /admin/keyfield
+ * <p>
+ * used to manage the key field of each collection, that may need to create
+ * index for them
+ * 
+ * @author joe
+ *
+ */
 public class keyfield extends Model {
 
     @Path(login = true, access = "access.config.admin")
     public void onGet() {
 
         int s = this.getInt("s");
-        int n = this.getInt("n", 20);
+        int n = this.getInt("n", 10, "number.per.page");
         BasicDBObject q = new BasicDBObject();
 
         if (X.isEmpty(this.path)) {

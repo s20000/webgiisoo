@@ -7,7 +7,8 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 
 /**
- * The Class SystemConfig.
+ * The Class SystemConfig is extended of Config, it can be "overrided" by module
+ * or configured, it stored in database
  * 
  * @author yjiang
  */
@@ -26,7 +27,7 @@ public class SystemConfig extends Bean {
     }
 
     /**
-     * I.
+     * get the int value
      * 
      * @param name
      *            the name
@@ -53,7 +54,7 @@ public class SystemConfig extends Bean {
     }
 
     /**
-     * D.
+     * get the double value
      * 
      * @param name
      *            the name
@@ -80,7 +81,7 @@ public class SystemConfig extends Bean {
     }
 
     /**
-     * S.
+     * get the string value
      * 
      * @param name
      *            the name
@@ -107,7 +108,7 @@ public class SystemConfig extends Bean {
     }
 
     /**
-     * L.
+     * get the long value
      * 
      * @param name
      *            the name
@@ -133,17 +134,24 @@ public class SystemConfig extends Bean {
         }
     }
 
+    /**
+     * get the current time
+     * 
+     * @deprecated
+     * @return long of current time
+     */
     public static long now() {
         return System.currentTimeMillis();
     }
 
     /**
-     * Sets the.
+     * Sets the value of the name in database, it will remove the configuration
+     * value if value is null
      * 
      * @param name
      *            the name
      * @param o
-     *            the o
+     *            the value
      */
     public synchronized static void setConfig(String name, Object o) {
         if (X.isEmpty(name)) {

@@ -14,7 +14,8 @@ import org.apache.commons.configuration.*;
 import org.apache.log4j.PropertyConfigurator;
 
 /**
- * The Class Config.
+ * The Class Config is whole configuration of system, usually is a copy of
+ * "giisoo.properties"
  */
 public class Config {
 
@@ -122,6 +123,33 @@ public class Config {
          */
         if (!conf.containsKey("site.name")) {
             conf.setProperty("site.name", "default");
+        }
+
+        if (conf != null) {
+            Iterator it = conf.getKeys();
+            while (it.hasNext()) {
+                Object name = it.next();
+                Object v = conf.getProperty(name.toString());
+                if (v != null && v instanceof String) {
+                    String s = (String) v;
+
+                    int i = s.indexOf("${");
+                    while (i > -1) {
+                        int j = s.indexOf("}", i + 2);
+                        String n = s.substring(i + 2, j);
+                        String s1 = System.getProperty(n);
+
+                        if (s1 == null) {
+                            System.out.println("did not set -D" + n + ", but required in " + home + ".properites");
+                            break;
+                        } else {
+                            s = s.substring(0, i) + s1 + s.substring(j + 1);
+                            i = s.indexOf("${");
+                        }
+                    }
+                    conf.setProperty(name.toString(), s);
+                }
+            }
         }
 
     }
