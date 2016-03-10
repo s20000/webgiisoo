@@ -160,15 +160,6 @@ public class setting extends Model {
             SystemConfig.setConfig("mdc.allow.uid", this.getString("mdc_allow_uid"));
             SystemConfig.setConfig("mdc.allow.user", this.getString("mdc_allow_user"));
 
-            log.debug("request=" + this.getJSON() + ", mpart=" + this.isMultipart());
-
-            // if (!X.isEmpty(this.getString("prikey"))) {
-            // SystemConfig.setConfig("pri_key", this.getString("prikey")
-            // .trim());
-            // }
-            // SystemConfig.setConfig("pub_key",
-            // this.getString("pubkey").trim());
-
             this.set(X.MESSAGE, lang.get("save.success") + ", " + lang.get("restart.required"));
 
             SystemConfig.setConfig("ntp.server", this.getString("ntp"));
@@ -216,4 +207,33 @@ public class setting extends Model {
 
     }
 
+    public static class mail extends setting {
+
+        @Override
+        public void set() {
+            SystemConfig.setConfig("mail.protocol", this.getString("protocol"));
+            SystemConfig.setConfig("mail.host", this.getString("host"));
+            SystemConfig.setConfig("mail.email", this.getString("email"));
+            SystemConfig.setConfig("mail.title", this.getString("title"));
+            SystemConfig.setConfig("mail.user", this.getString("user"));
+            SystemConfig.setConfig("mail.passwd", this.getString("passwd"));
+
+            this.set(X.MESSAGE, lang.get("save.success") + ", " + lang.get("restart.required"));
+
+            get();
+        }
+
+        @Override
+        public void get() {
+            this.set("protocol", SystemConfig.s("mail.protocol", "smtp"));
+            this.set("host", SystemConfig.s("mail.host", X.EMPTY));
+            this.set("email", SystemConfig.s("mail.email", X.EMPTY));
+            this.set("title", SystemConfig.s("mail.title", X.EMPTY));
+            this.set("user", SystemConfig.s("mail.user", X.EMPTY));
+            this.set("passwd", SystemConfig.s("mail.passwd", X.EMPTY));
+
+            this.set("page", "/admin/setting.mail.html");
+        }
+
+    }
 }

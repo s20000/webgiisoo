@@ -6,6 +6,7 @@
 package com.giisoo.framework.common;
 
 import com.giisoo.core.bean.Bean;
+import com.giisoo.core.bean.Beans;
 import com.giisoo.core.bean.DBMapping;
 import com.giisoo.core.bean.UID;
 import com.giisoo.core.bean.X;
@@ -87,6 +88,18 @@ public class Load extends Bean {
      */
     public static Load top(String name) {
         return Bean.load(new BasicDBObject("name", name).append("updated", new BasicDBObject("$gt", System.currentTimeMillis() - 2 * X.AMINUTE)), new BasicDBObject("count", -1), Load.class);
+    }
+
+    /**
+     * load all nodes "load"
+     * 
+     * @param name
+     * @param s
+     * @param n
+     * @return Beans<Load>
+     */
+    public static Beans<Load> load(String name, int s, int n) {
+        return Bean.load(new BasicDBObject("name", name).append("updated", new BasicDBObject("$gt", System.currentTimeMillis() - 2 * X.AMINUTE)), new BasicDBObject("count", -1), s, n, Load.class);
     }
 
 }

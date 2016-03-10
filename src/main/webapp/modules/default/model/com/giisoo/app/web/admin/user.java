@@ -52,7 +52,7 @@ public class user extends Model {
                     this.set(X.ERROR, lang.get("user.name.exists"));
                 } else {
 
-                    V v = V.create().copy(jo, "name", "password", "title", "nickname", "phone").set("locked", 0);
+                    V v = V.create().copy(jo, "name", "password", "title", "nickname", "email", "phone").set("locked", 0);
 
                     long id = User.create(v);
 
@@ -152,7 +152,7 @@ public class user extends Model {
         if (method.isPost()) {
 
             JSONObject j = this.getJSON();
-            V v = V.create().copy(j, "nickname", "password", "title", "phone").copyInt(j, "failtimes");
+            V v = V.create().copy(j, "nickname", "password", "title", "email", "phone").copyInt(j, "failtimes");
             if (!"on".equals(this.getString("locked"))) {
                 /**
                  * clean all the locked info

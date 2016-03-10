@@ -511,7 +511,17 @@ public class Language {
         }
 
         t /= 24;
-        return t + get("past.d");
+        if (t < 30) {
+            return t + get("past.d");
+        }
+
+        int t1 = t / 30;
+        if (t < 365) {
+            return t1 + get("past.M");
+        }
+
+        t1 = t / 365;
+        return t1 + get("past.y");
     }
 
     /**

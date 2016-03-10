@@ -2320,6 +2320,11 @@ td.more {
 	padding-left: 10px;
 }
 
+#menu .item .title.selected {
+	background: #868;
+	color: #fff !important;
+}
+
 #menu .item .title.hover {
 	background: #868;
 	color: #fff !important;

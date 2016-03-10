@@ -625,7 +625,11 @@ public class Model {
         String request = this.getHeader("X-Requested-With");
         if ("XMLHttpRequest".equals(request)) {
             JSONObject jo = new JSONObject();
-            jo.put(X.STATE, 202);
+
+            jo.put(X.STATE, 401);
+            this.setHeader("status", "401");
+            jo.put(X.STATE, 401);
+            
             jo.put(X.MESSAGE, "请重现登录！");
             jo.put(X.ERROR, "没有登录信息！");
             // this.redirect("/user/login/popup");
@@ -2025,8 +2029,9 @@ public class Model {
             }
         }
         if (log.isWarnEnabled())
-            log.warn("nosupport the POST " + this.path);
-        show("/nosupport.html");
+            log.warn("notfound the POST " + this.path);
+
+        notfound();
     }
 
     /**
@@ -2277,12 +2282,12 @@ public class Model {
             byte[] bb = new byte[1024 * 4];
             int total = 0;
             in.skip(start);
-            int ii = Math.min((int) (end - start), bb.length);
+            int ii = (int) Math.min((end - start), bb.length);
             int len = in.read(bb, 0, ii);
             while (len > 0) {
                 out.write(bb, 0, len);
                 total += len;
-                ii = Math.min((int) (end - start - total), bb.length);
+                ii = (int) Math.min((end - start - total), bb.length);
                 len = in.read(bb, 0, ii);
                 out.flush();
             }

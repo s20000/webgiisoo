@@ -17,7 +17,6 @@ import net.sf.json.JSONObject;
 import com.giisoo.core.bean.Bean;
 import com.giisoo.core.bean.Beans;
 import com.giisoo.core.bean.Bean.V;
-import com.giisoo.core.bean.Bean.W;
 import com.giisoo.core.bean.X;
 import com.giisoo.core.conf.SystemConfig;
 import com.giisoo.framework.common.App;
@@ -27,7 +26,6 @@ import com.giisoo.framework.common.Session;
 import com.giisoo.framework.common.User;
 import com.giisoo.framework.mdc.TConn;
 import com.giisoo.framework.web.Model;
-import com.giisoo.framework.web.Module;
 import com.giisoo.framework.web.Path;
 import com.giisoo.utils.base.Base64;
 import com.giisoo.utils.base.DES;
@@ -47,7 +45,7 @@ public class user extends Model {
      * Index.
      */
     @Path()
-    public void index() {
+    public void onGet() {
         if (login == null) {
             this.redirect("/user/login");
         } else if (login.hasAccess("access.admin")) {
@@ -808,7 +806,7 @@ public class user extends Model {
             JSONObject j = this.getJSON();
             User u = User.loadById(id);
             if (u != null) {
-                u.update(V.create().copy(j, "nickname", "password", "title"));
+                u.update(V.create().copy(j, "nickname", "password", "title", "email", "phone"));
 
                 this.set("message", lang.get("message.edit.success"));
                 this.set(X.MESSAGE, lang.get("save.success"));

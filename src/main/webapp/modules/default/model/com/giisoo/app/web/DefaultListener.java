@@ -37,6 +37,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import com.giisoo.app.web.admin.setting;
 import com.giisoo.app.web.admin.sync;
 import com.giisoo.core.bean.Bean;
+import com.giisoo.core.bean.Beans;
 import com.giisoo.core.bean.Bean.V;
 import com.giisoo.core.bean.X;
 import com.giisoo.core.conf.Config;
@@ -46,6 +47,7 @@ import com.giisoo.core.worker.WorkerTask;
 import com.giisoo.framework.common.AccessLog;
 import com.giisoo.framework.common.Cluster;
 import com.giisoo.framework.common.Host;
+import com.giisoo.framework.common.Load;
 import com.giisoo.framework.common.Menu;
 import com.giisoo.framework.common.OpLog;
 import com.giisoo.framework.common.Repo;
@@ -56,6 +58,8 @@ import com.giisoo.framework.mdc.MDCServer;
 import com.giisoo.framework.mdc.TConn;
 import com.giisoo.framework.mdc.utils.IP;
 import com.giisoo.framework.utils.FileUtil;
+import com.giisoo.framework.utils.Http;
+import com.giisoo.framework.utils.Http.Response;
 import com.giisoo.framework.utils.Shell;
 import com.giisoo.framework.web.Language;
 import com.giisoo.framework.web.LifeListener;
@@ -221,6 +225,7 @@ public class DefaultListener implements LifeListener {
 
         setting.register("system", setting.system.class);
         setting.register("sync", sync.class);
+        setting.register("smtp", setting.mail.class);
 
         V v = V.create().set("status", "running").set("updated", System.currentTimeMillis()).set("ip", IP.myip().toString()).set("started", System.currentTimeMillis()).set("master",
                 conf.containsKey("master") && "yes".equals(conf.getString("master")) ? 1 : 0);
@@ -233,6 +238,7 @@ public class DefaultListener implements LifeListener {
         new StatTask().schedule(X.AMINUTE);
         new SitemapTask().schedule(X.AMINUTE);
         new RestartTask().schedule(X.AMINUTE);
+        new VersionCheckTask().schedule(X.AMINUTE);
 
         /**
          * initialize the MDCServer
@@ -581,6 +587,36 @@ public class DefaultListener implements LifeListener {
 
     }
 
+    /**
+     * check the new version
+     * 
+     * @author joe
+     *
+     */
+    private static class VersionCheckTask extends WorkerTask {
+
+        @Override
+        public String getName() {
+            return "versioncheck.task";
+        }
+
+        @Override
+        public void onExecute() {
+            Response res = Http.post("http://www.giisoo.com/version", new String[][] { { "version", Module.load("default").getVersion() }, { "build", Module.load("default").getBuild() } });
+            if (res.status == 200 && !X.isEmpty(res.body)) {
+                JSONObject jo = JSONObject.fromObject(res.body);
+                String ver = jo.getString("version");
+                String build = jo.getString("build");
+                if (!X.isSame(ver, Module.load("default").getVersion()) || !X.isSame(build, Module.load("default").getBuild())) {
+                    SystemConfig.setConfig("notification.enabled", 1);
+                    SystemConfig.setConfig("notification.message", Language.getLanguage().get("notification.newbuild") + ": <a href='http://www.giisoo.com' target='_blank'>" + ver + "." + build
+                            + "</a>");
+                }
+            }
+        }
+
+    }
+
     private static class RestartTask extends WorkerTask {
 
         @Override
@@ -851,9 +887,22 @@ public class DefaultListener implements LifeListener {
             /**
              * stat all mdc
              */
-            date = lang.format(System.currentTimeMillis(), "yyyyMMddHHmm");
-            count = TConn.count(new BasicDBObject("uid", new BasicDBObject("$gt", 0)), TConn.class);
-            Stat.insertOrUpdate("mdc", date, 0L, count);
+            date = lang.format(System.currentTimeMillis(), "yyyyMMddHH");
+            count = TConn.count(new BasicDBObject("uid", new BasicDBObject("$gt", 0)).append("updated", new BasicDBObject("$gt", System.currentTimeMillis() - X.AMINUTE * 5)), TConn.class);
+            Stat s = Stat.load("mdc", date, 0L);
+            if (s == null || s.getCount() < count) {
+                Stat.insertOrUpdate("mdc", date, 0L, count);
+            }
+
+            /**
+             * record "load"
+             */
+            count = Load.count(new BasicDBObject("name", "mdc"), Load.class);
+            s = Stat.load("load", date, 0L);
+            if (s == null || s.getCount() < count) {
+                Stat.insertOrUpdate("load", date, 0L, count);
+            }
+
         }
 
         @Override

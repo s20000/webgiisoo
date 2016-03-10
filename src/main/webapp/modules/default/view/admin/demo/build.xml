@@ -36,6 +36,12 @@
 			<fileset file="target/${name}_${version}_${BUILDNO}.zip" />
 		</copy>
 				
+		<zip destfile="target/${name}_${version}_src.zip" encoding="UTF-8">
+			<fileset dir=".">
+				<exclude name="build/**" />
+				<exclude name="target/**" />
+			</fileset>
+		</zip>
 	</target>
 
 	<target name="compile" description="compile Java source">

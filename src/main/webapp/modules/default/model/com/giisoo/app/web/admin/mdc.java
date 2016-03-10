@@ -7,6 +7,7 @@ package com.giisoo.app.web.admin;
 
 import com.giisoo.core.bean.Beans;
 import com.giisoo.core.bean.X;
+import com.giisoo.framework.common.Load;
 import com.giisoo.framework.mdc.TConn;
 import com.giisoo.framework.mdc.TConnCenter;
 import com.giisoo.framework.web.Model;
@@ -50,6 +51,17 @@ public class mdc extends Model {
         this.set(bs, s, n);
 
         this.show("/admin/mdc.all.html");
+
+    }
+
+    @Path(path = "load", login = true, access = "access.config.admin")
+    public void load() {
+        int s = this.getInt("s");
+        int n = this.getInt("n", 10, "number.per.page");
+        Beans<Load> bs = Load.load("mdc", s, n);
+        this.set(bs, s, n);
+
+        this.show("/admin/mdc.load.html");
 
     }
 

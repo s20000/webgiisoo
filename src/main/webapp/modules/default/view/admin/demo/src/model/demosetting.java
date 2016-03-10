@@ -4,8 +4,17 @@ import com.giisoo.app.web.admin.setting;
 import com.giisoo.core.bean.X;
 import com.giisoo.core.conf.SystemConfig;
 
+/**
+ * some setting of the module
+ * 
+ * @author joe
+ *
+ */
 public class demosetting extends setting {
 
+    /**
+     * setting
+     */
     @Override
     public void set() {
         SystemConfig.setConfig("somesetting", this.getString("somesetting"));
@@ -15,11 +24,17 @@ public class demosetting extends setting {
         get();
     }
 
+    /**
+     * view the setting
+     */
     @Override
     public void get() {
         this.set("somesetting", SystemConfig.s("somesetting", null));
 
-        this.set("page", "/admin/demo.htm");
+        /**
+         * show the widget
+         */
+        this.set("page", "/admin/demo.html");
     }
 
 }

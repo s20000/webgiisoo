@@ -22,18 +22,23 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.giisoo.app.web.admin.setting;
-import com.giisoo.core.bean.Bean;
-import com.giisoo.core.bean.Beans;
-import com.giisoo.core.bean.X;
-import com.giisoo.core.worker.WorkerTask;
 import com.giisoo.framework.web.LifeListener;
 import com.giisoo.framework.web.Module;
 import com.giisoo.demo.web.admin.demosetting;
 
+/**
+ * lifelistener, it will be called when the module start
+ * 
+ * @author joe
+ *
+ */
 public class DemoListener implements LifeListener {
 
     static Log log = LogFactory.getLog(DemoListener.class);
 
+    /**
+     * be called when starting
+     */
     public void onStart(final Configuration conf, final Module module) {
 
         log.warn("WEBDEMO is starting");

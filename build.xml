@@ -13,7 +13,7 @@
 	</target>
 
 	<target name="zip" description="build sever all">
-		<delete file="target/webgiisoo_*.zip" />
+		<delete file="target/giisoo_*.zip" />
 
 		<replaceregexp byline="true">
 			<fileset file="target/webgiisoo/modules/default/view/release.txt" />
@@ -35,7 +35,7 @@
 			<fileset dir="target/webgiisoo/modules/default/view/docs/" includes="giisoo_*.tar.gz" />
 		</delete>
 
-		<zip destfile="target/webgiisoo_${version}_${BUILDNO}.zip">
+		<zip destfile="target/giisoo_${version}_upgrade_${BUILDNO}.zip">
 			<fileset dir="target/webgiisoo/modules/default">
 				<exclude name="**/WEB-INF/classes/**" />
 				<exclude name="**/model/com/**" />
@@ -43,7 +43,7 @@
 		</zip>
 
 		<copy todir="../archieves">
-			<fileset file="target/webgiisoo_${version}_${BUILDNO}.zip" />
+			<fileset file="target/giisoo_${version}_upgrade_${BUILDNO}.zip" />
 		</copy>
 
 	</target>

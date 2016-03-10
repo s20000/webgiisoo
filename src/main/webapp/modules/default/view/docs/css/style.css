@@ -73,6 +73,7 @@ a:hover {
 #foot .center {
 	border-top: 0;
 	overflow: visible;
+	width: 100%;
 }
 
 #content .center {
@@ -103,7 +104,6 @@ ul.navigation a {
 
 #foot {
     width: 100%;
-    background: RGBA(0,0,0,0.1);
     height: 32px;
     padding: 0;
     position: fixed;

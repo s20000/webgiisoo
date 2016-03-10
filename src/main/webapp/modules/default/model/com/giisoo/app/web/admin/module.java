@@ -112,7 +112,7 @@ public class module extends Model {
 
             create(out, name + "/src/").closeEntry();
             create(out, name + "/src/module.ini");
-            println(out, "id=" + id, "enabled=true", "default.language=zh_cn", "name=" + name, "package=" + package1, "lifelistener=" + lifelistener, "screenshot=/images/" + name + "-screenshot.png",
+            println(out, "id=" + id, "enabled=true", "default.language=zh_cn", "name=" + name, "package=" + package1, "lifelistener=" + lifelistener, "screenshot=/images/demo-screenshot.png",
                     "readme=" + readme, "version=1.0", "build=0");
             out.closeEntry();
 
@@ -205,6 +205,22 @@ public class module extends Model {
             create(out, name + "/src/model/java/" + p1.substring(0, p1.lastIndexOf("/")) + "/bean/").closeEntry();
             create(out, name + "/src/model/java/" + p1 + "/admin/").closeEntry();
 
+            // copy Demo.java
+            create(out, name + "/src/model/java/" + p1.substring(0, p1.lastIndexOf("/")) + "/bean/Demo.java");
+            f1 = module.getFile("/admin/demo/src/model/Demo.java");
+            if (f1 != null) {
+                copy(out, f1, new String[] { "com.giisoo.demo.bean", (p1.substring(0, p1.lastIndexOf("/")) + "/bean").replaceAll("/", ".") });
+            }
+            out.closeEntry();
+
+            // copy demo.java
+            create(out, name + "/src/model/java/" + p1 + "/demo.java");
+            f1 = module.getFile("/admin/demo/src/model/demo.java");
+            if (f1 != null) {
+                copy(out, f1, new String[] { "com.giisoo.demo.web", p1.replaceAll("/", ".") });
+            }
+            out.closeEntry();
+
             if (!X.isEmpty(lifelistener)) {
                 create(out, name + "/src/model/java/" + lifelistener.replaceAll("\\.", "/") + ".java");
                 if (!X.isEmpty(setting)) {
@@ -285,9 +301,8 @@ public class module extends Model {
                         }
                     }
                 }
-                if (!X.isEmpty(line)) {
-                    o.println(line);
-                }
+                o.println(line);
+
                 line = in.readLine();
             }
         } finally {

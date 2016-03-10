@@ -20,6 +20,7 @@ public class device extends Model {
 
         this.set("ip", this.getRemoteHost());
         this.set("headers", this.getHeaders());
+        this.set("node", Model.node());
         this.show("/device.html");
     }
 }

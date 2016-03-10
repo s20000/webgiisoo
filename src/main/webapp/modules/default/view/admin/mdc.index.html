@@ -1,5 +1,9 @@
 <div class='head'>$lang.get('mdc.index.title')</div>
 
+<div class='notes'>
+	管理MDC通信节点和查看状态，关于更多MDC, 请参见<a href='/docs/index.html' target='_blank'>帮助</a>
+</div>
+
 #parse('/widget/widget.message.html')
 
 #parse('/admin/mdc.tabs.html')
@@ -11,6 +15,7 @@
 			<th>$lang.get('head.capability')</th>
 			<th>$lang.get('head.user')</th>
 			<th>$lang.get('head.uid')</th>
+			<th>UUID</th>
 			<th>$lang.get('head.mq')</th>
 			<th>$lang.get('head.updated')</th>
 			<th>$lang.get('head.ip')</th>
@@ -24,7 +29,8 @@
 		<td><input type='checkbox' name='clientid' value='$f.clientid'/>$f.clientid</td>
 		<td>#if($d.isSupportZip())<i>zip</i>#end #if($f.isSupportEncode())<i>RSA/3DES</i>#end</td>
 		<td>$!f.user.name</td>
-		<td>$f.user.id</td>
+		<td>$!f.user.id</td>
+		<td>$!f.password</td>
 		<td>#if($f.address) $f.address #end</td>
 		<td>$lang.format($f.updated) ($lang.past($f.updated))</td>
 		<td>#if($f.ip) $f.ip #end</td>

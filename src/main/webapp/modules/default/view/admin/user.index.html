@@ -27,6 +27,7 @@
 			<th>$lang.get('user.name')</th>
 			<th>$lang.get('user.nickname')</th>
 			<th>$lang.get('user.title')</th>
+			<th>$lang.get('user.email')</th>
 			<th>$lang.get('user.phone')</th>
 			<th>$lang.get('user.roles')</th>
 #if($edit)
@@ -41,6 +42,7 @@
 		<td class='name'><a href='/admin/user/detail?id=$f.id'>#if($f.name)$f.name#end</a></td>
 		<td>$!f.nickname</td>
 		<td>$!f.title</td>
+		<td>$!f.email</td>
 		<td>$!f.phone</td>
 		<td>#foreach($r in $f.role.list)<i class='role'>$r.name</i>#end</td>
 		#if($edit)

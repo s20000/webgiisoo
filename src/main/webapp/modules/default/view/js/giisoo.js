@@ -451,7 +451,12 @@ function load(uri) {
 				},
 				success : function(d, status, xhr) {
 					processing && processing.hide();
-					show(d);
+					var resp = {"status":xhr.getResponseHeader('status')};
+					if(resp.status == '401') {
+						window.location.href="/";
+					} else {
+						show(d);
+					}
 				}
 			})
 }
