@@ -191,4 +191,8 @@ public class App extends Bean {
         return Bean.load(q, order, s, n, App.class);
     }
 
+    public static void delete(String appid) {
+        Bean.delete(new BasicDBObject(X._ID, appid), App.class);
+    }
+
 }

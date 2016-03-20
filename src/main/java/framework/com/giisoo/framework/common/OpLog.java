@@ -38,7 +38,7 @@ public class OpLog extends Bean {
      * @return the int
      */
     public static int remove() {
-        return Bean.delete(null, null, OpLog.class);
+        return Bean.delete(new BasicDBObject(), OpLog.class);
     }
 
     /**

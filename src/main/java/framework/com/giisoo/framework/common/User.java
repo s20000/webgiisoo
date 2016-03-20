@@ -359,6 +359,9 @@ public class User extends Bean {
     @SuppressWarnings("unchecked")
     public void setRole(long rid) {
         List<Long> roles = (List<Long>) this.get("roles");
+        if (roles == null) {
+            roles = new ArrayList<Long>();
+        }
 
         if (!roles.contains(rid)) {
             // add

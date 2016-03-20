@@ -17,6 +17,15 @@ import com.mongodb.BasicDBObject;
  */
 public class accesslog extends Model {
 
+    @Path(path = "stat", login = true, access = "acess.config.admin")
+    public void stat() {
+        String name = this.getString("name");
+        this.set("m", AccessLog.distinct(name));
+        this.set("name", name);
+        
+        this.show("/admin/accesslog.stat.html");
+    }
+
     @Path(login = true, access = "acess.config.admin")
     public void onGet() {
         String uri = this.getString("guri");

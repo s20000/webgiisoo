@@ -2559,35 +2559,6 @@ td.more {
 	margin: 2px 10px;
 }
 
-.fileupload .fileupload-cancel {
-	float: left;
-	line-height: 22px;
-	display: inline-block;
-	-webkit-appearance: none;
-	-moz-appearance: none;
-	-webkit-transition: .5s ease;
-	-moz-transition: .5s ease;
-	-o-transition: .5s ease;
-	-ms-transition: .5s ease;
-	transition: .5s ease;
-	font-family: inherit;
-	box-sizing: border-box;
-	font-size: 1rem;
-	text-align: center;
-	border: none;
-	text-shadow: none;
-	-webkit-border-radius: .4rem;
-	-moz-border-radius: .4rem;
-	border-radius: .4rem;
-	vertical-align: middle;
-	cursor: pointer;
-	background-color: #009df5;
-	color: #fff;
-	text-decoration: none;
-	margin: 2px 0;
-	padding: 0 10px;
-}
-
 .fileupload .fileupload-filename {
 	line-height: 26px;
 	height: 26px;
@@ -2679,8 +2650,55 @@ td.more {
 	display: none;
 }
 
-button:hover, .fileupload .fileupload-cancel:hover {
+.fileupload .fileupload-cancel, .fileupload .fileupload-resume {
+	float: left;
+	line-height: 22px;
+	display: inline-block;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	-webkit-transition: .5s ease;
+	-moz-transition: .5s ease;
+	-o-transition: .5s ease;
+	-ms-transition: .5s ease;
+	transition: .5s ease;
+	font-family: inherit;
+	box-sizing: border-box;
+	font-size: 1rem;
+	text-align: center;
+	border: none;
+	text-shadow: none;
+	-webkit-border-radius: .4rem;
+	-moz-border-radius: .4rem;
+	border-radius: .4rem;
+	vertical-align: middle;
+	cursor: pointer;
+	background-color: #009df5;
+	color: #fff;
+	text-decoration: none;
+	margin: 2px 2px;
+	padding: 0 10px;
+}
+
+.fileupload .fileupload-cancel {
+	background-color: #F59F00;
+}
+
+.fileupload .fileupload-resume {
+	background-color: #00B1F5;
+}
+
+button:hover {
 	background-color: #1B65A2;
+	box-shadow: 0 0 4px #009DF5;
+}
+
+.fileupload .fileupload-cancel:hover {
+	background-color: #F57100;
+	box-shadow: 0 0 4px #009DF5;
+}
+
+.fileupload .fileupload-resume:hover {
+	background-color: #008FF5;
 	box-shadow: 0 0 4px #009DF5;
 }
 
@@ -2910,4 +2928,115 @@ table .state_0 .state, table .state_0 .state, table .state_0 .state1,
 	float: left;
 	width: 30%;
 	border: 0;
+}
+
+.treeselect {
+	width: 178px;
+	height: 32px;
+	border: 1px solid #28394B;
+	color: #000;
+	line-height: 32px;
+	position: relative;
+	font-size: 12px;
+	background: #fff;
+}
+
+.treeselect-a span {
+	position: absolute;
+	width: 0px;
+	height: 0px;
+	border-left: 5px solid transparent;
+	border-right: 5px solid transparent;
+	border-top: 5px solid #000;
+	font-size: 0px;
+	line-height: 0px;
+	right: 8px;
+	top: 12px;
+}
+
+.treeselect .treeselect-link {
+	display: block;
+	padding-left: 12px;
+	height: 32px;
+	position: relative;
+	overflow: hidden;
+	white-space: nowrap;
+}
+
+.treeselect .treeselect-cont {
+	position: absolute;
+	left: -1px;
+	top: 31px;
+	width: 100%;
+	z-index: 2;
+	background: #fff;
+	display: none;
+	border: 1px solid #000;
+	overflow-y: auto;
+	max-height: 200px;
+	overflow-x: hidden;
+}
+
+.treeselect-node {
+	width: 100%;
+	line-height: 32px;
+	color: #000;
+	overflow: hidden;
+	white-space: nowrap;
+	cursor: pointer;
+	position: relative;
+}
+
+.treeselect-list {
+	display: none;
+}
+
+.treeselect-branch.open>.treeselect-list {
+	display: inline-block;
+	float: left;
+	width: 100%;
+	margin-left: 10px;
+}
+
+.treeselect-a .active {
+	border-left: 5px solid transparent;
+	border-right: 5px solid transparent;
+	border-bottom: 5px solid #000;
+	border-top: none;
+}
+
+.treeselect-node>span {
+	width: 100%;
+	display: inline-block;
+}
+
+.treeselect-node:hover>span {
+	background: #4d90fe;
+	color: #fff;
+}
+
+.treeselect-node.open>span {
+	background: #aaa;
+}
+
+.treeselect-node.selected>span {
+	background: #1f5dc4;
+	color: #fff;
+}
+
+.treeselect-node>span:before {
+	content: ' ';
+	width: 8px;
+	overflow: hidden;
+	height: 32px;
+	display: inline-block;
+	float: left;
+}
+
+.treeselect-branch>span:before {
+	content: '+';
+}
+
+.treeselect-branch.open>span:before {
+	content: '-';
 }

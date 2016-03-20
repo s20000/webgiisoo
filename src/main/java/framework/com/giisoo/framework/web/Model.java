@@ -402,6 +402,8 @@ public class Model {
                                     // log.debug("invoking: " + m.getName());
 
                                     try {
+
+                                        this.setHeader("Cache-Control", "no-cache");
                                         m.invoke(this, params);
 
                                         if ((pp.log() & method.method) > 0) {
@@ -504,6 +506,7 @@ public class Model {
                 // log.info(require);
                 if (require == null || !require.login() || (me != null && (require.access() == null || X.NONE.equals(require.access()) || me.hasAccess(require.access())))) {
 
+                    this.setHeader("Cache-Control", "no-cache");
                     onGet();
                 } else if (me == null) {
                     /**
@@ -548,6 +551,8 @@ public class Model {
                 User me = this.getUser();
                 this.set("me", me);
                 if (require == null || !require.login() || (me != null && (require.access() == null || X.NONE.equals(require.access()) || me.hasAccess(require.access())))) {
+
+                    this.setHeader("Cache-Control", "no-cache");
                     onPost();
                 } else if (me == null) {
                     /**
@@ -629,7 +634,7 @@ public class Model {
             jo.put(X.STATE, 401);
             this.setHeader("status", "401");
             jo.put(X.STATE, 401);
-            
+
             jo.put(X.MESSAGE, "请重现登录！");
             jo.put(X.ERROR, "没有登录信息！");
             // this.redirect("/user/login/popup");
@@ -831,7 +836,11 @@ public class Model {
      *            the value
      */
     final protected void setHeader(String name, String value) {
-        resp.setHeader(name, value);
+        if (resp.containsHeader(name)) {
+            resp.setHeader(name, value);
+        } else {
+            addHeader(name, value);
+        }
     }
 
     /**
@@ -1816,6 +1825,19 @@ public class Model {
         } else {
             responseJson(jo.toString());
         }
+    }
+
+    /**
+     * response "json" to end-user directly
+     * 
+     * @param state
+     * @param message
+     */
+    final protected void response(int state, String message) {
+        JSONObject jo = new JSONObject();
+        jo.put(X.STATE, 200);
+        jo.put(X.MESSAGE, message);
+        this.response(jo);
     }
 
     /**

@@ -106,8 +106,8 @@ public class SyncTask extends WorkerTask {
      * @param collection
      * @param order
      */
-    public static void register(String collection, String order) {
-        register(collection, collection, order);
+    public static void register(String collection, String order, int number) {
+        register(collection, collection, order, number);
     }
 
     /**
@@ -117,8 +117,8 @@ public class SyncTask extends WorkerTask {
      * @param collection
      * @param order
      */
-    public static void register(String parent, String collection, String order) {
-        register(parent, collection, order, null);
+    public static void register(String parent, String collection, String order, int number) {
+        register(parent, collection, order, null, number);
     }
 
     /**
@@ -129,8 +129,8 @@ public class SyncTask extends WorkerTask {
      * @param order
      * @param filter
      */
-    public static void register(String parent, String collection, String order, IFilter filter) {
-        register(parent, collection, order, filter, new Type[] { Type.set, Type.get });
+    public static void register(String parent, String collection, String order, IFilter filter, int number) {
+        register(parent, collection, order, filter, new Type[] { Type.set, Type.get }, number);
     }
 
     /**
@@ -142,11 +142,13 @@ public class SyncTask extends WorkerTask {
      * @param filter
      * @param t
      */
-    public static void register(String parent, String collection, String order, IFilter filter, Type[] t) {
+    public static void register(String parent, String collection, String order, IFilter filter, Type[] t, int number) {
         DataFilter df = new DataFilter();
         df.order = order;
         df.filter = filter;
         df.type = t;
+        df.number = number;
+
         collections.put(collection, df);
         List<String> list = groups.get(parent);
         if (list == null) {
@@ -345,5 +347,6 @@ public class SyncTask extends WorkerTask {
         IFilter filter;
         Type[] type;
         String order;
+        int number = 10;
     }
 }

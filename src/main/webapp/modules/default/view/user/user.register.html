@@ -1,56 +1,32 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
-<meta http-equiv="X-UA-Compatible" content="IE=10" />
+#parse('/user/head.html')
 
-<link rel="shortcut icon" href="/favicon.ico"
-	type="image/vnd.microsoft.icon" />
-<title>#if($browser_title) $browser_title | #end
-	$lang.get('browser.title')</title>
-<link href='/css/giisoo.min.css' rel='stylesheet' />
-<link href='/css/user.css' rel='stylesheet' />
-<link href='/css/user1.css' rel='stylesheet' />
-
-<script type="text/javascript" src="/js/jquery-1.10.js"></script>
-</head>
-<body>
-	<div id='wrapper'>
+	<div id='wrapper' class='register'>
 		<div id='head'>
 			<div class='center'>
 				<div class='logo'>$lang.get('site.logo')</div>
-				<div class='title'>$lang.get('site.title')</div>
 			</div>
 		</div>
 
-		<div id="content" class="login">
+		<div id="content">
 			<div class='center'>
 				<div class='outter'>
 					<div class='inner'>
-
-
-					<form method="post" class="register">
+					<form method="post">
 					#if($message)<div class='message'>$message</div>#end
 						<div class="title">
 							<span class="lock"></span>$lang.get('user.register')
 						</div>
 						<div class="left">
-							<div><label>$lang.get('user.name'):</label><input type="text" name="name" value=""></div>
-							<div class='note'>$lang.get('user.name.note')</div>
-							<div><label>$lang.get('user.nickname'):</label><input type="text" name="nickname" value=""></div>
-							<div class='note'>$lang.get('user.nickname.note')</div>
-							<div><label>$lang.get('user.email'):</label><input type="text" name="email" value=""></div>
-							<div class='note'>$lang.get('user.email.note')</div>
-							<div><label>$lang.get('user.mobile'):</label><input type="text" name="mobile" value=""></div>
-							<div class='note'>$lang.get('user.mobile.note')</div>
-							<div><label>$lang.get('user.pwd'):</label><input type="password" name="pwd" value=""></div>
+							<div><label><h3>$lang.get('user.name'):</h3><input type="text" name="name" value=""><g>$lang.get('user.name.note')</g></label></div>
+							<div><label><h3>$lang.get('user.nickname'):</h3><input type="text" name="nickname" value=""><g>$lang.get('user.nickname.note')</g></label></div>
+							<div><label><h3>$lang.get('user.email'):</h3><input type="text" name="email" value=""><g>$lang.get('user.email.note')</g></label></div>
+							<div><label><h3>$lang.get('user.mobile'):</h3><input type="text" name="mobile" value=""><g>$lang.get('user.mobile.note')</g></label></div>
+							<div><label><h3>$lang.get('user.pwd'):</h3><input type="password" name="pwd" value=""></label></div>
 							<div class="btn">
 								<button type="submit">$lang.get('btn.register')</button>
 							</div>
 						</div>
 					</form>
-
-
 
 					</div>
 				</div>
@@ -67,5 +43,5 @@
 			</div>
 		</div>
 	</div>
-</body>
-</html>
+
+#parse('/user/foot.html')

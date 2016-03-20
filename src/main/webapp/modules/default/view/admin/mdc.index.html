@@ -21,12 +21,13 @@
 			<th>$lang.get('head.ip')</th>
 			<th>$lang.get('head.sent')</th>
 			<th>$lang.get('head.received')</th>
+			<th></th>
 		</tr>
 	</thead>
 	<tbody>
 #foreach($f in $list)
 	<tr>
-		<td><input type='checkbox' name='clientid' value='$f.clientid'/>$f.clientid</td>
+		<td>$f.clientid</td>
 		<td>#if($d.isSupportZip())<i>zip</i>#end #if($f.isSupportEncode())<i>RSA/3DES</i>#end</td>
 		<td>$!f.user.name</td>
 		<td>$!f.user.id</td>
@@ -36,16 +37,15 @@
 		<td>#if($f.ip) $f.ip #end</td>
 		<td>$lang.size($f.sent)</td>
 		<td>$lang.size($f.received)</td>
+		<td>
+			<a href='/admin/mdc/close?clientid=$f.clientid'>$lang.get('a.close')</a>
+		</td>
 	</tr>
 #end
 	</tbody>
 </table>
 
  #parse('/widget/goto.page.html')
-
-<div class='btns'>
-	<a href='javascript:;' onclick='_post("/admin/mdc/close");'>$lang.get('a.close')</a>
-</div>
 
 <script>
 $('#user-table').tablesorter();

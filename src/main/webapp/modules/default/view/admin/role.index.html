@@ -11,26 +11,26 @@
 <table id='role-table' class='tablesorter nospace' border="0" cellpadding="0" cellspacing="1">
 	<thead>
 		<tr>
-#if($edit)
-			<th class='checkbox'><label><input type='checkbox'/>$lang.get('select.all')</label></th>
-#end
 			<th>ID</th>
 			<th>$lang.get('role.name')</th>
 			<th>$lang.get('role.memo')</th>
+#if($edit)
+			<th></th>
+#end			
 		</tr>
 	</thead>
 	<tbody>
 #foreach($f in $list)
 	<tr>
-	#if($edit)
-		<td class='checkbox'><input type='checkbox' name='id' value='$f.id'/></td>
-		<td>$f.id</td>
-		<td><a href='/admin/role/edit?id=$f.id'>$f.name</a></td>
-	#else
 		<td>$f.id</td>
 		<td>$f.name</td>
-	#end
 		<td>#if($f.memo)$f.memo#end</td>
+	#if($edit)
+		<td>
+			<a href="/admin/role/edit?id=$f.id">$lang.get('a.edit')</a>
+			<a href="javascript:;" onclick="_delete('$f.id', this)">$lang.get('a.delete')</a>
+		</td>
+	#end
 	</tr>
 #end
 	</tbody>
@@ -41,15 +41,15 @@
 <div class='btns'>
 #if($edit)
 	<a href='/admin/role/add'>$lang.get('a.add')</a>
-	<a href='javascript:;' onclick='_post("/admin/role/edit", "#role-table", 1);'>$lang.get('a.edit')</a>
-	<a href='javascript:;' onclick='_post("/admin/role/delete", "#role-table", -1);'>$lang.get('a.delete')</a>
 #end
 </div>
 
 <script>
-#if($edit)
-$('#user-table').tablesorter({headers:{0:{sorter:false}}});
-#else
-	$('#user-table').tablesorter();
-#end	
+function _delete(id, o) {
+	if(confirm('确认删除？')) {
+		$.post('/admin/rolle/delete', {id: id}, function(d){
+			$(o).parent().parent().remove();
+		})
+	}
+}
 </script>

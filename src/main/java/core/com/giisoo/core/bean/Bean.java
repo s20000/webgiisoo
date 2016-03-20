@@ -4242,8 +4242,16 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
     public static List<Object> distinct(String key, BasicDBObject q, Class<? extends Bean> t) {
         String collection = Bean.getCollection(t);
         if (!X.isEmpty(collection)) {
-            DBCollection c = Bean.getCollection(collection);
-            return c.distinct(key, q);
+            TimeStamp t1 = TimeStamp.create();
+            try {
+                KeyField.create(collection, new BasicDBObject(q).append(key, 1), null);
+
+                DBCollection c = Bean.getCollection(collection);
+                return c.distinct(key, q);
+            } finally {
+                if (log.isDebugEnabled())
+                    log.debug("disinct[" + key + "] cost=" + t1.past() + "ms,  collection=" + collection + ", query=" + q);
+            }
         }
         return null;
     }
@@ -4258,44 +4266,18 @@ public abstract class Bean extends DefaultCachable implements Map<String, Object
     public static long count(BasicDBObject q, Class<? extends Bean> t) {
         String collection = Bean.getCollection(t);
         if (!X.isEmpty(collection)) {
-            DBCollection c = Bean.getCollection(collection);
-            return c.count(q);
+            TimeStamp t1 = TimeStamp.create();
+            try {
+                KeyField.create(collection, q, null);
+
+                DBCollection c = Bean.getCollection(collection);
+                return c.count(q);
+            } finally {
+                if (log.isDebugEnabled())
+                    log.debug("count(*) cost=" + t1.past() + "ms,  collection=" + collection + ", query=" + q);
+            }
         }
         return 0;
-    }
-
-    /**
-     * repair collection, add "updated"
-     * 
-     * @return long of updated
-     */
-    public static long repair() {
-        Set<String> collections = Bean.getDB().getCollectionNames();
-        long i = 0;
-        for (String name : collections) {
-            if (!name.startsWith("system.")) {
-                i += repair(name);
-            }
-        }
-        return i;
-    }
-
-    private static long repair(String name) {
-        long i = 0;
-        DBCollection c = Bean.getCollection(name);
-        DBCursor cur = c.find(new BasicDBObject("updated", new BasicDBObject("$exists", false)));
-        try {
-            while (cur.hasNext()) {
-                DBObject d = cur.next();
-                c.update(new BasicDBObject(X._ID, d.get(X._ID)), new BasicDBObject("$set", new BasicDBObject("updated", i++)));
-            }
-            if (i > 0 && log.isInfoEnabled()) {
-                log.info("repair " + name + ": " + i);
-            }
-        } finally {
-            cur.close();
-        }
-        return i;
     }
 
 }

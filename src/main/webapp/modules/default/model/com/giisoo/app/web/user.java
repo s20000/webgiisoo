@@ -7,6 +7,7 @@ package com.giisoo.app.web;
 
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpSession;
@@ -17,6 +18,7 @@ import net.sf.json.JSONObject;
 import com.giisoo.core.bean.Bean;
 import com.giisoo.core.bean.Beans;
 import com.giisoo.core.bean.Bean.V;
+import com.giisoo.core.bean.UID;
 import com.giisoo.core.bean.X;
 import com.giisoo.core.conf.SystemConfig;
 import com.giisoo.framework.common.App;
@@ -24,6 +26,7 @@ import com.giisoo.framework.common.Cluster.Counter;
 import com.giisoo.framework.common.OpLog;
 import com.giisoo.framework.common.Session;
 import com.giisoo.framework.common.User;
+import com.giisoo.framework.common.giException;
 import com.giisoo.framework.mdc.TConn;
 import com.giisoo.framework.web.Model;
 import com.giisoo.framework.web.Path;
@@ -94,10 +97,15 @@ public class user extends Model {
                 }
 
                 return;
-            } catch (Exception e) {
+            } catch (giException e) {
                 log.error(e.getMessage(), e);
-
-                this.put(X.MESSAGE, lang.get("create_user_error"));
+                if (e.getState() == -1) {
+                    this.put(X.MESSAGE, lang.get("create_user_error_1"));
+                } else if (e.getState() == -2) {
+                    this.put(X.MESSAGE, lang.get("create_user_error_2"));
+                } else {
+                    this.put(X.MESSAGE, lang.get("create_user_error"));
+                }
                 OpLog.log(User.class, "register", lang.get("create.failed") + ":" + name);
             }
 
@@ -929,10 +937,34 @@ public class user extends Model {
     /**
      * Forget.
      */
-    @Path(path = "forget", login = true)
+    @Path(path = "forget")
     public void forget() {
 
-        this.set("me", this.getUser());
+        if (method.isPost()) {
+            String email = this.getString("email");
+            int s = 0;
+            BasicDBObject q = new BasicDBObject("email", email);
+            Beans<User> bs = User.load(q, s, 10);
+            List<String> list = new ArrayList<String>();
+            while (bs != null && bs.getList() != null && bs.getList().size() > 0) {
+                for (User u : bs.getList()) {
+                    if (!u.isDeleted()) {
+                        String token = UID.id(u.getId(), System.currentTimeMillis());
+                        u.update(V.create("reset_token", token).set("token_expired", System.currentTimeMillis() + X.ADAY));
+                        list.add("/user/reset?email=" + email + "&token=" + token);
+                    }
+                }
+                s += bs.getList().size();
+                bs = User.load(q, s, 10);
+            }
+
+            if (list.size() > 0) {
+                this.set("sent", 1);
+            } else {
+                this.set(X.MESSAGE, lang.get("invalid.email"));
+            }
+            this.set("email", email);
+        }
 
         show("/user/user.forget.html");
 

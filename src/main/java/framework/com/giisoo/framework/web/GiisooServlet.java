@@ -130,12 +130,12 @@ public class GiisooServlet extends HttpServlet {
 
             System.out.println("tomcat.home=" + Model.GIISOO_HOME);
             System.out.println("giisoo.home=" + Model.GIISOO_HOME);
-            System.out.println("webgiisoo.home=" + Model.HOME);
+            // System.out.println("webgiisoo.home=" + Model.HOME);
 
             log.info("webgiisoo is starting ...");
             log.info("tomcat.home=" + Model.GIISOO_HOME);
             log.info("giisoo.home=" + Model.GIISOO_HOME);
-            log.info("webgiisoo.home=" + Model.HOME);
+            // log.info("webgiisoo.home=" + Model.HOME);
 
             System.setProperty("home", home);
 

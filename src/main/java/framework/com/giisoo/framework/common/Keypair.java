@@ -128,4 +128,8 @@ public class Keypair extends Bean {
         return Bean.load(new BasicDBObject(X._ID, created), Keypair.class);
     }
 
+    public static void delete(long created) {
+        Bean.delete(new BasicDBObject(X._ID, created), Keypair.class);
+    }
+
 }

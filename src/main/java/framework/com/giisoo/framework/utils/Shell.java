@@ -131,4 +131,23 @@ public class Shell {
     public interface IPrint {
         void print(String line);
     }
+
+    public static boolean isLinux() {
+        try {
+            String uname = Shell.run("uname -a");
+            return uname.indexOf("Linux") > -1;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public static boolean isUbuntu() {
+        try {
+            String uname = Shell.run("uname -a");
+            return uname.indexOf("Ubuntu") > -1;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
 }

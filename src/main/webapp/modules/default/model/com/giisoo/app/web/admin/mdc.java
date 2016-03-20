@@ -34,7 +34,8 @@ public class mdc extends Model {
     public void onGet() {
         int s = this.getInt("s");
         int n = this.getInt("n", 10, "number.per.page");
-        Beans<TConn> bs = TConn.load(new BasicDBObject("uid", new BasicDBObject("$gt", 0)), s, n);
+        Beans<TConn> bs = TConn.load(new BasicDBObject("updated", new BasicDBObject("$gt", System.currentTimeMillis() - 5 * X.AMINUTE)).append("uid", new BasicDBObject("$gte", TConn.UID_INVALID)), s,
+                n);
         this.set(bs, s, n);
 
         this.query.path("/admin/mdc");

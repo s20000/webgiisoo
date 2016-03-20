@@ -94,7 +94,21 @@
 
 #parse('/widget/goto.page.html')
 
+<div class='btns'>
+	<a href='javascript:;' onclick='_deleteall();'>$lang.get('a.clean')</a>
+</div>
+
 <script>
+function _deleteall() {
+	if(confirm('确认删除所有操作日志？')) {
+		processing && processing.show();
+		$.post('/admin/log/deleteall', {}, function(d) {
+			processing && processing.hide();
+			reload();
+		});
+	}
+}
+
 function _showmore(obj){
 	var e = $(obj);
 	e = e.parent().find('div.more');

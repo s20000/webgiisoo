@@ -6,6 +6,8 @@
 package com.giisoo.framework.common;
 
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 import com.giisoo.core.bean.Bean;
@@ -73,8 +75,20 @@ public class AccessLog extends Bean {
         Bean.delete(new BasicDBObject(), AccessLog.class);
     }
 
-    public static List<Object> distinct() {
-        return Bean.distinct("url", new BasicDBObject("status", 200), AccessLog.class);
+    /**
+     * 
+     * @param name
+     * @return Map
+     */
+    public static Map<Object, Long> distinct(String name) {
+        List<Object> list = Bean.distinct(name, new BasicDBObject("status", 200), AccessLog.class);
+        Map<Object, Long> m = new TreeMap<Object, Long>();
+        for (Object v : list) {
+            long d = Bean.count(new BasicDBObject(name, v).append("status", 200), AccessLog.class);
+            m.put(v, d);
+        }
+
+        return m;
     }
 
 }

@@ -36,6 +36,14 @@ import com.mongodb.BasicDBObject;
  */
 public class log extends Model {
 
+    @Path(path = "deleteall", login = true, access = "access.config.admin")
+    public void deleteall() {
+        JSONObject jo = new JSONObject();
+        OpLog.remove();
+        jo.put(X.STATE, 200);
+        this.response(jo);
+    }
+
     /**
      * Popup2.
      */

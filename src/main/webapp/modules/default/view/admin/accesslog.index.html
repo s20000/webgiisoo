@@ -1,7 +1,7 @@
 <div class='head'>访问记录</div>
 
 <div class='notes'>
-	访问记录是webgiisoo框架自动记录的web访问信息。
+	访问记录是webgiisoo框架自动记录的web访问信息。在表头上点击右键，可以统计该列值信息。
 </div>
 
 #parse('/widget/widget.message.html')
@@ -37,16 +37,16 @@
 <table id='accesslog-table' class='tablesorter nospace' border="0" cellpadding="0" cellspacing="1">
 	<thead>
 		<tr>
-			<th>URL</th>
-			<th>Method</th>
-			<th>Status</th>
+			<th class='statable' data-name='url'>URL</th>
+			<th class='statable' data-name='method'>Method</th>
+			<th class='statable' data-name='status'>Status</th>
 			<th>Cost(ms)</th>
 			<th>SID</th>
 			<th>UID</th>
 			<th>USERNAME</th>
-			<th>IP</th>
+			<th class='statable' data-name='ip'>IP</th>
 			<th>Created</th>
-			<th style='width:300px'>Client</th>
+			<th class='statable' data-name='client' style='width:300px'>Client</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -69,14 +69,29 @@
 
  #parse('/widget/goto.page.html')
 
+#if($me.hasAccess('access.config.admin'))
 <div class='btns'>
-	<a href='javascript:;' onclick='_deleteall();'>$lang.get('a.delete')</a>
+	<a href='javascript:;' onclick='_deleteall();'>$lang.get('a.clean')</a>
 </div>
+#end
 
 <script>
 $(function(){
 	$('#accesslog-table').tablesorter();
+		
+	$('#accesslog-table th.statable').contextPopup({
+		title : '值查询',
+		items : [ {
+			label : '值统计',
+			icon : '/images/same.png',
+			action : function(e) {
+				e = $(e.target);
+				load('/admin/accesslog/stat?name=' + e.attr('data-name'));
+			}
+		} ]
+	});
 })
+
 function _deleteall() {
 	if(confirm('确认删除所有访问记录？')) {
 		processing && processing.show();

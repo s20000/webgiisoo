@@ -34,12 +34,13 @@
 			<th>$lang.get('head.ip')</th>
 			<th>$lang.get('head.lastlogin')</th>
 			<th>$lang.get('head.created')</th>
+			<th></th>
 		</tr>
 	</thead>
 	<tbody>
 #foreach($f in $list)
 	<tr #if($f.isLocked()) class='deleted' #end>
-		<td><input type='checkbox' name='appid' value='$f.appid'/>$f.appid</td>
+		<td>$f.appid</td>
 		<td>$!f.key</td>
 		<td>#if($f.company)$f.company#end</td>
 		<td>#if($f.contact) $f.contact #end</td>
@@ -47,6 +48,10 @@
 		<td>$!f.ip</td>
 		<td>#if($f.lastlogin>0)$lang.format($f.lastlogin)($lang.past($f.lastlogin))#end</td>
 		<td>$lang.format($f.created)</td>
+		<td>
+			<a href="/admin/app/edit?appid=$f.appid">$lang.get('a.edit')</a>
+			<a href="javascript:;" onclick="_delete('$f.appid', this)">$lang.get('a.delete')</a>
+		</td>
 	</tr>
 #end
 	</tbody>
@@ -56,9 +61,15 @@
 
 <div class='btns'>
 	<a href='/admin/app/add'>$lang.get('a.add')</a>
-	<a href='javascript:;' onclick='_post("/admin/app/edit", "#user-table", 1);'>$lang.get('a.edit')</a>
 </div>
 
 <script>
-$('#user-table').tablesorter();
+function _delete(appid, o) {
+	if(confirm('确认删除？')) {
+		$.post("/admin/app/delete", {appid:appid}, function(d){
+			$(o).parent().parent().remove();
+		})		
+	}	
+}
+
 </script>

@@ -329,7 +329,7 @@ public class Stat extends Bean implements Comparable<Stat> {
      * load the stat
      * 
      * @param q
-     * @return
+     * @return Stat
      */
     public static Stat load(BasicDBObject q) {
         return Bean.load(q, Stat.class);
@@ -340,7 +340,7 @@ public class Stat extends Bean implements Comparable<Stat> {
      * @param module
      * @param date
      * @param uid
-     * @return
+     * @return Stat
      */
     public static Stat load(String module, String date, long uid) {
         return load(new BasicDBObject("module", module).append("date", date).append("uid", uid));

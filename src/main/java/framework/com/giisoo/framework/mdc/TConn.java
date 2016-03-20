@@ -39,6 +39,9 @@ public class TConn extends Bean {
     public static final int STATE_ERROR = 5;
     public static final int STATE_PENDING = 6;
 
+    public static final int UID_INVALID = -1;
+    public static final int UID_DISCONNECTED = -2;
+
     /**
      * test is connected
      * 
@@ -138,7 +141,7 @@ public class TConn extends Bean {
      * get the "object id", if not logined, the id=clientid, if logined, the
      * id=userid
      * 
-     * @return
+     * @return Object
      */
     public Object getId() {
         return this.get("id");
@@ -389,7 +392,7 @@ public class TConn extends Bean {
         long received = this.getReceived() + b.length;
         this.set("received", received);
 
-        this.update(V.create("received", received));
+        this.update(V.create("received", received).set("updated", System.currentTimeMillis()));
 
         Command.process(b, this);
     }
@@ -408,7 +411,7 @@ public class TConn extends Bean {
         }
 
         if (getClientid() != null) {
-            update(getClientid(), V.create("uid", -1));
+            update(getClientid(), V.create("uid", UID_DISCONNECTED));
             set("clientid", null);
 
             TConnCenter.remove(this);
@@ -477,7 +480,7 @@ public class TConn extends Bean {
                         }
 
                         long sent = getSent() + b.length;
-                        update(V.create("sent", sent));
+                        update(V.create("sent", sent).set("updated", System.currentTimeMillis()));
 
                         IoBuffer buf = IoBuffer.allocate(b.length, false);
                         buf.put(b);
@@ -578,7 +581,7 @@ public class TConn extends Bean {
         String password = this.getPassword();
 
         if (locked == 0 && password != null && password.equals(uid)) {
-            if (Bean.updateCollection(new BasicDBObject("clientid", this.getClientid()), V.create("login", 1).set("logined", System.currentTimeMillis()), TConn.class) > 0) {
+            if (Bean.updateCollection(new BasicDBObject("clientid", this.getClientid()), V.create("login", 1).set("uid", UID_INVALID).set("logined", System.currentTimeMillis()), TConn.class) > 0) {
                 valid = true;
 
                 // TConn d = online.get(clientid);
@@ -1025,6 +1028,11 @@ public class TConn extends Bean {
             this.update(V.create("updated", t));
         }
         set("updated", t);
+    }
+
+    public static Beans<TConn> loadConnected(int s, int n) {
+        return Bean.load(new BasicDBObject("updated", new BasicDBObject("$gt", System.currentTimeMillis() - 5 * X.AMINUTE)).append("uid", new BasicDBObject("$gte", UID_INVALID)), new BasicDBObject(
+                X._ID, 1), s, n, TConn.class);
     }
 
 }

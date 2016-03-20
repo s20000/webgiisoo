@@ -9,6 +9,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -18,7 +19,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -39,6 +39,8 @@ import com.giisoo.app.web.admin.sync;
 import com.giisoo.core.bean.Bean;
 import com.giisoo.core.bean.Beans;
 import com.giisoo.core.bean.Bean.V;
+import com.giisoo.core.bean.KeyField;
+import com.giisoo.core.bean.UID;
 import com.giisoo.core.bean.X;
 import com.giisoo.core.conf.Config;
 import com.giisoo.core.conf.SystemConfig;
@@ -221,8 +223,6 @@ public class DefaultListener implements LifeListener {
 
         IP.init(conf);
 
-        NtpTask.owner.schedule(X.AMINUTE);
-
         setting.register("system", setting.system.class);
         setting.register("sync", sync.class);
         setting.register("smtp", setting.mail.class);
@@ -233,12 +233,15 @@ public class DefaultListener implements LifeListener {
 
         Cluster.self = Cluster.load(id);
 
+        NtpTask.owner.schedule(X.AMINUTE);
         HeartbeatTask.owner.schedule(X.AMINUTE);
         new CleanupTask(conf).schedule(X.AMINUTE);
         new StatTask().schedule(X.AMINUTE);
         new SitemapTask().schedule(X.AMINUTE);
         new RestartTask().schedule(X.AMINUTE);
         new VersionCheckTask().schedule(X.AMINUTE);
+        new SorterTask().schedule(X.AMINUTE);
+        new AppdogTask().schedule(X.AMINUTE);
 
         /**
          * initialize the MDCServer
@@ -279,14 +282,6 @@ public class DefaultListener implements LifeListener {
          */
         User.checkAndInit();
 
-        new WorkerTask() {
-
-            @Override
-            public void onExecute() {
-                Bean.repair();
-            }
-
-        }.schedule(10);
     }
 
     /*
@@ -617,6 +612,139 @@ public class DefaultListener implements LifeListener {
 
     }
 
+    private static class SorterTask extends WorkerTask {
+
+        @Override
+        public String getName() {
+            return "sorter.task";
+        }
+
+        @Override
+        public void onExecute() {
+            int s = 0;
+
+            BasicDBObject q = new BasicDBObject("status", new BasicDBObject("$ne", "done"));
+            BasicDBObject order = new BasicDBObject();
+
+            Beans<KeyField> bs = KeyField.load(q, order, s, 10);
+            while (bs != null && bs.getList() != null && bs.getList().size() > 0) {
+
+                for (KeyField f : bs.getList()) {
+                    f.run();
+                }
+                s += bs.getList().size();
+                bs = KeyField.load(q, order, s, 10);
+
+            }
+        }
+
+    }
+
+    /**
+     * check the appdog has been setup proper
+     * 
+     * @author joe
+     *
+     */
+    private static class AppdogTask extends WorkerTask {
+
+        @Override
+        public String getName() {
+            return "appdog.task";
+        }
+
+        @Override
+        public void onExecute() {
+            File f = new File("/etc/init.d/appdog");
+            if (!f.exists()) {
+                // copy one to there
+                f = Module.home.getFile("/admin/clone/etc/init.d/appdog");
+                if (f.exists()) {
+                    // copying
+
+                    if (Shell.isLinux()) {
+                        BufferedReader in = null;
+                        PrintStream out = null;
+                        try {
+                            Shell.run("cp " + f.getCanonicalPath() + " /etc/init.d/");
+                            Shell.run("chmod ugo+x /etc/init.d/appdog");
+
+                            if (Shell.isUbuntu()) {
+                                Shell.run("sysv-rc-conf --add appdog");
+                                Shell.run("sysv-rc-conf appdog on");
+                            } else {
+                                Shell.run("chkconfig --add appdog");
+                                Shell.run("chkconfig appdog on");
+                            }
+
+                            // check the apps.conf
+                            f = Module.home.getFile("/admin/clone/etc/appdog/apps.conf");
+                            Shell.run("mkdir /etc/appdog");
+                            Shell.run("cp " + f.getCanonicalPath() + " /etc/appdog/");
+
+                            // check the application is in appdog ?
+                            f = new File("/etc/appdog/apps.conf");
+                            String bin = Model.GIISOO_HOME + "/bin";
+
+                            in = new BufferedReader(new FileReader(f));
+                            String line = in.readLine();
+                            boolean found = false;
+                            while (line != null) {
+                                if (line.indexOf(bin) > 0) {
+                                    found = true;
+                                    break;
+                                }
+                            }
+                            in.close();
+                            in = null;
+                            if (!found) {
+                                out = new PrintStream(new FileOutputStream(f, true));
+                                /**
+                                 * [app:giisoo_xxxxx]<br>
+                                 * start=/opt/giisoo/bin/startup.sh<br>
+                                 * pattern=/opt/giisoo/bin<br>
+                                 * path=/opt/giisoo/bin<br>
+                                 * user=<br>
+                                 * check=0.5<br>
+                                 * enabled=1<br>
+                                 */
+                                out.println();
+                                out.println("[app:giisoo_" + UID.random(5) + "]");
+                                out.println("start=" + bin + "/startup.sh");
+                                out.println("pattern=" + bin);
+                                out.println("path=" + bin);
+                                out.println("user=");
+                                out.println("check=0.5");
+                                out.println("enabled=1");
+                                out.close();
+                                out = null;
+                            }
+
+                            Shell.run("/etc/init.d/appdog start");
+
+                        } catch (Exception e) {
+                            log.error(e.getMessage(), e);
+                        } finally {
+                            if (in != null) {
+                                try {
+                                    in.close();
+                                } catch (IOException e) {
+                                }
+                            }
+                            if (out != null) {
+                                out.close();
+                            }
+                        }
+                    } else {
+                        log.warn("[webgiisoo] can be more effective in [Linux]");
+                        OpLog.warn(null, "[webgiisoo] can be more effective in [Linux]", null);
+                    }
+                }
+            }
+
+        }
+    }
+
     private static class RestartTask extends WorkerTask {
 
         @Override
@@ -888,7 +1016,8 @@ public class DefaultListener implements LifeListener {
              * stat all mdc
              */
             date = lang.format(System.currentTimeMillis(), "yyyyMMddHH");
-            count = TConn.count(new BasicDBObject("uid", new BasicDBObject("$gt", 0)).append("updated", new BasicDBObject("$gt", System.currentTimeMillis() - X.AMINUTE * 5)), TConn.class);
+            count = TConn.count(new BasicDBObject("uid", new BasicDBObject("$gte", TConn.UID_INVALID)).append("updated", new BasicDBObject("$gt", System.currentTimeMillis() - X.AMINUTE * 5)),
+                    TConn.class);
             Stat s = Stat.load("mdc", date, 0L);
             if (s == null || s.getCount() < count) {
                 Stat.insertOrUpdate("mdc", date, 0L, count);
@@ -912,14 +1041,19 @@ public class DefaultListener implements LifeListener {
 
     }
 
-    @SuppressWarnings("unused")
+    /**
+     * create sitemap.txt for SE spider
+     * 
+     * @author joe
+     *
+     */
     private static class SitemapTask extends WorkerTask {
 
         @Override
         public void onExecute() {
 
             // get all url
-            List<Object> list = AccessLog.distinct();
+            Map<Object, Long> list = AccessLog.distinct("url");
 
             if (list != null && list.size() > 0) {
                 String name = "sitemap.txt";
@@ -934,7 +1068,7 @@ public class DefaultListener implements LifeListener {
                 try {
                     out = new PrintStream(new FileOutputStream(f));
                     out.println("/");
-                    for (Object u : list) {
+                    for (Object u : list.keySet()) {
                         out.println(u);
                     }
                     out.println();

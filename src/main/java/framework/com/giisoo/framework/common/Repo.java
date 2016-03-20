@@ -250,8 +250,6 @@ public class Repo extends Bean {
      * 
      * @param id
      *            the id
-     * @param uid
-     *            the uid
      * @return the int
      */
     public static int delete(String id) {

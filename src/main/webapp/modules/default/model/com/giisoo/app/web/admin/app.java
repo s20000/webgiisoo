@@ -147,10 +147,17 @@ public class app extends Model {
         onGet();
     }
 
+    @Path(path = "delete", login = true, access = "access.config.admin")
+    public void delete() {
+        String appid = this.getString("appid");
+        App.delete(appid);
+        this.response(200, null);
+    }
+
     /**
      * Edits the.
      */
-    @Path(path = "edit", login = true, access = "access.admin", log = Model.METHOD_POST)
+    @Path(path = "edit", login = true, access = "access.config.admin")
     public void edit() {
         String appid = this.getString("appid");
         if (method.isPost()) {

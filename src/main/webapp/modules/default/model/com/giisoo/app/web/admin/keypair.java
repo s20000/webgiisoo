@@ -13,6 +13,7 @@ import com.giisoo.core.bean.X;
 import com.giisoo.framework.common.Keypair;
 import com.giisoo.framework.web.Model;
 import com.giisoo.framework.web.Paging;
+import com.giisoo.framework.web.Path;
 
 /**
  * web api: /admin/keypair
@@ -65,6 +66,17 @@ public class keypair extends Model {
         this.query.path("/admin/keypair");
 
         this.show("/admin/keypair.index.html");
+    }
+
+    @Path(path = "delete", login = true, access = "access.config.admin")
+    public void delete() {
+        long created = this.getLong("created");
+        Keypair.delete(created);
+
+        JSONObject jo = new JSONObject();
+        jo.put(X.STATE, 200);
+        this.response(jo);
+
     }
 
     /*
